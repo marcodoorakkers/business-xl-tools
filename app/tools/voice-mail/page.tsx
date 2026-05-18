@@ -10,6 +10,7 @@ type Step = "idle" | "recording" | "processing" | "preview" | "sending" | "done"
 
 export default function VoiceMailPage() {
   const [step, setStep] = useState<Step>("idle");
+  const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [transcript, setTranscript] = useState("");
@@ -20,10 +21,12 @@ export default function VoiceMailPage() {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
-  async function getUserEmail() {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user?.email ?? "";
-  }
+  // Pre-fill email from logged-in account
+  useState(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email) setEmail(user.email);
+    });
+  });
 
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -76,7 +79,6 @@ export default function VoiceMailPage() {
   async function sendDraft() {
     setStep("sending");
     try {
-      const email = await getUserEmail();
       const res = await fetch("/api/tools/send-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -97,6 +99,7 @@ export default function VoiceMailPage() {
     setBody("");
     setTranscript("");
     setErrorMsg("");
+    // email bewaard zodat je niet opnieuw hoeft in te vullen
   }
 
   return (
@@ -111,6 +114,17 @@ export default function VoiceMailPage() {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <h1 className="text-xl font-bold text-gray-900 mb-1">Voice Mail Draft</h1>
           <p className="text-gray-500 text-sm mb-6">Spreek in wat je wilt mailen — de app maakt er een concept mail van. Kost 1 credit.</p>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Stuur concept naar</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="jij@example.com"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
           {(step === "idle" || step === "recording") && (
             <div className="flex flex-col items-center gap-4">
