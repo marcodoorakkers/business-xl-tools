@@ -30,7 +30,8 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
   const isProtected = request.nextUrl.pathname.startsWith("/dashboard") ||
     request.nextUrl.pathname.startsWith("/tools") ||
-    request.nextUrl.pathname.startsWith("/account");
+    request.nextUrl.pathname.startsWith("/account") ||
+    request.nextUrl.pathname.startsWith("/admin");
 
   if (!user && isProtected) {
     return NextResponse.redirect(new URL("/auth/login", request.url));

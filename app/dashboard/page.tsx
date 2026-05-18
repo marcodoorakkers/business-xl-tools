@@ -33,10 +33,11 @@ export default async function DashboardPage() {
     .single();
 
   const credits = profile?.credits ?? 0;
+  const isAdmin = user.email === process.env.ADMIN_EMAIL;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar credits={credits} />
+      <Navbar credits={credits} isAdmin={isAdmin} />
       <main className="max-w-4xl mx-auto px-6 py-10">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Jouw tools</h1>
         <p className="text-gray-500 text-sm mb-8">Kies een tool om te starten. Elke actie kost 1 credit.</p>

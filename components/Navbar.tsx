@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function Navbar({ credits }: { credits: number }) {
+export default function Navbar({ credits, isAdmin = false }: { credits: number; isAdmin?: boolean }) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -20,6 +20,9 @@ export default function Navbar({ credits }: { credits: number }) {
         <span className="text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-full font-medium">
           {credits} credits
         </span>
+        {isAdmin && (
+          <Link href="/admin" className="text-sm text-gray-600 hover:text-gray-900">Admin</Link>
+        )}
         <Link href="/account" className="text-sm text-gray-600 hover:text-gray-900">Account</Link>
         <button onClick={handleLogout} className="text-sm text-gray-600 hover:text-gray-900">Uitloggen</button>
       </div>
