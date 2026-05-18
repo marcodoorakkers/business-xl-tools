@@ -38,9 +38,10 @@ export default function VoiceMailPage() {
     mediaRecorder.current.onstop = async () => {
       stream.getTracks().forEach((t) => t.stop());
       const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
+      console.log("[VoiceMail] audio blob size:", (audioBlob.size / 1024).toFixed(1), "KB, chunks:", audioChunks.current.length);
       await processAudio(audioBlob);
     };
-    mediaRecorder.current.start();
+    mediaRecorder.current.start(1000);
     setStep("recording");
   }
 
