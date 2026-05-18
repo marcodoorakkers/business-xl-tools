@@ -11,6 +11,13 @@ const tools = [
     credits: 1,
     icon: "🎙️",
   },
+  {
+    name: "Meeting Memo",
+    description: "Neem je vergadering op en ontvang automatisch gestructureerde notulen.",
+    href: "/tools/meeting-memo",
+    credits: 1,
+    icon: "📝",
+  },
 ];
 
 export default async function DashboardPage() {
