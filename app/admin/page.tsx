@@ -36,18 +36,25 @@ export default function AdminPage() {
 
   async function saveCredits(userId: string) {
     setSaving(true);
-    const res = await fetch("/api/admin/credits", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, amount: Number(amount), mode }),
-    });
-    const data = await res.json();
-    if (data.success) {
-      setUsers(users.map((u) => u.id === userId ? { ...u, credits: data.newCredits } : u));
-      setSuccessId(userId);
-      setTimeout(() => setSuccessId(null), 2000);
-      setEditId(null);
-      setAmount("");
+    try {
+      const res = await fetch("/api/admin/credits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, amount: Number(amount), mode }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(`Fout: ${data.error || res.status}`);
+      } else if (data.success) {
+        setUsers(users.map((u) => u.id === userId ? { ...u, credits: data.newCredits } : u));
+        setSuccessId(userId);
+        setTimeout(() => setSuccessId(null), 2000);
+        setEditId(null);
+        setAmount("");
+        setError("");
+      }
+    } catch (e) {
+      setError("Netwerkfout bij opslaan.");
     }
     setSaving(false);
   }
