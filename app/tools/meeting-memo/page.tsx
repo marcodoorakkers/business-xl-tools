@@ -5,11 +5,13 @@ export const dynamic = "force-dynamic";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
-type Step = "setup" | "settings" | "recording" | "processing" | "review" | "generating" | "result" | "error";
+type Step = "setup" | "settings" | "history" | "history-detail" | "recording" | "processing" | "review" | "generating" | "result" | "error";
 type Lang = "nl" | "en";
 type Theme = "light" | "dark";
 
 interface Favorite { name: string; organization: string; }
+
+interface HistoryEntry { id: string; notes: Notes; savedAt: string; }
 
 interface Notes {
   samenvatting?: string; summary?: string;
@@ -39,6 +41,8 @@ export default function MeetingMemoPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [recordSeconds, setRecordSeconds] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [selectedEntry, setSelectedEntry] = useState<HistoryEntry | null>(null);
 
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
@@ -49,9 +53,11 @@ export default function MeetingMemoPage() {
     const savedTheme = localStorage.getItem("mm-theme") as Theme | null;
     const savedFavorites = localStorage.getItem("mm-favorites");
     const savedLang = localStorage.getItem("mm-lang") as Lang | null;
+    const savedHistory = localStorage.getItem("mm-history");
     if (savedTheme) setTheme(savedTheme);
     if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
     if (savedLang) setLang(savedLang);
+    if (savedHistory) setHistory(JSON.parse(savedHistory));
   }, []);
 
   function toggleTheme() {
@@ -62,6 +68,19 @@ export default function MeetingMemoPage() {
 
   function openSettings() { setPrevStep(step); setStep("settings"); }
   function closeSettings() { setStep(prevStep); }
+
+  function saveToHistory(n: Notes) {
+    const entry: HistoryEntry = { id: crypto.randomUUID(), notes: n, savedAt: new Date().toISOString() };
+    const updated = [entry, ...history].slice(0, 50);
+    setHistory(updated);
+    localStorage.setItem("mm-history", JSON.stringify(updated));
+  }
+
+  function deleteFromHistory(id: string) {
+    const updated = history.filter((h) => h.id !== id);
+    setHistory(updated);
+    localStorage.setItem("mm-history", JSON.stringify(updated));
+  }
 
   // Sorted favorites: by org then name
   function sortedFavorites(favs: Favorite[]) {
@@ -196,6 +215,7 @@ export default function MeetingMemoPage() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setNotes(data);
+      saveToHistory(data);
       setStep("result");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Notulen genereren mislukt");
@@ -269,6 +289,9 @@ export default function MeetingMemoPage() {
         </div>
         <div className="flex items-center gap-2">
           <button onClick={toggleTheme} className={`text-lg px-2 py-1 rounded-lg ${btnSec}`}>{isDark ? "☀️" : "🌙"}</button>
+          {step !== "history" && step !== "history-detail" && (
+            <button onClick={() => { setPrevStep(step); setStep("history"); }} className={`text-lg px-2 py-1 rounded-lg ${btnSec}`} title={isNl ? "Historie" : "History"}>🗂️</button>
+          )}
           {step !== "settings" && <button onClick={openSettings} className={`text-lg px-2 py-1 rounded-lg ${btnSec}`}>⚙️</button>}
         </div>
       </nav>
@@ -362,6 +385,66 @@ export default function MeetingMemoPage() {
               </button>
             </div>
           )}
+
+          {/* HISTORY LIST */}
+          {step === "history" && (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <button onClick={() => setStep(prevStep)} className={`text-sm ${muted} hover:text-blue-500`}>←</button>
+                <h2 className="text-lg font-bold">{isNl ? "Vergaderhistorie" : "Meeting history"}</h2>
+              </div>
+              {history.length === 0 ? (
+                <p className={`text-sm ${muted} text-center py-8`}>{isNl ? "Nog geen vergaderingen opgeslagen." : "No meetings saved yet."}</p>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {history.map((entry) => (
+                    <button key={entry.id} onClick={() => { setSelectedEntry(entry); setStep("history-detail"); }}
+                      className={`text-left rounded-xl border p-4 transition-colors ${isDark ? "border-gray-700 hover:border-blue-500 bg-gray-700/30" : "border-gray-200 hover:border-blue-400 bg-gray-50 hover:bg-blue-50"}`}>
+                      <p className={`font-medium text-sm ${isDark ? "text-gray-100" : "text-gray-900"}`}>
+                        {entry.notes._meta?.title || (isNl ? "Vergadering" : "Meeting")}
+                      </p>
+                      <p className={`text-xs ${muted} mt-0.5`}>
+                        {entry.notes._meta?.date} · {entry.notes._meta?.time}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* HISTORY DETAIL */}
+          {step === "history-detail" && selectedEntry && (() => {
+            const n = selectedEntry.notes;
+            const entryLang = (n._meta as { lang?: string } & typeof n._meta)?.lang ?? lang;
+            const nl = entryLang === "nl";
+            return (
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <button onClick={() => setStep("history")} className={`text-sm ${muted} hover:text-blue-500`}>← {isNl ? "Terug" : "Back"}</button>
+                  <button onClick={() => { deleteFromHistory(selectedEntry.id); setStep("history"); }}
+                    className="text-xs text-red-400 hover:text-red-600">{isNl ? "Verwijder" : "Delete"}</button>
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold">{n._meta?.title}</h2>
+                  <p className={`text-xs ${muted}`}>{n._meta?.date} · {n._meta?.time}</p>
+                </div>
+                {(n.samenvatting || n.summary) && <Section icon="📋" title={nl ? "Samenvatting" : "Summary"} color="blue" dark={isDark}><p>{n.samenvatting || n.summary}</p></Section>}
+                {(n.aanwezigen || n.attendees || []).length > 0 && <Section icon="👥" title={nl ? "Aanwezigen" : "Attendees"} color="purple" dark={isDark}><ul>{(n.aanwezigen || n.attendees || []).map((a, i) => <li key={i}>• {a}</li>)}</ul></Section>}
+                {(n.besproken_punten || n.topics || []).length > 0 && <Section icon="💬" title={nl ? "Besproken punten" : "Topics"} color="green" dark={isDark}><ul>{(n.besproken_punten || n.topics || []).map((t, i) => <li key={i}>• {t}</li>)}</ul></Section>}
+                {(n.beslissingen || n.decisions || []).length > 0 && <Section icon="✅" title={nl ? "Beslissingen" : "Decisions"} color="yellow" dark={isDark}><ul>{(n.beslissingen || n.decisions || []).map((d, i) => <li key={i}>• {d}</li>)}</ul></Section>}
+                {(n.actiepunten || n.actions || []).length > 0 && (
+                  <Section icon="⚡" title={nl ? "Actiepunten" : "Action items"} color="orange" dark={isDark}>
+                    <ul>
+                      {nl ? (n.actiepunten || []).map((a, i) => <li key={i}>• <strong>{a.wie}</strong>: {a.actie} <span className="opacity-60">({a.wanneer})</span></li>)
+                          : (n.actions || []).map((a, i) => <li key={i}>• <strong>{a.who}</strong>: {a.action} <span className="opacity-60">({a.when})</span></li>)}
+                    </ul>
+                  </Section>
+                )}
+                {(n.volgende_vergadering || n.next_meeting) && <Section icon="📅" title={nl ? "Volgende vergadering" : "Next meeting"} color="gray" dark={isDark}><p>{n.volgende_vergadering || n.next_meeting}</p></Section>}
+              </div>
+            );
+          })()}
 
           {/* SETTINGS */}
           {step === "settings" && (
