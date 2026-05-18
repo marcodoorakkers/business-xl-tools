@@ -41,10 +41,7 @@ ${transcript}`,
     const email = JSON.parse(jsonMatch[0]);
 
     // Deduct 1 credit
-    await supabase
-      .from("profiles")
-      .update({ credits: supabase.rpc("decrement_credits", { user_id: user.id }) })
-      .eq("id", user.id);
+    await supabase.rpc("decrement_credits", { user_id: user.id });
 
     // Log usage
     await supabase.from("usage_logs").insert({
