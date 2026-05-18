@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 60;
 import OpenAI from "openai";
 
 export async function POST(req: NextRequest) {

@@ -30,7 +30,7 @@ export default function VoiceMailPage() {
 
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder.current = new MediaRecorder(stream);
+    mediaRecorder.current = new MediaRecorder(stream, { audioBitsPerSecond: 32000 });
     audioChunks.current = [];
     mediaRecorder.current.ondataavailable = (e) => {
       if (e.data.size > 0) audioChunks.current.push(e.data);
