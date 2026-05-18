@@ -227,6 +227,72 @@ export default function MeetingMemoPage() {
     return `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
   }
 
+  async function exportToDocx(n: Notes, nl: boolean) {
+    const { Document, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, Packer } = await import("docx");
+
+    const title = n._meta?.title || (nl ? "Vergadering" : "Meeting");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const children: any[] = [];
+
+    children.push(new Paragraph({ text: title, heading: HeadingLevel.HEADING_1 }));
+    children.push(new Paragraph({ text: `${n._meta?.date ?? ""} · ${n._meta?.time ?? ""}`, spacing: { after: 200 } }));
+
+    const summary = n.samenvatting || n.summary;
+    if (summary) {
+      children.push(new Paragraph({ text: nl ? "Samenvatting" : "Summary", heading: HeadingLevel.HEADING_2 }));
+      children.push(new Paragraph({ text: summary }));
+    }
+
+    const attendeesList = n.aanwezigen || n.attendees || [];
+    if (attendeesList.length > 0) {
+      children.push(new Paragraph({ text: nl ? "Aanwezigen" : "Attendees", heading: HeadingLevel.HEADING_2 }));
+      attendeesList.forEach((a) => children.push(new Paragraph({ text: a, bullet: { level: 0 } })));
+    }
+
+    const topicsList = n.besproken_punten || n.topics || [];
+    if (topicsList.length > 0) {
+      children.push(new Paragraph({ text: nl ? "Besproken punten" : "Topics discussed", heading: HeadingLevel.HEADING_2 }));
+      topicsList.forEach((t) => children.push(new Paragraph({ text: t, bullet: { level: 0 } })));
+    }
+
+    const decisionsList = n.beslissingen || n.decisions || [];
+    if (decisionsList.length > 0) {
+      children.push(new Paragraph({ text: nl ? "Beslissingen" : "Decisions", heading: HeadingLevel.HEADING_2 }));
+      decisionsList.forEach((d) => children.push(new Paragraph({ text: d, bullet: { level: 0 } })));
+    }
+
+    const hasActions = nl ? (n.actiepunten || []).length > 0 : (n.actions || []).length > 0;
+    if (hasActions) {
+      children.push(new Paragraph({ text: nl ? "Actiepunten" : "Action items", heading: HeadingLevel.HEADING_2 }));
+      const headerRow = new TableRow({
+        children: [
+          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: nl ? "Wie" : "Who", bold: true })] })], width: { size: 25, type: WidthType.PERCENTAGE } }),
+          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: nl ? "Actie" : "Action", bold: true })] })], width: { size: 50, type: WidthType.PERCENTAGE } }),
+          new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: nl ? "Wanneer" : "When", bold: true })] })], width: { size: 25, type: WidthType.PERCENTAGE } }),
+        ],
+      });
+      const dataRows = nl
+        ? (n.actiepunten || []).map((a) => new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: a.wie })] }), new TableCell({ children: [new Paragraph({ text: a.actie })] }), new TableCell({ children: [new Paragraph({ text: a.wanneer })] })] }))
+        : (n.actions || []).map((a) => new TableRow({ children: [new TableCell({ children: [new Paragraph({ text: a.who })] }), new TableCell({ children: [new Paragraph({ text: a.action })] }), new TableCell({ children: [new Paragraph({ text: a.when })] })] }));
+      children.push(new Table({ rows: [headerRow, ...dataRows], width: { size: 100, type: WidthType.PERCENTAGE } }));
+    }
+
+    const nextMeeting = n.volgende_vergadering || n.next_meeting;
+    if (nextMeeting) {
+      children.push(new Paragraph({ text: nl ? "Volgende vergadering" : "Next meeting", heading: HeadingLevel.HEADING_2 }));
+      children.push(new Paragraph({ text: nextMeeting }));
+    }
+
+    const doc = new Document({ sections: [{ children }] });
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${title.replace(/[^\w\s]/g, "").trim() || "meeting"}.docx`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  }
+
   function copyAll() {
     if (!notes) return;
     const isNl = lang === "nl";
@@ -422,8 +488,13 @@ export default function MeetingMemoPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                   <button onClick={() => setStep("history")} className={`text-sm ${muted} hover:text-blue-500`}>← {isNl ? "Terug" : "Back"}</button>
-                  <button onClick={() => { deleteFromHistory(selectedEntry.id); setStep("history"); }}
-                    className="text-xs text-red-400 hover:text-red-600">{isNl ? "Verwijder" : "Delete"}</button>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => exportToDocx(n, nl)} className={`text-xs px-3 py-1 rounded-lg border transition-colors ${isDark ? "bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600" : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"}`}>
+                      Word
+                    </button>
+                    <button onClick={() => { deleteFromHistory(selectedEntry.id); setStep("history"); }}
+                      className="text-xs text-red-400 hover:text-red-600">{isNl ? "Verwijder" : "Delete"}</button>
+                  </div>
                 </div>
                 <div>
                   <h2 className="text-lg font-bold">{n._meta?.title}</h2>
@@ -565,14 +636,19 @@ export default function MeetingMemoPage() {
           {/* RESULT */}
           {step === "result" && notes && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
                   <h2 className="text-lg font-bold">{notes._meta?.title}</h2>
                   <p className={`text-xs ${muted}`}>{notes._meta?.date} · {notes._meta?.time}</p>
                 </div>
-                <button onClick={copyAll} className={`text-sm px-3 py-1 rounded-lg border transition-colors ${copied ? "bg-green-50 text-green-600 border-green-200" : isDark ? "bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600" : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"}`}>
-                  {copied ? "✓ Gekopieerd" : isNl ? "Kopieer alles" : "Copy all"}
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button onClick={copyAll} className={`text-sm px-3 py-1 rounded-lg border transition-colors ${copied ? "bg-green-50 text-green-600 border-green-200" : isDark ? "bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600" : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"}`}>
+                    {copied ? "✓" : isNl ? "Kopieer" : "Copy"}
+                  </button>
+                  <button onClick={() => exportToDocx(notes, isNl)} className={`text-sm px-3 py-1 rounded-lg border transition-colors ${isDark ? "bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600" : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"}`}>
+                    Word
+                  </button>
+                </div>
               </div>
               {(notes.samenvatting || notes.summary) && <Section icon="📋" title={isNl ? "Samenvatting" : "Summary"} color="blue" dark={isDark}><p>{notes.samenvatting || notes.summary}</p></Section>}
               {(notes.aanwezigen || notes.attendees || []).length > 0 && <Section icon="👥" title={isNl ? "Aanwezigen" : "Attendees"} color="purple" dark={isDark}><ul>{(notes.aanwezigen || notes.attendees || []).map((a, i) => <li key={i}>• {a}</li>)}</ul></Section>}
