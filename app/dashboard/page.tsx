@@ -18,6 +18,13 @@ const tools = [
     credits: 1,
     icon: "📝",
   },
+  {
+    name: "Weekmenu Planner",
+    description: "Geef je voorkeuren op en ontvang een weekmenu voor 7 avondmaaltijden met boodschappenlijst.",
+    href: "/tools/dinner-planner",
+    credits: 1,
+    icon: "🍽️",
+  },
 ];
 
 export default async function DashboardPage() {
