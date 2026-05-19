@@ -171,7 +171,7 @@ export default function VacancyFinderPage() {
                 placeholder={"Naam: ...\nFunctie: Senior Developer\n\nOver mij:\n...\n\nWerkervaring:\n...\n\nSkills:\nReact, TypeScript, Node.js, ..."}
                 className="w-full mt-3 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
-              <p className="text-xs text-gray-400 mt-1">{profileText.length} tekens {profileText.length < 50 && profileText.length > 0 ? "— voeg meer toe voor betere resultaten" : ""}</p>
+              <p className="text-xs text-gray-400 mt-1">{profileText.length} tekens {profileText.length > 0 && profileText.length < 100 ? "— meer info geeft betere resultaten" : ""}</p>
             </div>
 
             {errorMsg && step === "setup" && (
@@ -180,7 +180,7 @@ export default function VacancyFinderPage() {
 
             <button
               onClick={search}
-              disabled={profileText.trim().length < 50}
+              disabled={profileText.trim().length === 0}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white rounded-xl py-3 text-sm font-medium transition-colors"
             >
               Zoek freelance vacatures
