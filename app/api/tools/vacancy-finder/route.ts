@@ -14,7 +14,6 @@ interface AdzunaJob {
   salary_min?: number;
   salary_max?: number;
   created: string;
-  contract_type?: string;
 }
 
 interface Vacancy {
@@ -29,7 +28,11 @@ interface Vacancy {
   scope: "nl" | "remote" | "international";
 }
 
-async function searchAdzuna(country: string, what: string, where?: string): Promise<AdzunaJob[]> {
+async function searchAdzuna(
+  country: string,
+  what: string,
+  scope: Vacancy["scope"]
+): Promise<Vacancy[]> {
   const appId = process.env.ADZUNA_APP_ID;
   const appKey = process.env.ADZUNA_APP_KEY;
   if (!appId || !appKey) return [];
@@ -38,21 +41,35 @@ async function searchAdzuna(country: string, what: string, where?: string): Prom
     app_id: appId,
     app_key: appKey,
     what,
-    results_per_page: "8",
-    contract: "1",
+    results_per_page: "10",
     sort_by: "date",
   });
-  if (where) params.set("where", where);
+
+  const url = `https://api.adzuna.com/v1/api/jobs/${country}/search/1?${params}`;
 
   try {
-    const res = await fetch(
-      `https://api.adzuna.com/v1/api/jobs/${country}/search/1?${params}`,
-      { headers: { "Content-Type": "application/json" } }
-    );
-    if (!res.ok) return [];
+    const res = await fetch(url);
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[vacancy-finder] Adzuna ${country} "${what}" → ${res.status}:`, body.slice(0, 200));
+      return [];
+    }
     const data = await res.json();
-    return data.results ?? [];
-  } catch {
+    const jobs: AdzunaJob[] = data.results ?? [];
+    console.log(`[vacancy-finder] Adzuna ${country} "${what}" → ${jobs.length} results`);
+    return jobs.map((j) => ({
+      id: `${scope}-${j.id}`,
+      title: j.title,
+      company: j.company?.display_name ?? "Onbekend",
+      location: j.location?.display_name ?? "",
+      description: j.description?.slice(0, 220) ?? "",
+      url: j.redirect_url,
+      salary: formatSalary(j.salary_min, j.salary_max),
+      created: j.created,
+      scope,
+    }));
+  } catch (err) {
+    console.error(`[vacancy-finder] Adzuna ${country} fetch error:`, err);
     return [];
   }
 }
@@ -63,20 +80,6 @@ function formatSalary(min?: number, max?: number): string | undefined {
   if (min && max) return `${fmt(min)} – ${fmt(max)}`;
   if (min) return `vanaf ${fmt(min)}`;
   if (max) return `t/m ${fmt(max)}`;
-}
-
-function mapJobs(jobs: AdzunaJob[], scope: Vacancy["scope"]): Vacancy[] {
-  return jobs.map((j) => ({
-    id: `${scope}-${j.id}`,
-    title: j.title,
-    company: j.company?.display_name ?? "Onbekend",
-    location: j.location?.display_name ?? "",
-    description: j.description?.slice(0, 200) ?? "",
-    url: j.redirect_url,
-    salary: formatSalary(j.salary_min, j.salary_max),
-    created: j.created,
-    scope,
-  }));
 }
 
 export async function POST(req: NextRequest) {
@@ -102,14 +105,16 @@ export async function POST(req: NextRequest) {
     max_tokens: 512,
     messages: [{
       role: "user",
-      content: `Analyseer dit LinkedIn profiel/CV en extraheer de meest relevante informatie voor een vacaturezoeker.
+      content: `Analyseer dit LinkedIn profiel/CV voor een vacaturezoeker gericht op freelance/ZZP werk.
 Geef ALLEEN een JSON object terug, zonder extra tekst of markdown:
 {
-  "titles": ["meest relevante functietitel in het Engels", "tweede optie", "derde optie"],
-  "skills": ["skill1", "skill2", "skill3", "skill4", "skill5"],
+  "titles": ["meest relevante Engelstalige functietitel (kort, 1-3 woorden)", "tweede optie", "derde optie"],
+  "skills": ["skill1", "skill2", "skill3"],
   "experience": "bijv. 8 jaar",
   "summary": "1-zin samenvatting van het profiel in het Nederlands"
 }
+
+Houd de titels kort en generiek zodat ze goed werken als zoekterm. Bijv. "Developer" niet "Senior Full-Stack JavaScript Developer".
 
 Profiel:
 ${profileText.slice(0, 3000)}`,
@@ -123,37 +128,37 @@ ${profileText.slice(0, 3000)}`,
   try {
     const cleaned = analysisContent.text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
     const match = cleaned.match(/\{[\s\S]*\}/);
-    if (!match) throw new Error();
+    if (!match) throw new Error("No JSON found");
     profileData = JSON.parse(match[0]);
   } catch {
     return NextResponse.json({ error: "Kon profiel niet verwerken" }, { status: 500 });
   }
 
-  const primaryTitle = profileData.titles[0] ?? "professional";
-  const skillsStr = profileData.skills.slice(0, 3).join(" ");
+  console.log("[vacancy-finder] Profile extracted:", profileData.titles, profileData.skills);
 
-  // Step 2: search vacancies in parallel
-  const [nlJobs, remoteJobs, intJobs] = await Promise.all([
-    searchAdzuna("nl", `${primaryTitle} freelance ${skillsStr}`),
-    searchAdzuna("gb", `${primaryTitle} remote freelance contract ${skillsStr}`),
-    searchAdzuna("gb", `${primaryTitle} contract ${skillsStr}`),
+  const title = profileData.titles[0] ?? "professional";
+  const title2 = profileData.titles[1] ?? title;
+
+  // Step 2: parallel searches — no contract=1 filter, use keywords instead
+  const [nlJobs, remoteJobs, intJobs1, intJobs2] = await Promise.all([
+    searchAdzuna("nl", `${title} freelance`, "nl"),
+    searchAdzuna("gb", `${title} remote contract`, "remote"),
+    searchAdzuna("gb", `${title} freelance contract`, "international"),
+    searchAdzuna("gb", `${title2} contract`, "international"),
   ]);
 
-  // Deduplicate across searches by title+company
+  // Deduplicate by title+company
   const seen = new Set<string>();
   const allVacancies: Vacancy[] = [];
-
-  for (const v of [
-    ...mapJobs(nlJobs, "nl"),
-    ...mapJobs(remoteJobs, "remote"),
-    ...mapJobs(intJobs, "international"),
-  ]) {
+  for (const v of [...nlJobs, ...remoteJobs, ...intJobs1, ...intJobs2]) {
     const key = `${v.title.toLowerCase()}-${v.company.toLowerCase()}`;
     if (!seen.has(key)) {
       seen.add(key);
       allVacancies.push(v);
     }
   }
+
+  console.log(`[vacancy-finder] Total unique vacancies: ${allVacancies.length}`);
 
   await supabase.rpc("decrement_credits", { user_id: user.id });
   await supabase.from("usage_logs").insert({ user_id: user.id, tool: "vacancy-finder", credits_used: 1 });
