@@ -25,6 +25,13 @@ const tools = [
     credits: 1,
     icon: "🍽️",
   },
+  {
+    name: "Vacaturezoeker",
+    description: "Plak je LinkedIn profiel en vind actuele freelance & contract vacatures in NL, remote en internationaal.",
+    href: "/tools/vacancy-finder",
+    credits: 1,
+    icon: "🔍",
+  },
 ];
 
 export default async function DashboardPage() {
