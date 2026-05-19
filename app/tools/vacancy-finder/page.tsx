@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 
 type Step = "setup" | "analyzing" | "results" | "error";
@@ -56,9 +56,34 @@ export default function VacancyFinderPage() {
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>("all");
   const [errorMsg, setErrorMsg] = useState("");
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfName, setPdfName] = useState("");
+  const pdfInputRef = useRef<HTMLInputElement>(null);
+
+  async function handlePdf(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPdfLoading(true);
+    setPdfName(file.name);
+    try {
+      const formData = new FormData();
+      formData.append("pdf", file);
+      const res = await fetch("/api/tools/parse-pdf", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setProfileText(data.text);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "PDF verwerken mislukt");
+      setPdfName("");
+    } finally {
+      setPdfLoading(false);
+      if (pdfInputRef.current) pdfInputRef.current.value = "";
+    }
+  }
 
   async function search() {
     if (!profileText.trim()) return;
+    setErrorMsg("");
     setStep("analyzing");
     try {
       const res = await fetch("/api/tools/vacancy-finder", {
@@ -112,21 +137,46 @@ export default function VacancyFinderPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Jouw LinkedIn profiel of CV-tekst
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Jouw LinkedIn profiel of CV
               </label>
-              <p className="text-xs text-gray-400 mb-2">
-                Tip: kopieer je LinkedIn 'Over', werkervaring en skills en plak dat hier. Hoe meer info, hoe beter de match.
-              </p>
+
+              {/* PDF upload */}
+              <input ref={pdfInputRef} type="file" accept=".pdf" className="hidden" onChange={handlePdf} />
+              <button
+                onClick={() => pdfInputRef.current?.click()}
+                disabled={pdfLoading}
+                className={`w-full py-3 mb-3 rounded-xl text-sm font-medium border-2 border-dashed transition-colors flex items-center justify-center gap-2
+                  ${pdfName ? "border-green-400 text-green-600 bg-green-50" : "border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500 bg-white"}
+                  ${pdfLoading ? "opacity-60 cursor-wait" : ""}`}
+              >
+                {pdfLoading ? (
+                  <><div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /> PDF wordt ingelezen...</>
+                ) : pdfName ? (
+                  <>✓ {pdfName} — klik om ander bestand te kiezen</>
+                ) : (
+                  <>📄 Upload LinkedIn PDF <span className="text-gray-400 font-normal">(LinkedIn → Meer → Profiel opslaan als PDF)</span></>
+                )}
+              </button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
+                <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-gray-400">of plak tekst</span></div>
+              </div>
+
               <textarea
                 value={profileText}
                 onChange={(e) => setProfileText(e.target.value)}
-                rows={12}
+                rows={10}
                 placeholder={"Naam: ...\nFunctie: Senior Developer\n\nOver mij:\n...\n\nWerkervaring:\n...\n\nSkills:\nReact, TypeScript, Node.js, ..."}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none font-mono"
+                className="w-full mt-3 border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
-              <p className="text-xs text-gray-400 mt-1">{profileText.length} tekens</p>
+              <p className="text-xs text-gray-400 mt-1">{profileText.length} tekens {profileText.length < 50 && profileText.length > 0 ? "— voeg meer toe voor betere resultaten" : ""}</p>
             </div>
+
+            {errorMsg && step === "setup" && (
+              <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{errorMsg}</p>
+            )}
 
             <button
               onClick={search}
