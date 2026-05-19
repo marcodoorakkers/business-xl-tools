@@ -30,15 +30,21 @@ export default function VoiceMailPage() {
 
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder.current = new MediaRecorder(stream, { audioBitsPerSecond: 32000 });
+    // Pick the best supported format — Safari uses mp4, Chrome/Firefox use webm
+    const mimeType = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"]
+      .find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+    mediaRecorder.current = new MediaRecorder(stream, {
+      ...(mimeType ? { mimeType } : {}),
+      audioBitsPerSecond: 32000,
+    });
     audioChunks.current = [];
     mediaRecorder.current.ondataavailable = (e) => {
       if (e.data.size > 0) audioChunks.current.push(e.data);
     };
     mediaRecorder.current.onstop = async () => {
       stream.getTracks().forEach((t) => t.stop());
-      const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
-      console.log("[VoiceMail] audio blob size:", (audioBlob.size / 1024).toFixed(1), "KB, chunks:", audioChunks.current.length);
+      const audioBlob = new Blob(audioChunks.current, { type: mimeType || "audio/webm" });
+      console.log("[VoiceMail] format:", mimeType, "size:", (audioBlob.size / 1024).toFixed(1), "KB");
       await processAudio(audioBlob);
     };
     mediaRecorder.current.start(1000);
@@ -52,8 +58,9 @@ export default function VoiceMailPage() {
 
   async function processAudio(audioBlob: Blob) {
     try {
+      const ext = audioBlob.type.includes("mp4") ? "mp4" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
       const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
+      formData.append("audio", audioBlob, `recording.${ext}`);
 
       const transcribeRes = await fetch("/api/tools/transcribe", { method: "POST", body: formData });
       const { text, error: transcribeError } = await transcribeRes.json();

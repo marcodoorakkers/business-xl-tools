@@ -170,14 +170,19 @@ export default function MeetingMemoPage() {
 
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder.current = new MediaRecorder(stream);
+    const mimeType = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"]
+      .find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+    mediaRecorder.current = new MediaRecorder(stream, {
+      ...(mimeType ? { mimeType } : {}),
+      audioBitsPerSecond: 32000,
+    });
     audioChunks.current = [];
     mediaRecorder.current.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.current.push(e.data); };
     mediaRecorder.current.onstop = async () => {
       stream.getTracks().forEach((t) => t.stop());
-      await transcribeAudio(new Blob(audioChunks.current, { type: "audio/webm" }));
+      await transcribeAudio(new Blob(audioChunks.current, { type: mimeType || "audio/webm" }));
     };
-    mediaRecorder.current.start();
+    mediaRecorder.current.start(1000);
     setRecordSeconds(0);
     timerRef.current = setInterval(() => setRecordSeconds((s) => s + 1), 1000);
     setStep("recording");
@@ -192,7 +197,8 @@ export default function MeetingMemoPage() {
   async function transcribeAudio(audioBlob: Blob) {
     try {
       const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
+      const ext = audioBlob.type.includes("mp4") ? "mp4" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
+      formData.append("audio", audioBlob, `recording.${ext}`);
       const res = await fetch("/api/tools/meeting-transcribe", { method: "POST", body: formData });
       const { text, error } = await res.json();
       if (error) throw new Error(error);
