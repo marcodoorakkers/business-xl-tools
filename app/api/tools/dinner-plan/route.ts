@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
-    max_tokens: 4096,
+    max_tokens: 8000,
     messages: [{
       role: "user",
       content: `Maak een gevarieerd weekmenu voor de volgende dagen: ${daysStr}. Voor ${persons} persoon/personen.
@@ -37,9 +37,9 @@ Geef ALLEEN een JSON object terug, zonder extra tekst, uitleg of markdown. Exact
     {
       "day": "Maandag",
       "dish": "Naam van het gerecht",
-      "description": "Korte smakelijke omschrijving (1 zin)",
+      "description": "Korte omschrijving (max 10 woorden)",
       "time": "30 min",
-      "recipe": "1. Stap één\\n2. Stap twee\\n3. Stap drie (5-8 stappen, beknopt maar volledig)",
+      "recipe": "1. Stap één\\n2. Stap twee\\n3. Stap drie (max 5 stappen, elk max 10 woorden)",
       "ingredients": [
         { "item": "2 uien", "category": "Groenten & fruit" },
         { "item": "300g kipfilet", "category": "Vlees, vis & vleesvervanger" }
@@ -48,8 +48,11 @@ Geef ALLEEN een JSON object terug, zonder extra tekst, uitleg of markdown. Exact
   ]
 }
 
-Gebruik alleen deze categorieën voor ingrediënten: "Groenten & fruit", "Vlees, vis & vleesvervanger", "Zuivel & eieren", "Droogwaren & conserven", "Sauzen, kruiden & oliën", "Brood & bakkerij", "Overig".
-Geef hoeveelheden op voor ${persons} persoon/personen. Houd de gerechten realistisch en gevarieerd.`,
+Regels:
+- Gebruik alleen deze categorieën: "Groenten & fruit", "Vlees, vis & vleesvervanger", "Zuivel & eieren", "Droogwaren & conserven", "Sauzen, kruiden & oliën", "Brood & bakkerij", "Overig"
+- Hoeveelheden voor ${persons} persoon/personen
+- Houd alles beknopt — description max 10 woorden, recipe-stappen max 10 woorden per stap
+- Gevarieerde gerechten, niet elke dag pasta of rijst`,
     }],
   });
 
@@ -59,7 +62,10 @@ Geef hoeveelheden op voor ${persons} persoon/personen. Houd de gerechten realist
   try {
     const cleaned = content.text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return NextResponse.json({ error: "Kon weekmenu niet genereren" }, { status: 500 });
+    if (!jsonMatch) {
+      console.error("[dinner-plan] No JSON in response, stop_reason:", message.stop_reason, "length:", content.text.length);
+      return NextResponse.json({ error: "Kon weekmenu niet genereren. Probeer het opnieuw." }, { status: 500 });
+    }
 
     const plan = JSON.parse(jsonMatch[0]);
 
@@ -67,7 +73,8 @@ Geef hoeveelheden op voor ${persons} persoon/personen. Houd de gerechten realist
     await supabase.from("usage_logs").insert({ user_id: user.id, tool: "dinner-planner", credits_used: 1 });
 
     return NextResponse.json(plan);
-  } catch {
-    return NextResponse.json({ error: "Kon weekmenu niet verwerken" }, { status: 500 });
+  } catch (err) {
+    console.error("[dinner-plan] JSON parse error:", err, "stop_reason:", message.stop_reason);
+    return NextResponse.json({ error: "Weekmenu kon niet worden verwerkt. Probeer het opnieuw." }, { status: 500 });
   }
 }
