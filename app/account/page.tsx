@@ -59,11 +59,11 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <p className="text-sm text-gray-500 mb-5">Kies een pakket — credits vervallen nooit.</p>
           <div className="flex flex-col gap-3">
             {PACKAGES.map((pkg) => (
-              <div key={pkg.priceId} className={`flex items-center justify-between p-4 rounded-xl border-2 transition-colors ${pkg.highlight ? "border-blue-500 bg-blue-50" : "border-gray-100 bg-gray-50"}`}>
+              <div key={pkg.priceId} className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-gray-900">{pkg.name}</span>
-                    {pkg.highlight && <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full font-medium">Populair</span>}
+                    {pkg.highlight && <span className="text-xs bg-orange-400 text-white px-2 py-0.5 rounded-full font-medium">⭐ Populair</span>}
                   </div>
                   <p className="text-sm text-gray-500">{pkg.credits} credits · {pkg.perCredit}</p>
                 </div>
