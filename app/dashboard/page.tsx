@@ -10,6 +10,8 @@ const tools = [
     href: "/tools/voice-mail",
     credits: 1,
     icon: "🎙️",
+    color: "from-purple-500 to-indigo-500",
+    bg: "bg-purple-50",
   },
   {
     name: "Meeting Memo",
@@ -17,6 +19,8 @@ const tools = [
     href: "/tools/meeting-memo",
     credits: 1,
     icon: "📝",
+    color: "from-blue-500 to-cyan-500",
+    bg: "bg-blue-50",
   },
   {
     name: "Weekmenu Planner",
@@ -24,6 +28,8 @@ const tools = [
     href: "/tools/dinner-planner",
     credits: 1,
     icon: "🍽️",
+    color: "from-orange-400 to-pink-500",
+    bg: "bg-orange-50",
   },
   {
     name: "Vacaturezoeker",
@@ -31,6 +37,8 @@ const tools = [
     href: "/tools/vacancy-finder",
     credits: 1,
     icon: "🔍",
+    color: "from-green-500 to-teal-500",
+    bg: "bg-green-50",
   },
 ];
 
@@ -53,19 +61,25 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar credits={credits} isAdmin={isAdmin} />
       <main className="max-w-4xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Jouw tools</h1>
-        <p className="text-gray-500 text-sm mb-8">Kies een tool om te starten. Elke actie kost 1 credit.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="mb-8">
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Jouw tools</h1>
+          <p className="text-gray-500 text-sm">Kies een tool om te starten. Elke actie kost 1 credit.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {tools.map((tool) => (
             <Link
               key={tool.href}
               href={tool.href}
-              className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow flex flex-col gap-2"
+              className={`${tool.bg} rounded-3xl p-7 flex flex-col gap-4 hover:shadow-md transition-shadow`}
             >
-              <span className="text-3xl">{tool.icon}</span>
-              <h2 className="font-semibold text-gray-900">{tool.name}</h2>
-              <p className="text-sm text-gray-500">{tool.description}</p>
-              <span className="text-xs text-blue-600 font-medium mt-1">{tool.credits} credit per gebruik</span>
+              <div className={`w-12 h-12 bg-gradient-to-br ${tool.color} rounded-2xl flex items-center justify-center text-2xl shadow-md`}>
+                {tool.icon}
+              </div>
+              <div>
+                <h2 className="font-bold text-gray-900 text-lg mb-1">{tool.name}</h2>
+                <p className="text-sm text-gray-600 leading-relaxed">{tool.description}</p>
+              </div>
+              <span className="text-xs text-blue-600 font-semibold">{tool.credits} credit per gebruik →</span>
             </Link>
           ))}
         </div>
