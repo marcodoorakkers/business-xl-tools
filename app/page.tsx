@@ -156,7 +156,7 @@ export default function LandingPage() {
               )}
               <Link href="/auth/register"
                 className={`mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors ${tier.highlight ? "bg-white text-blue-600 hover:bg-blue-50" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
-                {tier.cta} →
+                {tier.name === "Probeer" ? "Begin gratis →" : "Binnenkort beschikbaar"}
               </Link>
             </div>
           ))}

@@ -53,28 +53,13 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <p className="text-blue-200 text-sm mt-1">credits beschikbaar</p>
         </div>
 
-        {/* Buy credits */}
+        {/* Buy credits - coming soon */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
           <h2 className="font-semibold text-gray-900 mb-1">Credits kopen</h2>
-          <p className="text-sm text-gray-500 mb-5">Kies een pakket — credits vervallen nooit.</p>
-          <div className="flex flex-col gap-3">
-            {PACKAGES.map((pkg) => (
-              <div key={pkg.priceId} className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900">{pkg.name}</span>
-                    {pkg.highlight && <span className="text-xs bg-orange-400 text-white px-2 py-0.5 rounded-full font-medium">⭐ Populair</span>}
-                  </div>
-                  <p className="text-sm text-gray-500">{pkg.credits} credits · {pkg.perCredit}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-gray-900">{pkg.price}</span>
-                  <BuyCreditsButton priceId={pkg.priceId} />
-                </div>
-              </div>
-            ))}
+          <p className="text-sm text-gray-500 mb-4">Binnenkort kun je hier direct credits kopen.</p>
+          <div className="bg-blue-50 rounded-xl p-4 text-sm text-blue-700 font-medium text-center">
+            🚀 Betalen via iDEAL, creditcard en Bancontact — komt er binnenkort aan!
           </div>
-          <p className="text-xs text-gray-400 mt-4">Betalen via iDEAL, creditcard of Bancontact · Excl. BTW</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
