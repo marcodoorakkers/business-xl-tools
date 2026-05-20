@@ -124,6 +124,46 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing */}
+      <section className="max-w-6xl mx-auto px-6 py-24">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">Simpele prijzen</h2>
+          <p className="text-gray-500">Koop credits wanneer je ze nodig hebt. Geen abonnement, geen verplichtingen.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            { name: "Probeer", price: "Gratis", credits: 10, perCredit: null, description: "Bij registratie", highlight: false, cta: "Begin gratis" },
+            { name: "Starter", price: "€9,99", credits: 50, perCredit: "€0,20 per credit", description: "Voor af en toe gebruik", highlight: false, cta: "Koop credits" },
+            { name: "Popular", price: "€29,99", credits: 200, perCredit: "€0,15 per credit", description: "Meest gekozen", highlight: true, cta: "Koop credits" },
+            { name: "Best value", price: "€59,99", credits: 500, perCredit: "€0,12 per credit", description: "Voor intensief gebruik", highlight: false, cta: "Koop credits" },
+          ].map((tier) => (
+            <div key={tier.name} className={`relative rounded-3xl p-7 flex flex-col gap-4 ${tier.highlight ? "bg-blue-600 text-white shadow-xl shadow-blue-200 scale-105" : "bg-gray-50"}`}>
+              {tier.highlight && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-400 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+                  ⭐ Meest gekozen
+                </div>
+              )}
+              <div>
+                <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${tier.highlight ? "text-blue-200" : "text-gray-400"}`}>{tier.name}</p>
+                <p className={`text-4xl font-extrabold ${tier.highlight ? "text-white" : "text-gray-900"}`}>{tier.price}</p>
+                <p className={`text-sm mt-1 ${tier.highlight ? "text-blue-200" : "text-gray-500"}`}>{tier.description}</p>
+              </div>
+              <div className={`text-3xl font-bold ${tier.highlight ? "text-white" : "text-gray-900"}`}>
+                {tier.credits} <span className={`text-base font-normal ${tier.highlight ? "text-blue-200" : "text-gray-500"}`}>credits</span>
+              </div>
+              {tier.perCredit && (
+                <p className={`text-xs ${tier.highlight ? "text-blue-200" : "text-gray-400"}`}>{tier.perCredit}</p>
+              )}
+              <Link href="/auth/register"
+                className={`mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors ${tier.highlight ? "bg-white text-blue-600 hover:bg-blue-50" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
+                {tier.cta} →
+              </Link>
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-xs text-gray-400 mt-6">Alle prijzen zijn excl. BTW · Betalen via iDEAL, creditcard of Bancontact · Credits vervallen niet</p>
+      </section>
+
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
         <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl p-12 text-white">
