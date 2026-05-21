@@ -135,38 +135,95 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 py-24">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Simpele prijzen</h2>
-          <p className="text-gray-500">Koop credits wanneer je ze nodig hebt. Geen abonnement, geen verplichtingen.</p>
+          <p className="text-gray-500">Begin gratis of kies het Pro abonnement voor de beste waarde.</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[
-            { name: "Probeer", price: "Gratis", credits: 10, perCredit: null, description: "10 credits bij registratie", highlight: false, cta: "Begin gratis" },
-            { name: "Starter", price: "€9,99", credits: 50, perCredit: "€0,20 per credit", description: "Voor af en toe gebruik", highlight: false, cta: "Koop credits" },
-            { name: "Populair", price: "€29,99", credits: 200, perCredit: "€0,15 per credit", description: "Meest gekozen", highlight: true, cta: "Koop credits" },
-            { name: "Beste koop", price: "€59,99", credits: 500, perCredit: "€0,12 per credit", description: "Voor intensief gebruik", highlight: false, cta: "Koop credits" },
-          ].map((tier) => (
-            <div key={tier.name} className={`relative rounded-3xl p-7 flex flex-col gap-4 ${tier.highlight ? "bg-blue-600 text-white shadow-xl shadow-blue-200 scale-105" : "bg-gray-50"}`}>
-              {tier.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-400 text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-                  ⭐ Meest gekozen
-                </div>
-              )}
-              <div>
-                <p className={`text-xs font-bold uppercase tracking-wider mb-1 ${tier.highlight ? "text-blue-200" : "text-gray-400"}`}>{tier.name}</p>
-                <p className={`text-4xl font-extrabold ${tier.highlight ? "text-white" : "text-gray-900"}`}>{tier.price}</p>
-                <p className={`text-sm mt-1 ${tier.highlight ? "text-blue-200" : "text-gray-500"}`}>{tier.description}</p>
-              </div>
-              <div className={`text-3xl font-bold ${tier.highlight ? "text-white" : "text-gray-900"}`}>
-                {tier.credits} <span className={`text-base font-normal ${tier.highlight ? "text-blue-200" : "text-gray-500"}`}>credits</span>
-              </div>
-              {tier.perCredit && (
-                <p className={`text-xs ${tier.highlight ? "text-blue-200" : "text-gray-400"}`}>{tier.perCredit}</p>
-              )}
-              <Link href="/auth/register"
-                className={`mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors ${tier.highlight ? "bg-white text-blue-600 hover:bg-blue-50" : "bg-blue-600 text-white hover:bg-blue-700"}`}>
-                {tier.cta} →
-              </Link>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          {/* Gratis */}
+          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">Gratis</p>
+              <p className="text-4xl font-extrabold text-gray-900">€0</p>
+              <p className="text-sm mt-1 text-gray-500">10 credits bij registratie</p>
             </div>
-          ))}
+            <div className="text-3xl font-bold text-gray-900">
+              10 <span className="text-base font-normal text-gray-500">credits</span>
+            </div>
+            <Link href="/auth/register"
+              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
+              Begin gratis →
+            </Link>
+          </div>
+
+          {/* Pro */}
+          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-amber-500 text-white shadow-xl shadow-amber-200 scale-105">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-amber-600 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+              ⭐ Aanbevolen
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-amber-100">Pro</p>
+              <p className="text-4xl font-extrabold text-white">€4,99</p>
+              <p className="text-sm mt-1 text-amber-100">/maand</p>
+            </div>
+            <div className="text-3xl font-bold text-white">
+              50 <span className="text-base font-normal text-amber-100">credits/maand</span>
+            </div>
+            <p className="text-xs text-amber-100">Maandelijks opzegbaar</p>
+            <Link href="/account"
+              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-white text-amber-600 hover:bg-amber-50">
+              Start Pro →
+            </Link>
+          </div>
+
+          {/* Starter */}
+          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">Starter</p>
+              <p className="text-4xl font-extrabold text-gray-900">€9,99</p>
+              <p className="text-sm mt-1 text-gray-500">Voor af en toe gebruik</p>
+            </div>
+            <div className="text-3xl font-bold text-gray-900">
+              50 <span className="text-base font-normal text-gray-500">credits</span>
+            </div>
+            <p className="text-xs text-gray-400">€0,20 per credit</p>
+            <Link href="/auth/register"
+              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
+              Koop credits →
+            </Link>
+          </div>
+
+          {/* Populair */}
+          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">Populair</p>
+              <p className="text-4xl font-extrabold text-gray-900">€29,99</p>
+              <p className="text-sm mt-1 text-gray-500">Voor regelmatig gebruik</p>
+            </div>
+            <div className="text-3xl font-bold text-gray-900">
+              200 <span className="text-base font-normal text-gray-500">credits</span>
+            </div>
+            <p className="text-xs text-gray-400">€0,15 per credit</p>
+            <Link href="/auth/register"
+              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
+              Koop credits →
+            </Link>
+          </div>
+
+          {/* Beste koop */}
+          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">Beste koop</p>
+              <p className="text-4xl font-extrabold text-gray-900">€59,99</p>
+              <p className="text-sm mt-1 text-gray-500">Voor intensief gebruik</p>
+            </div>
+            <div className="text-3xl font-bold text-gray-900">
+              500 <span className="text-base font-normal text-gray-500">credits</span>
+            </div>
+            <p className="text-xs text-gray-400">€0,12 per credit</p>
+            <Link href="/auth/register"
+              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
+              Koop credits →
+            </Link>
+          </div>
         </div>
         <p className="text-center text-xs text-gray-400 mt-6">Alle prijzen zijn excl. BTW · Betalen via iDEAL, creditcard of Bancontact · Credits vervallen niet</p>
       </section>
