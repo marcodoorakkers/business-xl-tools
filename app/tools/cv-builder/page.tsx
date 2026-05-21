@@ -22,86 +22,186 @@ interface CV {
   certifications?: string[];
 }
 
-const TEMPLATES: { value: Template; label: string; desc: string; accent: string; preview: React.ReactNode }[] = [
-  {
-    value: "modern",
+// ─── Template style definitions ────────────────────────────────────────────────
+const TEMPLATE_STYLES: Record<Template, {
+  label: string;
+  dot: string;
+  headerBg: string;
+  headerPadding: string;
+  nameClass: string;
+  titleClass: string;
+  contactClass: string;
+  align: "left" | "center";
+  sectionLabel: string;
+  accent: string;
+  bodyBg: string;
+  border?: string;
+}> = {
+  modern: {
     label: "Modern",
-    desc: "Blauw accent, strakke lijnen",
-    accent: "bg-blue-600",
-    preview: (
-      <div className="w-full h-20 bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col">
-        <div className="bg-blue-600 h-7 px-2 flex items-center gap-1">
-          <div className="w-12 h-2 bg-white/90 rounded" />
-          <div className="w-8 h-1.5 bg-blue-300 rounded" />
-        </div>
-        <div className="flex-1 px-2 py-1.5 flex flex-col gap-1">
-          <div className="w-16 h-1.5 bg-blue-600 rounded" />
-          <div className="w-full h-1 bg-gray-200 rounded" />
-          <div className="w-3/4 h-1 bg-gray-200 rounded" />
-        </div>
-      </div>
-    ),
+    dot: "bg-blue-600",
+    headerBg: "bg-blue-600",
+    headerPadding: "px-7 py-5",
+    nameClass: "text-3xl font-bold text-white",
+    titleClass: "text-blue-200 text-sm mt-0.5",
+    contactClass: "text-blue-300 text-xs mt-1.5",
+    align: "left",
+    sectionLabel: "text-blue-600 font-bold text-[10px] uppercase tracking-widest border-b-2 border-blue-600 pb-0.5 mb-2 mt-4",
+    accent: "text-blue-600",
+    bodyBg: "bg-white",
   },
-  {
-    value: "classic",
+  classic: {
     label: "Classic",
-    desc: "Tijdloos, zwart & grijs",
-    accent: "bg-gray-800",
-    preview: (
-      <div className="w-full h-20 bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col px-2 py-2 gap-1.5">
-        <div className="flex flex-col gap-0.5">
-          <div className="w-14 h-2 bg-gray-800 rounded" />
-          <div className="w-10 h-1.5 bg-gray-400 rounded" />
-        </div>
-        <div className="w-full h-px bg-gray-300" />
-        <div className="flex flex-col gap-1">
-          <div className="w-10 h-1.5 bg-gray-700 rounded" />
-          <div className="w-full h-1 bg-gray-200 rounded" />
-          <div className="w-4/5 h-1 bg-gray-200 rounded" />
-        </div>
-      </div>
-    ),
+    dot: "bg-gray-800",
+    headerBg: "bg-white border-b-2 border-gray-200",
+    headerPadding: "px-7 py-5",
+    nameClass: "text-3xl font-bold text-gray-900 font-serif",
+    titleClass: "text-gray-500 text-sm italic mt-0.5",
+    contactClass: "text-gray-400 text-xs mt-1.5",
+    align: "center",
+    sectionLabel: "text-gray-800 font-bold text-[10px] uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-2 mt-4",
+    accent: "text-gray-600",
+    bodyBg: "bg-white",
+    border: "border border-gray-200",
   },
-  {
-    value: "bold",
+  bold: {
     label: "Bold",
-    desc: "Donker, krachtig, modern",
-    accent: "bg-gray-900",
-    preview: (
-      <div className="w-full h-20 bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col">
-        <div className="bg-gray-900 h-9 px-2 flex flex-col justify-center gap-0.5">
-          <div className="w-14 h-2 bg-white rounded" />
-          <div className="w-10 h-1.5 bg-teal-400 rounded" />
-        </div>
-        <div className="flex-1 px-2 py-1.5 flex flex-col gap-1">
-          <div className="w-12 h-1.5 bg-teal-600 rounded" />
-          <div className="w-full h-1 bg-gray-200 rounded" />
-          <div className="w-2/3 h-1 bg-gray-200 rounded" />
-        </div>
-      </div>
-    ),
+    dot: "bg-gray-900",
+    headerBg: "bg-gray-900",
+    headerPadding: "px-7 py-5",
+    nameClass: "text-3xl font-bold text-white",
+    titleClass: "text-teal-400 text-sm mt-0.5",
+    contactClass: "text-teal-200 text-xs mt-1.5",
+    align: "left",
+    sectionLabel: "text-teal-600 font-bold text-[10px] uppercase tracking-widest mb-2 mt-4",
+    accent: "text-teal-600",
+    bodyBg: "bg-white",
   },
-  {
-    value: "minimal",
+  minimal: {
     label: "Minimal",
-    desc: "Clean, veel witruimte",
-    accent: "bg-gray-400",
-    preview: (
-      <div className="w-full h-20 bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col px-2 py-2 gap-1.5">
-        <div className="flex flex-col gap-0.5">
-          <div className="w-16 h-2 bg-gray-700 rounded" />
-          <div className="w-10 h-1.5 bg-gray-300 rounded" />
-        </div>
-        <div className="flex flex-col gap-1 mt-1">
-          <div className="w-8 h-1 bg-gray-300 rounded" />
-          <div className="w-full h-1 bg-gray-100 rounded" />
-          <div className="w-3/4 h-1 bg-gray-100 rounded" />
+    dot: "bg-gray-400",
+    headerBg: "bg-white",
+    headerPadding: "px-7 pt-6 pb-4",
+    nameClass: "text-3xl font-bold text-gray-900",
+    titleClass: "text-gray-500 text-sm mt-0.5",
+    contactClass: "text-gray-400 text-xs mt-1.5",
+    align: "left",
+    sectionLabel: "text-gray-400 text-[10px] uppercase tracking-[0.2em] mb-2 mt-4",
+    accent: "text-gray-500",
+    bodyBg: "bg-white",
+    border: "border border-gray-100",
+  },
+};
+
+// ─── Live CV Preview ────────────────────────────────────────────────────────────
+function CVPreview({ cv, template, lang, photo }: { cv: CV; template: Template; lang: Lang; photo: string | null }) {
+  const nl = lang === "nl";
+  const s = TEMPLATE_STYLES[template];
+  const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
+
+  return (
+    <div className={`rounded-xl overflow-hidden text-sm ${s.bodyBg} ${s.border ?? ""}`}>
+      {/* Header */}
+      <div className={`${s.headerBg} ${s.headerPadding} flex items-start gap-4 ${s.align === "center" ? "flex-col items-center text-center" : ""}`}>
+        {photo && s.align !== "center" && (
+          <img src={photo} alt="foto" className="w-16 h-20 object-cover rounded flex-shrink-0 shadow" />
+        )}
+        <div className={s.align === "center" ? "flex flex-col items-center" : ""}>
+          {photo && s.align === "center" && (
+            <img src={photo} alt="foto" className="w-16 h-20 object-cover rounded mb-3 shadow" />
+          )}
+          <p className={s.nameClass}>{cv.name}</p>
+          <p className={s.titleClass}>{cv.title}</p>
+          <p className={s.contactClass}>{contactParts.join("  ·  ")}</p>
         </div>
       </div>
-    ),
-  },
-];
 
+      {/* Body */}
+      <div className="px-7 pb-6">
+        {/* Profile */}
+        <p className={s.sectionLabel}>{nl ? "Profiel" : "Profile"}</p>
+        <p className="text-gray-700 text-xs leading-relaxed">{cv.summary}</p>
+
+        {/* Experience */}
+        {cv.experience.length > 0 && (
+          <>
+            <p className={s.sectionLabel}>{nl ? "Werkervaring" : "Experience"}</p>
+            <div className="flex flex-col gap-3">
+              {cv.experience.map((exp, i) => (
+                <div key={i}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="font-semibold text-gray-900 text-xs">{exp.title}</span>
+                      <span className={`text-xs ml-1.5 ${s.accent}`}>{exp.company}</span>
+                    </div>
+                    <span className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">{exp.period}</span>
+                  </div>
+                  <ul className="mt-1 flex flex-col gap-0.5">
+                    {exp.description.map((d, j) => (
+                      <li key={j} className="text-[11px] text-gray-600 flex gap-1.5">
+                        <span className="text-gray-300 flex-shrink-0 mt-0.5">•</span>{d}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Education */}
+        {cv.education.length > 0 && (
+          <>
+            <p className={s.sectionLabel}>{nl ? "Opleiding" : "Education"}</p>
+            <div className="flex flex-col gap-2">
+              {cv.education.map((edu, i) => (
+                <div key={i} className="flex items-start justify-between gap-2">
+                  <div>
+                    <span className="font-semibold text-gray-900 text-xs">{edu.degree}</span>
+                    <span className="text-[11px] text-gray-500 ml-1.5">{edu.institution}</span>
+                  </div>
+                  <span className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">{edu.period}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Skills */}
+        {cv.skills.length > 0 && (
+          <>
+            <p className={s.sectionLabel}>{nl ? "Vaardigheden" : "Skills"}</p>
+            <p className="text-xs text-gray-600">{cv.skills.join("  ·  ")}</p>
+          </>
+        )}
+
+        {/* Languages */}
+        {cv.languages.length > 0 && (
+          <>
+            <p className={s.sectionLabel}>{nl ? "Talen" : "Languages"}</p>
+            <p className="text-xs text-gray-600">{cv.languages.join("  ·  ")}</p>
+          </>
+        )}
+
+        {/* Certifications */}
+        {cv.certifications && cv.certifications.length > 0 && (
+          <>
+            <p className={s.sectionLabel}>{nl ? "Certificaten" : "Certifications"}</p>
+            <ul className="flex flex-col gap-0.5">
+              {cv.certifications.map((c, i) => (
+                <li key={i} className="text-xs text-gray-600 flex gap-1.5">
+                  <span className="text-gray-300">•</span>{c}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
 export default function CVBuilderPage() {
   const [step, setStep] = useState<Step>("setup");
   const [lang, setLang] = useState<Lang>("nl");
@@ -178,7 +278,6 @@ export default function CVBuilderPage() {
       UnderlineType, Packer, Table, TableRow, TableCell, WidthType, ImageRun, VerticalAlign,
     } = await import("docx");
 
-    // Prepare photo data if uploaded
     let photoData: Uint8Array | null = null;
     let photoType: "jpg" | "png" | "gif" | "bmp" | "svg" | "tiff" | "webp" = "jpg";
     if (photoDataUrl) {
@@ -222,52 +321,56 @@ export default function CVBuilderPage() {
           spacing: { before: 280, after: 120 },
         });
       }
-      // minimal
       return new Paragraph({
         children: [new TextRun({ text: text.toUpperCase(), color: "9CA3AF", size: 18, characterSpacing: 80 })],
         spacing: { before: 280, after: 100 },
       });
     };
 
-    // ── Header ──────────────────────────────────────────────────────────────
+    const photoCell = (fill: string) => new TableCell({
+      width: { size: 18, type: WidthType.PERCENTAGE },
+      shading: { fill },
+      borders: noBorder,
+      verticalAlign: VerticalAlign.CENTER,
+      children: [new Paragraph({
+        alignment: AlignmentType.CENTER,
+        shading: { fill },
+        spacing: { before: 120, after: 120 },
+        children: [new ImageRun({ data: photoData!, transformation: { width: 80, height: 100 }, type: photoType })],
+      })],
+    });
+
+    const headerWithPhoto = (leftCells: object[], leftFill: string, rightFill: string) =>
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
+        rows: [new TableRow({
+          children: [
+            new TableCell({
+              width: { size: 82, type: WidthType.PERCENTAGE },
+              shading: { fill: leftFill },
+              borders: noBorder,
+              verticalAlign: VerticalAlign.CENTER,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              children: leftCells as any[],
+            }),
+            photoCell(rightFill),
+          ],
+        })],
+      });
+
+    // Header
     if (template === "modern") {
       const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone, cv.contact.linkedin].filter(Boolean) as string[];
-      if (photoData) {
-        children.push(new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
-          rows: [
-            new TableRow({
-              children: [
-                new TableCell({
-                  width: { size: 82, type: WidthType.PERCENTAGE },
-                  shading: { fill: "2563EB" },
-                  borders: noBorder,
-                  verticalAlign: VerticalAlign.CENTER,
-                  children: [
-                    new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
-                    new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { after: 0 } }),
-                    new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
-                  ],
-                }),
-                new TableCell({
-                  width: { size: 18, type: WidthType.PERCENTAGE },
-                  shading: { fill: "1D4ED8" },
-                  borders: noBorder,
-                  verticalAlign: VerticalAlign.CENTER,
-                  children: [new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    shading: { fill: "1D4ED8" },
-                    spacing: { before: 120, after: 120 },
-                    children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
-                  })],
-                }),
-              ],
-            }),
-          ],
-        }));
-        children.push(new Paragraph({ text: "", spacing: { after: 120 } }));
-      } else {
+      const leftChildren = [
+        new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
+        new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { after: 0 } }),
+        new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
+      ];
+      if (photoData) { children.push(headerWithPhoto(leftChildren, "2563EB", "1D4ED8")); children.push(new Paragraph({ text: "", spacing: { after: 100 } })); }
+      else { children.push(...leftChildren.map(p => { return p; })); children[children.length - 1]; }
+      if (!photoData) {
+        children.length = 0;
         children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } }));
         children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } }));
         children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } }));
@@ -275,37 +378,12 @@ export default function CVBuilderPage() {
     } else if (template === "classic") {
       const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
       if (photoData) {
-        children.push(new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
-          rows: [
-            new TableRow({
-              children: [
-                new TableCell({
-                  width: { size: 80, type: WidthType.PERCENTAGE },
-                  borders: noBorder,
-                  verticalAlign: VerticalAlign.CENTER,
-                  children: [
-                    new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })], spacing: { after: 60 } }),
-                    new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })], spacing: { after: 80 } }),
-                    new Paragraph({ children: [new TextRun({ text: contactParts.join("  ·  "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "E5E7EB", space: 8 } }, spacing: { after: 200 } }),
-                  ],
-                }),
-                new TableCell({
-                  width: { size: 20, type: WidthType.PERCENTAGE },
-                  borders: noBorder,
-                  verticalAlign: VerticalAlign.CENTER,
-                  children: [new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    spacing: { before: 0, after: 0 },
-                    children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
-                  })],
-                }),
-              ],
-            }),
-          ],
-        }));
-        children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
+        const leftChildren = [
+          new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })], spacing: { after: 60 } }),
+          new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })], spacing: { after: 80 } }),
+          new Paragraph({ children: [new TextRun({ text: contactParts.join("  ·  "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "E5E7EB", space: 8 } }, spacing: { after: 200 } }),
+        ];
+        children.push(headerWithPhoto(leftChildren, "FFFFFF", "FFFFFF")); children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
       } else {
         children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })], alignment: AlignmentType.CENTER, spacing: { after: 60 } }));
         children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })], alignment: AlignmentType.CENTER, spacing: { after: 80 } }));
@@ -313,81 +391,26 @@ export default function CVBuilderPage() {
       }
     } else if (template === "bold") {
       const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
-      if (photoData) {
-        children.push(new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
-          rows: [
-            new TableRow({
-              children: [
-                new TableCell({
-                  width: { size: 82, type: WidthType.PERCENTAGE },
-                  shading: { fill: "111827" },
-                  borders: noBorder,
-                  verticalAlign: VerticalAlign.CENTER,
-                  children: [
-                    new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
-                    new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { after: 0 } }),
-                    new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
-                  ],
-                }),
-                new TableCell({
-                  width: { size: 18, type: WidthType.PERCENTAGE },
-                  shading: { fill: "1F2937" },
-                  borders: noBorder,
-                  verticalAlign: VerticalAlign.CENTER,
-                  children: [new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    shading: { fill: "1F2937" },
-                    spacing: { before: 120, after: 120 },
-                    children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
-                  })],
-                }),
-              ],
-            }),
-          ],
-        }));
-        children.push(new Paragraph({ text: "", spacing: { after: 120 } }));
-      } else {
+      const leftChildren = [
+        new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
+        new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { after: 0 } }),
+        new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
+      ];
+      if (photoData) { children.push(headerWithPhoto(leftChildren, "111827", "1F2937")); children.push(new Paragraph({ text: "", spacing: { after: 120 } })); }
+      else {
         children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } }));
         children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } }));
         children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } }));
       }
     } else {
-      // minimal
       const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
       if (photoData) {
-        children.push(new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
-          rows: [
-            new TableRow({
-              children: [
-                new TableCell({
-                  width: { size: 80, type: WidthType.PERCENTAGE },
-                  borders: noBorder,
-                  verticalAlign: VerticalAlign.CENTER,
-                  children: [
-                    new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } }),
-                    new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } }),
-                    new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } }, spacing: { after: 200 } }),
-                  ],
-                }),
-                new TableCell({
-                  width: { size: 20, type: WidthType.PERCENTAGE },
-                  borders: noBorder,
-                  verticalAlign: VerticalAlign.CENTER,
-                  children: [new Paragraph({
-                    alignment: AlignmentType.CENTER,
-                    spacing: { before: 0, after: 0 },
-                    children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
-                  })],
-                }),
-              ],
-            }),
-          ],
-        }));
-        children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
+        const leftChildren = [
+          new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } }),
+          new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } }),
+          new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } }, spacing: { after: 200 } }),
+        ];
+        children.push(headerWithPhoto(leftChildren, "FFFFFF", "FFFFFF")); children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
       } else {
         children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } }));
         children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } }));
@@ -395,11 +418,9 @@ export default function CVBuilderPage() {
       }
     }
 
-    // ── Summary ──────────────────────────────────────────────────────────────
     children.push(sectionLabel(nl ? "Profiel" : "Profile"));
     children.push(new Paragraph({ text: cv.summary, spacing: { after: 120 } }));
 
-    // ── Experience ───────────────────────────────────────────────────────────
     if (cv.experience.length > 0) {
       children.push(sectionLabel(nl ? "Werkervaring" : "Experience"));
       for (const exp of cv.experience) {
@@ -417,7 +438,6 @@ export default function CVBuilderPage() {
       }
     }
 
-    // ── Education ────────────────────────────────────────────────────────────
     if (cv.education.length > 0) {
       children.push(sectionLabel(nl ? "Opleiding" : "Education"));
       for (const edu of cv.education) {
@@ -432,19 +452,16 @@ export default function CVBuilderPage() {
       }
     }
 
-    // ── Skills ───────────────────────────────────────────────────────────────
     if (cv.skills.length > 0) {
       children.push(sectionLabel(nl ? "Vaardigheden" : "Skills"));
       children.push(new Paragraph({ text: cv.skills.join("  ·  "), spacing: { after: 80 } }));
     }
 
-    // ── Languages ────────────────────────────────────────────────────────────
     if (cv.languages.length > 0) {
       children.push(sectionLabel(nl ? "Talen" : "Languages"));
       children.push(new Paragraph({ text: cv.languages.join("  ·  "), spacing: { after: 80 } }));
     }
 
-    // ── Certifications ───────────────────────────────────────────────────────
     if (cv.certifications && cv.certifications.length > 0) {
       children.push(sectionLabel(nl ? "Certificaten" : "Certifications"));
       for (const cert of cv.certifications) {
@@ -496,7 +513,7 @@ export default function CVBuilderPage() {
 
       <main className="max-w-2xl mx-auto px-4 py-10">
 
-        {/* SETUP */}
+        {/* ── SETUP ── */}
         {step === "setup" && (
           <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-6">
             <div>
@@ -512,26 +529,6 @@ export default function CVBuilderPage() {
                   <button key={l} onClick={() => setLang(l)}
                     className={`flex-1 py-2 rounded-xl text-sm font-medium border-2 transition-colors ${lang === l ? "bg-blue-600 text-white border-blue-600" : "border-gray-200 text-gray-600 hover:border-blue-400"}`}>
                     {l === "nl" ? "🇳🇱 Nederlands" : "🇬🇧 English"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Template */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Opmaak / Template</label>
-              <div className="grid grid-cols-2 gap-3">
-                {TEMPLATES.map((t) => (
-                  <button key={t.value} onClick={() => setTemplate(t.value)}
-                    className={`flex flex-col gap-2 p-3 rounded-xl border-2 text-left transition-all ${template === t.value ? "border-blue-500 shadow-md" : "border-gray-200 hover:border-blue-300"}`}>
-                    {t.preview}
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2.5 h-2.5 rounded-full ${t.accent}`} />
-                      <div>
-                        <p className="font-semibold text-gray-900 text-sm">{t.label}</p>
-                        <p className="text-xs text-gray-400">{t.desc}</p>
-                      </div>
-                    </div>
                   </button>
                 ))}
               </div>
@@ -593,32 +590,6 @@ export default function CVBuilderPage() {
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
             </div>
 
-            {/* Photo upload (optional) */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Foto <span className="text-gray-400 font-normal">(optioneel)</span>
-              </label>
-              <p className="text-xs text-gray-400 mb-2">Wordt rechtsboven in de header van je Word CV geplaatst.</p>
-              <input ref={photoInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp" className="hidden" onChange={handlePhoto} />
-              <button onClick={() => photoInputRef.current?.click()}
-                className={`w-full py-3 rounded-xl text-sm font-medium border-2 border-dashed transition-colors flex items-center justify-center gap-2
-                  ${photoDataUrl ? "border-green-400 text-green-600 bg-green-50" : "border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"}`}>
-                {photoDataUrl ? (
-                  <div className="flex items-center gap-3">
-                    <img src={photoDataUrl} alt="preview" className="w-8 h-10 object-cover rounded" />
-                    <span>✓ {photoName} — klik om te wijzigen</span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setPhotoDataUrl(null); setPhotoName(""); }}
-                      className="ml-2 text-red-400 hover:text-red-600 text-xs underline">
-                      verwijderen
-                    </button>
-                  </div>
-                ) : (
-                  <>🖼️ Upload foto <span className="text-gray-400 font-normal">(JPG of PNG, pasfoto formaat)</span></>
-                )}
-              </button>
-            </div>
-
             {errorMsg && <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{errorMsg}</p>}
 
             <button onClick={generate} disabled={!profileText.trim() || (style === "targeted" && !jobDescription.trim())}
@@ -628,7 +599,7 @@ export default function CVBuilderPage() {
           </div>
         )}
 
-        {/* GENERATING */}
+        {/* ── GENERATING ── */}
         {step === "generating" && (
           <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center gap-4 py-16">
             <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -637,120 +608,54 @@ export default function CVBuilderPage() {
           </div>
         )}
 
-        {/* RESULT */}
+        {/* ── RESULT ── */}
         {step === "result" && cv && (
           <div className="flex flex-col gap-4">
-            {/* Header card */}
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg flex items-start gap-4">
-              {photoDataUrl && (
-                <img src={photoDataUrl} alt="foto" className="w-14 h-18 object-cover rounded-lg flex-shrink-0 shadow-md" style={{ height: "72px" }} />
-              )}
-              <div className="flex-1">
-                <p className="text-blue-200 text-xs font-semibold uppercase tracking-wider mb-2">CV gegenereerd ✓</p>
-                <h2 className="text-2xl font-bold mb-1">{cv.name}</h2>
-                <p className="text-blue-200 text-sm mb-3">{cv.title}</p>
-                <div className="flex flex-wrap gap-3 text-xs text-blue-100">
-                  {cv.contact.location && <span>📍 {cv.contact.location}</span>}
-                  {cv.contact.email && <span>✉️ {cv.contact.email}</span>}
-                  {cv.contact.phone && <span>📞 {cv.contact.phone}</span>}
-                </div>
-              </div>
-            </div>
 
-            {/* Template picker in result */}
-            <div className="bg-white rounded-2xl shadow-lg p-5">
-              <p className="text-sm font-medium text-gray-700 mb-3">Kies je template voor de download:</p>
-              <div className="grid grid-cols-4 gap-2">
-                {TEMPLATES.map((t) => (
-                  <button key={t.value} onClick={() => setTemplate(t.value)}
-                    className={`flex flex-col gap-1.5 p-2 rounded-xl border-2 transition-all ${template === t.value ? "border-blue-500 shadow-sm" : "border-gray-200 hover:border-blue-300"}`}>
-                    {t.preview}
-                    <p className="text-xs font-medium text-gray-700 text-center">{t.label}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* CV content preview */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-5">
+            {/* Template switcher + photo */}
+            <div className="bg-white rounded-2xl shadow-lg p-4 flex flex-col gap-3">
+              {/* Template pills */}
               <div>
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{lang === "nl" ? "Profiel" : "Profile"}</h3>
-                <p className="text-sm text-gray-700 leading-relaxed">{cv.summary}</p>
+                <p className="text-xs text-gray-500 font-medium mb-2">Opmaak</p>
+                <div className="flex gap-2">
+                  {(Object.entries(TEMPLATE_STYLES) as [Template, typeof TEMPLATE_STYLES[Template]][]).map(([key, s]) => (
+                    <button key={key} onClick={() => setTemplate(key)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${template === key ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm" : "border-gray-200 text-gray-600 hover:border-gray-300"}`}>
+                      <span className={`w-2 h-2 rounded-full ${s.dot}`} />
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {cv.experience.length > 0 && (
-                <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{lang === "nl" ? "Werkervaring" : "Experience"}</h3>
-                  <div className="flex flex-col gap-4">
-                    {cv.experience.map((exp, i) => (
-                      <div key={i}>
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm">{exp.title}</p>
-                            <p className="text-sm text-blue-600">{exp.company}</p>
-                          </div>
-                          <span className="text-xs text-gray-400 whitespace-nowrap">{exp.period}</span>
-                        </div>
-                        <ul className="mt-2 flex flex-col gap-1">
-                          {exp.description.map((d, j) => (
-                            <li key={j} className="text-xs text-gray-600 flex gap-2"><span className="text-gray-300 mt-0.5">•</span>{d}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+              {/* Photo upload */}
+              <div className="flex items-center gap-3 pt-1 border-t border-gray-100">
+                <input ref={photoInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={handlePhoto} />
+                {photoDataUrl ? (
+                  <div className="flex items-center gap-2 flex-1">
+                    <img src={photoDataUrl} alt="foto" className="w-8 h-10 object-cover rounded shadow-sm" />
+                    <span className="text-xs text-gray-600 flex-1 truncate">{photoName}</span>
+                    <button onClick={() => photoInputRef.current?.click()} className="text-xs text-blue-600 hover:underline">Wijzigen</button>
+                    <button onClick={() => { setPhotoDataUrl(null); setPhotoName(""); }} className="text-xs text-red-400 hover:underline">Verwijderen</button>
                   </div>
-                </div>
-              )}
-
-              {cv.education.length > 0 && (
-                <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">{lang === "nl" ? "Opleiding" : "Education"}</h3>
-                  <div className="flex flex-col gap-2">
-                    {cv.education.map((edu, i) => (
-                      <div key={i} className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="font-semibold text-gray-900 text-sm">{edu.degree}</p>
-                          <p className="text-xs text-gray-500">{edu.institution}</p>
-                        </div>
-                        <span className="text-xs text-gray-400 whitespace-nowrap">{edu.period}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {cv.skills.length > 0 && (
-                <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{lang === "nl" ? "Vaardigheden" : "Skills"}</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {cv.skills.map((s, i) => <span key={i} className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full">{s}</span>)}
-                  </div>
-                </div>
-              )}
-
-              {cv.languages.length > 0 && (
-                <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{lang === "nl" ? "Talen" : "Languages"}</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {cv.languages.map((l, i) => <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">{l}</span>)}
-                  </div>
-                </div>
-              )}
-
-              {cv.certifications && cv.certifications.length > 0 && (
-                <div>
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{lang === "nl" ? "Certificaten" : "Certifications"}</h3>
-                  <ul className="flex flex-col gap-1">
-                    {cv.certifications.map((c, i) => <li key={i} className="text-xs text-gray-600 flex gap-2"><span className="text-gray-300">•</span>{c}</li>)}
-                  </ul>
-                </div>
-              )}
+                ) : (
+                  <button onClick={() => photoInputRef.current?.click()}
+                    className="flex items-center gap-2 text-xs text-gray-500 hover:text-blue-600 transition-colors">
+                    <span className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-base">🖼️</span>
+                    <span>Foto toevoegen <span className="text-gray-400">(optioneel)</span></span>
+                  </button>
+                )}
+              </div>
             </div>
 
+            {/* Live CV preview */}
+            <CVPreview cv={cv} template={template} lang={lang} photo={photoDataUrl} />
+
+            {/* Actions */}
             <div className="flex gap-3">
               <button onClick={exportToDocx}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 text-sm font-semibold transition-colors shadow-lg shadow-blue-100">
-                📥 Download als Word ({TEMPLATES.find(t => t.value === template)?.label}{photoDataUrl ? " + foto" : ""})
+                📥 Download als Word{photoDataUrl ? " + foto" : ""}
               </button>
               <button onClick={reset}
                 className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl px-4 py-3 text-sm font-medium transition-colors">
@@ -760,7 +665,7 @@ export default function CVBuilderPage() {
           </div>
         )}
 
-        {/* ERROR */}
+        {/* ── ERROR ── */}
         {step === "error" && (
           <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center gap-4 py-10">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-3xl">!</div>
