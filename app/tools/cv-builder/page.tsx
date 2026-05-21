@@ -113,7 +113,10 @@ export default function CVBuilderPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfName, setPdfName] = useState("");
+  const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
+  const [photoName, setPhotoName] = useState("");
   const pdfInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   async function handlePdf(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -134,6 +137,18 @@ export default function CVBuilderPage() {
       setPdfLoading(false);
       if (pdfInputRef.current) pdfInputRef.current.value = "";
     }
+  }
+
+  function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoName(file.name);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (ev.target?.result) setPhotoDataUrl(ev.target.result as string);
+    };
+    reader.readAsDataURL(file);
+    if (photoInputRef.current) photoInputRef.current.value = "";
   }
 
   async function generate() {
@@ -158,10 +173,33 @@ export default function CVBuilderPage() {
 
   async function exportToDocx() {
     if (!cv) return;
-    const { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, UnderlineType, Packer } = await import("docx");
+    const {
+      Document, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle,
+      UnderlineType, Packer, Table, TableRow, TableCell, WidthType, ImageRun, VerticalAlign,
+    } = await import("docx");
+
+    // Prepare photo data if uploaded
+    let photoData: Uint8Array | null = null;
+    let photoType: "jpg" | "png" | "gif" | "bmp" | "svg" | "tiff" | "webp" = "jpg";
+    if (photoDataUrl) {
+      const [meta, base64] = photoDataUrl.split(",");
+      const mime = meta.match(/data:([^;]+)/)?.[1] ?? "image/jpeg";
+      photoType = mime.includes("png") ? "png" : mime.includes("gif") ? "gif" : "jpg";
+      const binary = atob(base64);
+      photoData = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) photoData[i] = binary.charCodeAt(i);
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const children: any[] = [];
     const nl = lang === "nl";
+
+    const noBorder = {
+      top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+    };
 
     const sectionLabel = (text: string) => {
       if (template === "modern") {
@@ -191,88 +229,177 @@ export default function CVBuilderPage() {
       });
     };
 
-    // Header
+    // ── Header ──────────────────────────────────────────────────────────────
     if (template === "modern") {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })],
-        shading: { fill: "2563EB" },
-        spacing: { before: 0, after: 0 },
-        indent: { left: 200, right: 200 },
-      }));
-      children.push(new Paragraph({
-        children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })],
-        shading: { fill: "2563EB" },
-        spacing: { after: 0 },
-        indent: { left: 200, right: 200 },
-      }));
       const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone, cv.contact.linkedin].filter(Boolean) as string[];
-      children.push(new Paragraph({
-        children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })],
-        shading: { fill: "1D4ED8" },
-        spacing: { after: 200 },
-        indent: { left: 200, right: 200 },
-      }));
+      if (photoData) {
+        children.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  width: { size: 82, type: WidthType.PERCENTAGE },
+                  shading: { fill: "2563EB" },
+                  borders: noBorder,
+                  verticalAlign: VerticalAlign.CENTER,
+                  children: [
+                    new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
+                    new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { after: 0 } }),
+                    new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
+                  ],
+                }),
+                new TableCell({
+                  width: { size: 18, type: WidthType.PERCENTAGE },
+                  shading: { fill: "1D4ED8" },
+                  borders: noBorder,
+                  verticalAlign: VerticalAlign.CENTER,
+                  children: [new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    shading: { fill: "1D4ED8" },
+                    spacing: { before: 120, after: 120 },
+                    children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
+                  })],
+                }),
+              ],
+            }),
+          ],
+        }));
+        children.push(new Paragraph({ text: "", spacing: { after: 120 } }));
+      } else {
+        children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } }));
+        children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } }));
+        children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } }));
+      }
     } else if (template === "classic") {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })],
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 60 },
-      }));
-      children.push(new Paragraph({
-        children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })],
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 80 },
-      }));
       const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
-      children.push(new Paragraph({
-        children: [new TextRun({ text: contactParts.join("  ·  "), size: 18, color: "9CA3AF" })],
-        alignment: AlignmentType.CENTER,
-        border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "E5E7EB", space: 8 } },
-        spacing: { after: 200 },
-      }));
+      if (photoData) {
+        children.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  width: { size: 80, type: WidthType.PERCENTAGE },
+                  borders: noBorder,
+                  verticalAlign: VerticalAlign.CENTER,
+                  children: [
+                    new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })], spacing: { after: 60 } }),
+                    new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })], spacing: { after: 80 } }),
+                    new Paragraph({ children: [new TextRun({ text: contactParts.join("  ·  "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "E5E7EB", space: 8 } }, spacing: { after: 200 } }),
+                  ],
+                }),
+                new TableCell({
+                  width: { size: 20, type: WidthType.PERCENTAGE },
+                  borders: noBorder,
+                  verticalAlign: VerticalAlign.CENTER,
+                  children: [new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spacing: { before: 0, after: 0 },
+                    children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
+                  })],
+                }),
+              ],
+            }),
+          ],
+        }));
+        children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
+      } else {
+        children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })], alignment: AlignmentType.CENTER, spacing: { after: 60 } }));
+        children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })], alignment: AlignmentType.CENTER, spacing: { after: 80 } }));
+        children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("  ·  "), size: 18, color: "9CA3AF" })], alignment: AlignmentType.CENTER, border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "E5E7EB", space: 8 } }, spacing: { after: 200 } }));
+      }
     } else if (template === "bold") {
-      children.push(new Paragraph({
-        children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })],
-        shading: { fill: "111827" },
-        spacing: { before: 0, after: 0 },
-        indent: { left: 200, right: 200 },
-      }));
-      children.push(new Paragraph({
-        children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })],
-        shading: { fill: "111827" },
-        spacing: { after: 0 },
-        indent: { left: 200, right: 200 },
-      }));
       const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
-      children.push(new Paragraph({
-        children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })],
-        shading: { fill: "1F2937" },
-        spacing: { after: 200 },
-        indent: { left: 200, right: 200 },
-      }));
+      if (photoData) {
+        children.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  width: { size: 82, type: WidthType.PERCENTAGE },
+                  shading: { fill: "111827" },
+                  borders: noBorder,
+                  verticalAlign: VerticalAlign.CENTER,
+                  children: [
+                    new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
+                    new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { after: 0 } }),
+                    new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
+                  ],
+                }),
+                new TableCell({
+                  width: { size: 18, type: WidthType.PERCENTAGE },
+                  shading: { fill: "1F2937" },
+                  borders: noBorder,
+                  verticalAlign: VerticalAlign.CENTER,
+                  children: [new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    shading: { fill: "1F2937" },
+                    spacing: { before: 120, after: 120 },
+                    children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
+                  })],
+                }),
+              ],
+            }),
+          ],
+        }));
+        children.push(new Paragraph({ text: "", spacing: { after: 120 } }));
+      } else {
+        children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } }));
+        children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } }));
+        children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } }));
+      }
     } else {
       // minimal
-      children.push(new Paragraph({
-        children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })],
-        spacing: { after: 40 },
-      }));
-      children.push(new Paragraph({
-        children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })],
-        spacing: { after: 60 },
-      }));
       const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
-      children.push(new Paragraph({
-        children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "9CA3AF" })],
-        border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } },
-        spacing: { after: 200 },
-      }));
+      if (photoData) {
+        children.push(new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
+          rows: [
+            new TableRow({
+              children: [
+                new TableCell({
+                  width: { size: 80, type: WidthType.PERCENTAGE },
+                  borders: noBorder,
+                  verticalAlign: VerticalAlign.CENTER,
+                  children: [
+                    new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } }),
+                    new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } }),
+                    new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } }, spacing: { after: 200 } }),
+                  ],
+                }),
+                new TableCell({
+                  width: { size: 20, type: WidthType.PERCENTAGE },
+                  borders: noBorder,
+                  verticalAlign: VerticalAlign.CENTER,
+                  children: [new Paragraph({
+                    alignment: AlignmentType.CENTER,
+                    spacing: { before: 0, after: 0 },
+                    children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
+                  })],
+                }),
+              ],
+            }),
+          ],
+        }));
+        children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
+      } else {
+        children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } }));
+        children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } }));
+        children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } }, spacing: { after: 200 } }));
+      }
     }
 
-    // Summary
+    // ── Summary ──────────────────────────────────────────────────────────────
     children.push(sectionLabel(nl ? "Profiel" : "Profile"));
     children.push(new Paragraph({ text: cv.summary, spacing: { after: 120 } }));
 
-    // Experience
+    // ── Experience ───────────────────────────────────────────────────────────
     if (cv.experience.length > 0) {
       children.push(sectionLabel(nl ? "Werkervaring" : "Experience"));
       for (const exp of cv.experience) {
@@ -290,7 +417,7 @@ export default function CVBuilderPage() {
       }
     }
 
-    // Education
+    // ── Education ────────────────────────────────────────────────────────────
     if (cv.education.length > 0) {
       children.push(sectionLabel(nl ? "Opleiding" : "Education"));
       for (const edu of cv.education) {
@@ -305,19 +432,19 @@ export default function CVBuilderPage() {
       }
     }
 
-    // Skills
+    // ── Skills ───────────────────────────────────────────────────────────────
     if (cv.skills.length > 0) {
       children.push(sectionLabel(nl ? "Vaardigheden" : "Skills"));
       children.push(new Paragraph({ text: cv.skills.join("  ·  "), spacing: { after: 80 } }));
     }
 
-    // Languages
+    // ── Languages ────────────────────────────────────────────────────────────
     if (cv.languages.length > 0) {
       children.push(sectionLabel(nl ? "Talen" : "Languages"));
       children.push(new Paragraph({ text: cv.languages.join("  ·  "), spacing: { after: 80 } }));
     }
 
-    // Certifications
+    // ── Certifications ───────────────────────────────────────────────────────
     if (cv.certifications && cv.certifications.length > 0) {
       children.push(sectionLabel(nl ? "Certificaten" : "Certifications"));
       for (const cert of cv.certifications) {
@@ -325,7 +452,7 @@ export default function CVBuilderPage() {
       }
     }
 
-    void HeadingLevel; void UnderlineType;
+    void HeadingLevel; void UnderlineType; void VerticalAlign;
 
     const doc = new Document({
       styles: {
@@ -466,6 +593,32 @@ export default function CVBuilderPage() {
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
             </div>
 
+            {/* Photo upload (optional) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Foto <span className="text-gray-400 font-normal">(optioneel)</span>
+              </label>
+              <p className="text-xs text-gray-400 mb-2">Wordt rechtsboven in de header van je Word CV geplaatst.</p>
+              <input ref={photoInputRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp" className="hidden" onChange={handlePhoto} />
+              <button onClick={() => photoInputRef.current?.click()}
+                className={`w-full py-3 rounded-xl text-sm font-medium border-2 border-dashed transition-colors flex items-center justify-center gap-2
+                  ${photoDataUrl ? "border-green-400 text-green-600 bg-green-50" : "border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"}`}>
+                {photoDataUrl ? (
+                  <div className="flex items-center gap-3">
+                    <img src={photoDataUrl} alt="preview" className="w-8 h-10 object-cover rounded" />
+                    <span>✓ {photoName} — klik om te wijzigen</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setPhotoDataUrl(null); setPhotoName(""); }}
+                      className="ml-2 text-red-400 hover:text-red-600 text-xs underline">
+                      verwijderen
+                    </button>
+                  </div>
+                ) : (
+                  <>🖼️ Upload foto <span className="text-gray-400 font-normal">(JPG of PNG, pasfoto formaat)</span></>
+                )}
+              </button>
+            </div>
+
             {errorMsg && <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{errorMsg}</p>}
 
             <button onClick={generate} disabled={!profileText.trim() || (style === "targeted" && !jobDescription.trim())}
@@ -488,14 +641,19 @@ export default function CVBuilderPage() {
         {step === "result" && cv && (
           <div className="flex flex-col gap-4">
             {/* Header card */}
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
-              <p className="text-blue-200 text-xs font-semibold uppercase tracking-wider mb-2">CV gegenereerd ✓</p>
-              <h2 className="text-2xl font-bold mb-1">{cv.name}</h2>
-              <p className="text-blue-200 text-sm mb-3">{cv.title}</p>
-              <div className="flex flex-wrap gap-3 text-xs text-blue-100">
-                {cv.contact.location && <span>📍 {cv.contact.location}</span>}
-                {cv.contact.email && <span>✉️ {cv.contact.email}</span>}
-                {cv.contact.phone && <span>📞 {cv.contact.phone}</span>}
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg flex items-start gap-4">
+              {photoDataUrl && (
+                <img src={photoDataUrl} alt="foto" className="w-14 h-18 object-cover rounded-lg flex-shrink-0 shadow-md" style={{ height: "72px" }} />
+              )}
+              <div className="flex-1">
+                <p className="text-blue-200 text-xs font-semibold uppercase tracking-wider mb-2">CV gegenereerd ✓</p>
+                <h2 className="text-2xl font-bold mb-1">{cv.name}</h2>
+                <p className="text-blue-200 text-sm mb-3">{cv.title}</p>
+                <div className="flex flex-wrap gap-3 text-xs text-blue-100">
+                  {cv.contact.location && <span>📍 {cv.contact.location}</span>}
+                  {cv.contact.email && <span>✉️ {cv.contact.email}</span>}
+                  {cv.contact.phone && <span>📞 {cv.contact.phone}</span>}
+                </div>
               </div>
             </div>
 
@@ -592,7 +750,7 @@ export default function CVBuilderPage() {
             <div className="flex gap-3">
               <button onClick={exportToDocx}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 text-sm font-semibold transition-colors shadow-lg shadow-blue-100">
-                📥 Download als Word ({TEMPLATES.find(t => t.value === template)?.label})
+                📥 Download als Word ({TEMPLATES.find(t => t.value === template)?.label}{photoDataUrl ? " + foto" : ""})
               </button>
               <button onClick={reset}
                 className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl px-4 py-3 text-sm font-medium transition-colors">
