@@ -23,73 +23,67 @@ interface CV {
 }
 
 // ─── Template style definitions ────────────────────────────────────────────────
+// Uses inline styles (not Tailwind classes) for all template-specific colors
+// so they survive Tailwind's production purge.
 const TEMPLATE_STYLES: Record<Template, {
   label: string;
-  dot: string;
-  headerBg: string;
-  headerPadding: string;
-  nameClass: string;
-  titleClass: string;
-  contactClass: string;
+  dotColor: string;
+  headerStyle: React.CSSProperties;
+  bodyStyle: React.CSSProperties;
+  nameStyle: React.CSSProperties;
+  titleStyle: React.CSSProperties;
+  contactStyle: React.CSSProperties;
+  sectionStyle: React.CSSProperties;
+  accentStyle: React.CSSProperties;
   align: "left" | "center";
-  sectionLabel: string;
-  accent: string;
-  bodyBg: string;
-  border?: string;
 }> = {
   modern: {
     label: "Modern",
-    dot: "bg-blue-600",
-    headerBg: "bg-blue-600",
-    headerPadding: "px-7 py-5",
-    nameClass: "text-3xl font-bold text-white",
-    titleClass: "text-blue-200 text-sm mt-0.5",
-    contactClass: "text-blue-300 text-xs mt-1.5",
+    dotColor: "#2563EB",
+    headerStyle: { background: "#2563EB", padding: "20px 28px" },
+    bodyStyle: { background: "#fff" },
+    nameStyle: { color: "#fff", fontSize: "22px", fontWeight: 700, lineHeight: 1.2 },
+    titleStyle: { color: "#BFDBFE", fontSize: "13px", marginTop: 2 },
+    contactStyle: { color: "#93C5FD", fontSize: "11px", marginTop: 6 },
+    sectionStyle: { color: "#2563EB", fontWeight: 700, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", borderBottom: "2px solid #2563EB", paddingBottom: 2, marginTop: 16, marginBottom: 8 },
+    accentStyle: { color: "#2563EB" },
     align: "left",
-    sectionLabel: "text-blue-600 font-bold text-[10px] uppercase tracking-widest border-b-2 border-blue-600 pb-0.5 mb-2 mt-4",
-    accent: "text-blue-600",
-    bodyBg: "bg-white",
   },
   classic: {
     label: "Classic",
-    dot: "bg-gray-800",
-    headerBg: "bg-white border-b-2 border-gray-200",
-    headerPadding: "px-7 py-5",
-    nameClass: "text-3xl font-bold text-gray-900 font-serif",
-    titleClass: "text-gray-500 text-sm italic mt-0.5",
-    contactClass: "text-gray-400 text-xs mt-1.5",
+    dotColor: "#1F2937",
+    headerStyle: { background: "#fff", padding: "20px 28px", borderBottom: "2px solid #E5E7EB" },
+    bodyStyle: { background: "#fff", border: "1px solid #E5E7EB" },
+    nameStyle: { color: "#111827", fontSize: "22px", fontWeight: 700, lineHeight: 1.2, fontFamily: "Georgia, serif" },
+    titleStyle: { color: "#6B7280", fontSize: "13px", fontStyle: "italic", marginTop: 2 },
+    contactStyle: { color: "#9CA3AF", fontSize: "11px", marginTop: 6 },
+    sectionStyle: { color: "#1F2937", fontWeight: 700, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid #D1D5DB", paddingBottom: 2, marginTop: 16, marginBottom: 8 },
+    accentStyle: { color: "#4B5563" },
     align: "center",
-    sectionLabel: "text-gray-800 font-bold text-[10px] uppercase tracking-wider border-b border-gray-300 pb-0.5 mb-2 mt-4",
-    accent: "text-gray-600",
-    bodyBg: "bg-white",
-    border: "border border-gray-200",
   },
   bold: {
     label: "Bold",
-    dot: "bg-gray-900",
-    headerBg: "bg-gray-900",
-    headerPadding: "px-7 py-5",
-    nameClass: "text-3xl font-bold text-white",
-    titleClass: "text-teal-400 text-sm mt-0.5",
-    contactClass: "text-teal-200 text-xs mt-1.5",
+    dotColor: "#111827",
+    headerStyle: { background: "#111827", padding: "20px 28px" },
+    bodyStyle: { background: "#fff" },
+    nameStyle: { color: "#fff", fontSize: "22px", fontWeight: 700, lineHeight: 1.2 },
+    titleStyle: { color: "#2DD4BF", fontSize: "13px", marginTop: 2 },
+    contactStyle: { color: "#99F6E4", fontSize: "11px", marginTop: 6 },
+    sectionStyle: { color: "#0D9488", fontWeight: 700, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 16, marginBottom: 8 },
+    accentStyle: { color: "#0D9488" },
     align: "left",
-    sectionLabel: "text-teal-600 font-bold text-[10px] uppercase tracking-widest mb-2 mt-4",
-    accent: "text-teal-600",
-    bodyBg: "bg-white",
   },
   minimal: {
     label: "Minimal",
-    dot: "bg-gray-400",
-    headerBg: "bg-white",
-    headerPadding: "px-7 pt-6 pb-4",
-    nameClass: "text-3xl font-bold text-gray-900",
-    titleClass: "text-gray-500 text-sm mt-0.5",
-    contactClass: "text-gray-400 text-xs mt-1.5",
+    dotColor: "#9CA3AF",
+    headerStyle: { background: "#fff", padding: "24px 28px 16px" },
+    bodyStyle: { background: "#fff", border: "1px solid #F3F4F6" },
+    nameStyle: { color: "#111827", fontSize: "22px", fontWeight: 700, lineHeight: 1.2 },
+    titleStyle: { color: "#6B7280", fontSize: "13px", marginTop: 2 },
+    contactStyle: { color: "#9CA3AF", fontSize: "11px", marginTop: 6 },
+    sectionStyle: { color: "#9CA3AF", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.2em", marginTop: 16, marginBottom: 8, borderBottom: "1px solid #F3F4F6", paddingBottom: 2 },
+    accentStyle: { color: "#6B7280" },
     align: "left",
-    sectionLabel: "text-gray-400 text-[10px] uppercase tracking-[0.2em] mb-2 mt-4",
-    accent: "text-gray-500",
-    bodyBg: "bg-white",
-    border: "border border-gray-100",
   },
 };
 
@@ -99,46 +93,48 @@ function CVPreview({ cv, template, lang, photo }: { cv: CV; template: Template; 
   const s = TEMPLATE_STYLES[template];
   const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
 
+  const SectionLabel = ({ text }: { text: string }) => (
+    <p style={s.sectionStyle as React.CSSProperties}>{text}</p>
+  );
+
   return (
-    <div className={`rounded-xl overflow-hidden text-sm ${s.bodyBg} ${s.border ?? ""}`}>
+    <div className="rounded-xl overflow-hidden text-sm shadow-lg" style={s.bodyStyle}>
       {/* Header */}
-      <div className={`${s.headerBg} ${s.headerPadding} flex items-start gap-4 ${s.align === "center" ? "flex-col items-center text-center" : ""}`}>
+      <div style={{ ...s.headerStyle, display: "flex", alignItems: "flex-start", gap: 16, flexDirection: s.align === "center" ? "column" : "row", ...(s.align === "center" ? { alignItems: "center", textAlign: "center" } : {}) }}>
         {photo && s.align !== "center" && (
-          <img src={photo} alt="foto" className="w-16 h-20 object-cover rounded flex-shrink-0 shadow" />
+          <img src={photo} alt="foto" className="rounded shadow flex-shrink-0" style={{ width: 64, height: 80, objectFit: "cover" }} />
         )}
-        <div className={s.align === "center" ? "flex flex-col items-center" : ""}>
+        <div style={s.align === "center" ? { display: "flex", flexDirection: "column", alignItems: "center" } : {}}>
           {photo && s.align === "center" && (
-            <img src={photo} alt="foto" className="w-16 h-20 object-cover rounded mb-3 shadow" />
+            <img src={photo} alt="foto" className="rounded shadow" style={{ width: 64, height: 80, objectFit: "cover", marginBottom: 12 }} />
           )}
-          <p className={s.nameClass}>{cv.name}</p>
-          <p className={s.titleClass}>{cv.title}</p>
-          <p className={s.contactClass}>{contactParts.join("  ·  ")}</p>
+          <p style={s.nameStyle}>{cv.name}</p>
+          <p style={s.titleStyle}>{cv.title}</p>
+          <p style={s.contactStyle}>{contactParts.join("  ·  ")}</p>
         </div>
       </div>
 
       {/* Body */}
       <div className="px-7 pb-6">
-        {/* Profile */}
-        <p className={s.sectionLabel}>{nl ? "Profiel" : "Profile"}</p>
-        <p className="text-gray-700 text-xs leading-relaxed">{cv.summary}</p>
+        <SectionLabel text={nl ? "Profiel" : "Profile"} />
+        <p className="text-gray-700 leading-relaxed" style={{ fontSize: 12 }}>{cv.summary}</p>
 
-        {/* Experience */}
         {cv.experience.length > 0 && (
           <>
-            <p className={s.sectionLabel}>{nl ? "Werkervaring" : "Experience"}</p>
+            <SectionLabel text={nl ? "Werkervaring" : "Experience"} />
             <div className="flex flex-col gap-3">
               {cv.experience.map((exp, i) => (
                 <div key={i}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="font-semibold text-gray-900 text-xs">{exp.title}</span>
-                      <span className={`text-xs ml-1.5 ${s.accent}`}>{exp.company}</span>
+                      <span className="font-semibold text-gray-900" style={{ fontSize: 12 }}>{exp.title}</span>
+                      <span className="ml-1.5" style={{ fontSize: 12, ...s.accentStyle }}>{exp.company}</span>
                     </div>
-                    <span className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">{exp.period}</span>
+                    <span className="text-gray-400 whitespace-nowrap flex-shrink-0" style={{ fontSize: 10 }}>{exp.period}</span>
                   </div>
                   <ul className="mt-1 flex flex-col gap-0.5">
                     {exp.description.map((d, j) => (
-                      <li key={j} className="text-[11px] text-gray-600 flex gap-1.5">
+                      <li key={j} className="text-gray-600 flex gap-1.5" style={{ fontSize: 11 }}>
                         <span className="text-gray-300 flex-shrink-0 mt-0.5">•</span>{d}
                       </li>
                     ))}
@@ -149,47 +145,43 @@ function CVPreview({ cv, template, lang, photo }: { cv: CV; template: Template; 
           </>
         )}
 
-        {/* Education */}
         {cv.education.length > 0 && (
           <>
-            <p className={s.sectionLabel}>{nl ? "Opleiding" : "Education"}</p>
+            <SectionLabel text={nl ? "Opleiding" : "Education"} />
             <div className="flex flex-col gap-2">
               {cv.education.map((edu, i) => (
                 <div key={i} className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="font-semibold text-gray-900 text-xs">{edu.degree}</span>
-                    <span className="text-[11px] text-gray-500 ml-1.5">{edu.institution}</span>
+                    <span className="font-semibold text-gray-900" style={{ fontSize: 12 }}>{edu.degree}</span>
+                    <span className="text-gray-500 ml-1.5" style={{ fontSize: 11 }}>{edu.institution}</span>
                   </div>
-                  <span className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">{edu.period}</span>
+                  <span className="text-gray-400 whitespace-nowrap flex-shrink-0" style={{ fontSize: 10 }}>{edu.period}</span>
                 </div>
               ))}
             </div>
           </>
         )}
 
-        {/* Skills */}
         {cv.skills.length > 0 && (
           <>
-            <p className={s.sectionLabel}>{nl ? "Vaardigheden" : "Skills"}</p>
-            <p className="text-xs text-gray-600">{cv.skills.join("  ·  ")}</p>
+            <SectionLabel text={nl ? "Vaardigheden" : "Skills"} />
+            <p className="text-gray-600" style={{ fontSize: 12 }}>{cv.skills.join("  ·  ")}</p>
           </>
         )}
 
-        {/* Languages */}
         {cv.languages.length > 0 && (
           <>
-            <p className={s.sectionLabel}>{nl ? "Talen" : "Languages"}</p>
-            <p className="text-xs text-gray-600">{cv.languages.join("  ·  ")}</p>
+            <SectionLabel text={nl ? "Talen" : "Languages"} />
+            <p className="text-gray-600" style={{ fontSize: 12 }}>{cv.languages.join("  ·  ")}</p>
           </>
         )}
 
-        {/* Certifications */}
         {cv.certifications && cv.certifications.length > 0 && (
           <>
-            <p className={s.sectionLabel}>{nl ? "Certificaten" : "Certifications"}</p>
+            <SectionLabel text={nl ? "Certificaten" : "Certifications"} />
             <ul className="flex flex-col gap-0.5">
               {cv.certifications.map((c, i) => (
-                <li key={i} className="text-xs text-gray-600 flex gap-1.5">
+                <li key={i} className="text-gray-600 flex gap-1.5" style={{ fontSize: 12 }}>
                   <span className="text-gray-300">•</span>{c}
                 </li>
               ))}
@@ -619,9 +611,9 @@ export default function CVBuilderPage() {
                 <p className="text-xs text-gray-500 font-medium mb-2">Opmaak</p>
                 <div className="flex gap-2">
                   {(Object.entries(TEMPLATE_STYLES) as [Template, typeof TEMPLATE_STYLES[Template]][]).map(([key, s]) => (
-                    <button key={key} onClick={() => setTemplate(key)}
+                    <button key={key} onClick={() => setTemplate(key as Template)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${template === key ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm" : "border-gray-200 text-gray-600 hover:border-gray-300"}`}>
-                      <span className={`w-2 h-2 rounded-full ${s.dot}`} />
+                      <span className="w-2 h-2 rounded-full" style={{ background: s.dotColor }} />
                       {s.label}
                     </button>
                   ))}
