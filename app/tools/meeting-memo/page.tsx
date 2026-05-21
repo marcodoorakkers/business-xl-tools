@@ -378,6 +378,7 @@ export default function MeetingMemoPage() {
             <button onClick={() => { setPrevStep(step); setStep("history"); }} className={`text-lg px-2 py-1 rounded-lg ${btnSec}`} title={isNl ? "Historie" : "History"}>🗂️</button>
           )}
           {step !== "settings" && <button onClick={openSettings} className={`text-lg px-2 py-1 rounded-lg ${btnSec}`}>⚙️</button>}
+          <button onClick={async () => { const { createClient } = await import("@/lib/supabase/client"); await createClient().auth.signOut(); window.location.href = "/auth/login"; }} className={`text-xs px-2 py-1 rounded-lg ${btnSec}`}>Uitloggen</button>
         </div>
       </nav>
 

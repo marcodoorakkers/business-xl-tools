@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import ToolNav from "@/components/ToolNav";
 
 type Step = "idle" | "recording" | "processing" | "preview" | "sending" | "done" | "error";
 
@@ -112,11 +113,7 @@ export default function VoiceMailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-3">
-        <Link href="/dashboard" className="text-gray-500 hover:text-gray-900 text-sm">← Dashboard</Link>
-        <span className="text-gray-300">|</span>
-        <span className="font-semibold text-gray-900 text-sm">🎙️ Voice Mail Draft</span>
-      </nav>
+      <ToolNav label="🎙️ Voice Mail Draft" />
 
       <main className="max-w-xl mx-auto px-4 py-10">
         <div className="bg-white rounded-2xl shadow-lg p-8">
