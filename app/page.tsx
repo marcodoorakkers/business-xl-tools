@@ -208,22 +208,6 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Beste koop */}
-          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">Beste koop</p>
-              <p className="text-4xl font-extrabold text-gray-900">€59,99</p>
-              <p className="text-sm mt-1 text-gray-500">Voor intensief gebruik</p>
-            </div>
-            <div className="text-3xl font-bold text-gray-900">
-              500 <span className="text-base font-normal text-gray-500">credits</span>
-            </div>
-            <p className="text-xs text-gray-400">€0,12 per credit</p>
-            <Link href="/auth/register"
-              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
-              Koop credits →
-            </Link>
-          </div>
         </div>
         <p className="text-center text-xs text-gray-400 mt-6">Alle prijzen zijn excl. BTW · Betalen via iDEAL, creditcard of Bancontact · Credits vervallen niet</p>
       </section>

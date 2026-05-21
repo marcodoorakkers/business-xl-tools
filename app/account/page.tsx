@@ -10,7 +10,6 @@ import CancelSubscriptionButton from "./CancelSubscriptionButton";
 const PACKAGES = [
   { name: "Starter", credits: 50, price: "€9,99", priceId: "price_1TZSta1ifGSUEPSdHvDnulnr", perCredit: "€0,20/credit" },
   { name: "Populair", credits: 200, price: "€29,99", priceId: "price_1TZSte1ifGSUEPSd9N8emyuz", perCredit: "€0,15/credit" },
-  { name: "Beste Koop", credits: 500, price: "€59,99", priceId: "price_1TZStd1ifGSUEPSdlWmrtbOS", perCredit: "€0,12/credit" },
 ];
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ payment?: string; credits?: string }> }) {
