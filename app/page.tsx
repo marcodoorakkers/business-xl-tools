@@ -25,14 +25,14 @@ const tools = [
   {
     icon: "🔍",
     name: "Vacaturezoeker",
-    description: "Upload je LinkedIn profiel en vind direct actuele freelance vacatures wereldwijd.",
+    description: "Plak je CV of profiel en vind direct actuele freelance & contract vacatures wereldwijd.",
     color: "from-green-500 to-teal-500",
     bg: "bg-green-50",
   },
   {
     icon: "📋",
     name: "CV Builder",
-    description: "Maak een professioneel CV van je LinkedIn profiel of bestaand CV — kies uit 6 templates en download direct als Word.",
+    description: "Upload je CV als PDF en ontvang een professioneel CV op maat — kies uit 6 templates en download als Word.",
     color: "from-rose-500 to-pink-500",
     bg: "bg-rose-50",
   },

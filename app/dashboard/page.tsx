@@ -33,7 +33,7 @@ const tools = [
   },
   {
     name: "Vacaturezoeker",
-    description: "Plak je LinkedIn profiel en vind actuele freelance & contract vacatures in NL, remote en internationaal.",
+    description: "Plak je CV of profiel en vind actuele freelance & contract vacatures in NL, remote en internationaal.",
     href: "/tools/vacancy-finder",
     credits: 1,
     icon: "🔍",
@@ -42,7 +42,7 @@ const tools = [
   },
   {
     name: "CV Builder",
-    description: "Upload je LinkedIn PDF of bestaand CV en kies uit 6 templates — compact, uitgebreid of gericht op een vacature.",
+    description: "Upload je CV als PDF en kies uit 6 templates — compact, uitgebreid of gericht op een vacature.",
     href: "/tools/cv-builder",
     credits: 1,
     icon: "📋",
