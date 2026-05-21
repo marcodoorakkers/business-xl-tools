@@ -174,7 +174,7 @@ export default function CVBuilderPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-6">
             <div>
               <h1 className="text-xl font-bold text-gray-900 mb-1">CV Builder</h1>
-              <p className="text-gray-500 text-sm">Upload je LinkedIn PDF en ontvang een professioneel CV in Word. Kost 1 credit.</p>
+              <p className="text-gray-500 text-sm">Upload je CV of LinkedIn PDF en ontvang een professioneel CV in Word. Kost 1 credit.</p>
             </div>
 
             {/* Language */}
@@ -225,7 +225,7 @@ export default function CVBuilderPage() {
 
             {/* PDF upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn profiel</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">CV of LinkedIn profiel</label>
               <input ref={pdfInputRef} type="file" accept=".pdf" className="hidden" onChange={handlePdf} />
               <button onClick={() => pdfInputRef.current?.click()} disabled={pdfLoading}
                 className={`w-full py-3 mb-3 rounded-xl text-sm font-medium border-2 border-dashed transition-colors flex items-center justify-center gap-2
@@ -236,7 +236,7 @@ export default function CVBuilderPage() {
                 ) : pdfName ? (
                   <>✓ {pdfName} — klik om ander bestand te kiezen</>
                 ) : (
-                  <>📄 Upload LinkedIn PDF <span className="text-gray-400 font-normal">(LinkedIn → Meer → Profiel opslaan als PDF)</span></>
+                  <>📄 Upload PDF <span className="text-gray-400 font-normal">(bestaand CV of LinkedIn → Meer → Profiel opslaan als PDF)</span></>
                 )}
               </button>
 
@@ -246,7 +246,7 @@ export default function CVBuilderPage() {
               </div>
 
               <textarea value={profileText} onChange={(e) => setProfileText(e.target.value)} rows={6}
-                placeholder="Plak je LinkedIn profiel tekst hier..."
+                placeholder="Plak je CV of LinkedIn profiel tekst hier..."
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
             </div>
 
