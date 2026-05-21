@@ -100,6 +100,7 @@ export default function AdminPage() {
 
   async function updateStatus(ideaId: string, status: Status) {
     setUpdatingId(ideaId);
+    setError("");
     try {
       const res = await fetch("/api/admin/ideas", {
         method: "PATCH",
@@ -109,6 +110,10 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success) {
         setIdeas(ideas.map((i) => i.id === ideaId ? { ...i, status } : i));
+        if (data.creditsAwarded) {
+          setError("✅ Status bijgewerkt en 100 credits toegekend aan de indiener!");
+          setTimeout(() => setError(""), 4000);
+        }
       } else {
         setError(`Fout: ${data.error}`);
       }
@@ -153,7 +158,9 @@ export default function AdminPage() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 mb-6">{error}</div>
+          <div className={`border rounded-xl p-4 mb-6 ${error.startsWith("✅") ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-600"}`}>
+            {error}
+          </div>
         )}
 
         {/* ── Users tab ── */}

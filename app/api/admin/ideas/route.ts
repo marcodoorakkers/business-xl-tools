@@ -42,8 +42,36 @@ export async function PATCH(req: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  // Fetch current idea to check if we need to award credits
+  const { data: idea, error: fetchError } = await admin
+    .from("ideas")
+    .select("status, user_id")
+    .eq("id", id)
+    .single();
+
+  if (fetchError || !idea) return NextResponse.json({ error: "Idee niet gevonden" }, { status: 404 });
+
+  // Update the status
   const { error } = await admin.from("ideas").update({ status }).eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  return NextResponse.json({ success: true, status });
+  // Award 100 credits if this idea just went live for the first time
+  let creditsAwarded = false;
+  if (status === "live" && idea.status !== "live") {
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("credits")
+      .eq("id", idea.user_id)
+      .single();
+
+    if (profile) {
+      await admin
+        .from("profiles")
+        .update({ credits: profile.credits + 100 })
+        .eq("id", idea.user_id);
+      creditsAwarded = true;
+    }
+  }
+
+  return NextResponse.json({ success: true, status, creditsAwarded });
 }
