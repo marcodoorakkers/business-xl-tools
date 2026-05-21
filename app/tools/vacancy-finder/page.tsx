@@ -133,12 +133,12 @@ export default function VacancyFinderPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-6">
             <div>
               <h1 className="text-xl font-bold text-gray-900 mb-1">Vacaturezoeker</h1>
-              <p className="text-gray-500 text-sm">Plak je LinkedIn profiel of omschrijf je ervaring. Wij zoeken actuele freelance/contract vacatures in NL, remote en internationaal. Kost 1 credit.</p>
+              <p className="text-gray-500 text-sm">Plak je CV of omschrijf je ervaring. Wij zoeken actuele freelance/contract vacatures in NL, remote en internationaal. Kost 1 credit.</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Jouw LinkedIn profiel of CV
+                Jouw CV of profiel
               </label>
 
               {/* PDF upload */}
@@ -155,7 +155,7 @@ export default function VacancyFinderPage() {
                 ) : pdfName ? (
                   <>✓ {pdfName} — klik om ander bestand te kiezen</>
                 ) : (
-                  <>📄 Upload LinkedIn PDF <span className="text-gray-400 font-normal">(LinkedIn → Meer → Profiel opslaan als PDF)</span></>
+                  <>📄 Upload CV als PDF</>
                 )}
               </button>
 
