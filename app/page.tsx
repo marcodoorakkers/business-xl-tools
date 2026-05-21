@@ -70,7 +70,7 @@ export default function LandingPage() {
           </span>
         </h1>
         <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Een groeiende collectie AI-tools die dagelijkse klusjes van je overnemen. Jij doet de leuke dingen, wij de rest.
+          Een groeiende collectie tools die dagelijkse klusjes van je overnemen. Jij doet de leuke dingen, wij de rest.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link href="/auth/register"
@@ -192,7 +192,11 @@ export default function LandingPage() {
             <span>⚡</span>
             <span>TimeSaverTools</span>
           </div>
-          <p>© {new Date().getFullYear()} TimeSaverTools · Alle rechten voorbehouden</p>
+          <div className="flex flex-col sm:flex-row items-center gap-3 text-xs text-gray-400">
+            <p>Resultaten worden gegenereerd door AI · Verantwoordelijkheid voor gebruik ligt bij de gebruiker</p>
+            <Link href="/disclaimer" className="hover:text-gray-600 underline underline-offset-2 whitespace-nowrap">Meer info</Link>
+          </div>
+          <p className="text-xs">© {new Date().getFullYear()} TimeSaverTools · Alle rechten voorbehouden</p>
         </div>
       </footer>
     </div>
