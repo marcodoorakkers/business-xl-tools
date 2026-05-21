@@ -29,6 +29,13 @@ const tools = [
     color: "from-green-500 to-teal-500",
     bg: "bg-green-50",
   },
+  {
+    icon: "📋",
+    name: "CV Builder",
+    description: "Maak een professioneel CV van je LinkedIn profiel — compact, uitgebreid of gericht op een vacature.",
+    color: "from-rose-500 to-pink-500",
+    bg: "bg-rose-50",
+  },
 ];
 
 export default function LandingPage() {

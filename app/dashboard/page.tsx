@@ -40,6 +40,15 @@ const tools = [
     color: "from-green-500 to-teal-500",
     bg: "bg-green-50",
   },
+  {
+    name: "CV Builder",
+    description: "Upload je LinkedIn PDF en ontvang een professioneel CV op maat — compact, uitgebreid of gericht op een vacature.",
+    href: "/tools/cv-builder",
+    credits: 1,
+    icon: "📋",
+    color: "from-rose-500 to-pink-500",
+    bg: "bg-rose-50",
+  },
 ];
 
 export default async function DashboardPage() {
