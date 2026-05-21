@@ -6,9 +6,9 @@ import DeleteAccountButton from "./DeleteAccountButton";
 import BuyCreditsButton from "./BuyCreditsButton";
 
 const PACKAGES = [
-  { name: "Starter", credits: 50, price: "€9,99", priceId: "price_1TZ9ZX0AXggw0GmQLWb7kxtD", perCredit: "€0,20/credit" },
-  { name: "Populair", credits: 200, price: "€29,99", priceId: "price_1TZ9a60AXggw0GmQlCYZ9oZV", perCredit: "€0,15/credit", highlight: true },
-  { name: "Beste Koop", credits: 500, price: "€59,99", priceId: "price_1TZ9al0AXggw0GmQEFUb3TrM", perCredit: "€0,12/credit" },
+  { name: "Starter", credits: 50, price: "€9,99", priceId: "price_1TZSta1ifGSUEPSdHvDnulnr", perCredit: "€0,20/credit" },
+  { name: "Populair", credits: 200, price: "€29,99", priceId: "price_1TZSte1ifGSUEPSd9N8emyuz", perCredit: "€0,15/credit", highlight: true },
+  { name: "Beste Koop", credits: 500, price: "€59,99", priceId: "price_1TZStd1ifGSUEPSdlWmrtbOS", perCredit: "€0,12/credit" },
 ];
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ payment?: string; credits?: string }> }) {

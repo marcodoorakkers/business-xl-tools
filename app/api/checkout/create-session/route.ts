@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const CREDIT_PACKAGES: Record<string, number> = {
-  "price_1TZ9ZX0AXggw0GmQLWb7kxtD": 50,   // Starter
-  "price_1TZ9a60AXggw0GmQlCYZ9oZV": 200,  // Populair
-  "price_1TZ9al0AXggw0GmQEFUb3TrM": 500,  // Beste Koop
+  "price_1TZSta1ifGSUEPSdHvDnulnr": 50,   // Starter
+  "price_1TZSte1ifGSUEPSd9N8emyuz": 200,  // Populair
+  "price_1TZStd1ifGSUEPSdlWmrtbOS": 500,  // Beste Koop
 };
 
 export async function POST(req: NextRequest) {
