@@ -9,9 +9,18 @@ import ToolNav from "@/components/ToolNav";
 
 type Step = "idle" | "recording" | "processing" | "preview" | "sending" | "done" | "error";
 
+const LANGUAGES = [
+  { code: "nl", label: "🇳🇱 Nederlands" },
+  { code: "en", label: "🇬🇧 English" },
+  { code: "de", label: "🇩🇪 Deutsch" },
+  { code: "fr", label: "🇫🇷 Français" },
+  { code: "es", label: "🇪🇸 Español" },
+];
+
 export default function VoiceMailPage() {
   const [step, setStep] = useState<Step>("idle");
   const [email, setEmail] = useState("");
+  const [language, setLanguage] = useState("nl");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [transcript, setTranscript] = useState("");
@@ -71,7 +80,7 @@ export default function VoiceMailPage() {
       const generateRes = await fetch("/api/tools/generate-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript: text }),
+        body: JSON.stringify({ transcript: text, language }),
       });
       const { subject: s, body: b, error: generateError } = await generateRes.json();
       if (generateError) throw new Error(generateError);
@@ -120,7 +129,7 @@ export default function VoiceMailPage() {
           <h1 className="text-xl font-bold text-gray-900 mb-1">Voice Mail Draft</h1>
           <p className="text-gray-500 text-sm mb-6">Spreek in wat je wilt mailen — de app maakt er een concept mail van. Kost 1 credit.</p>
 
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Stuur concept naar</label>
             <input
               type="email"
@@ -128,6 +137,27 @@ export default function VoiceMailPage() {
               readOnly
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500 cursor-default"
             />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Uitvoertaal van de mail</label>
+            <div className="flex flex-wrap gap-2">
+              {LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => setLanguage(lang.code)}
+                  disabled={step === "recording" || step === "processing"}
+                  className={`px-3 py-1.5 rounded-xl text-sm font-medium border transition-colors disabled:opacity-50 ${
+                    language === lang.code
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {(step === "idle" || step === "recording") && (

@@ -7,8 +7,17 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { transcript } = await req.json();
+  const { transcript, language = "nl" } = await req.json();
   if (!transcript) return NextResponse.json({ error: "Geen transcript" }, { status: 400 });
+
+  const languageNames: Record<string, string> = {
+    nl: "Nederlands",
+    en: "English",
+    de: "Deutsch",
+    fr: "Français",
+    es: "Español",
+  };
+  const outputLanguage = languageNames[language] ?? "Nederlands";
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -20,7 +29,7 @@ export async function POST(req: NextRequest) {
       content: `Je krijgt een gesproken bericht dat iemand wil omzetten naar een e-mail.
 Verwerk ALLE inhoud uit het gesproken bericht in de mail — laat niets weg en vat niet samen.
 Maak er een nette, professionele e-mail van met correcte alinea's en zinsbouw.
-Gebruik dezelfde taal als het ingesproken bericht.
+Schrijf de mail ALTIJD in het ${outputLanguage}, ongeacht de taal van het gesproken bericht.
 
 Geef ALLEEN een JSON object terug, zonder extra tekst, uitleg of markdown. Exact dit formaat:
 {"subject": "onderwerp hier", "body": "volledige mailtekst hier"}
