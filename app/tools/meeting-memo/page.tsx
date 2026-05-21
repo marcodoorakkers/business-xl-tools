@@ -21,7 +21,7 @@ interface Notes {
   actiepunten?: { actie: string; wie: string; wanneer: string }[];
   actions?: { action: string; who: string; when: string }[];
   volgende_vergadering?: string; next_meeting?: string;
-  _meta?: { title: string; date: string; time: string };
+  _meta?: { title: string; date: string; time: string; duration?: number };
 }
 
 export default function MeetingMemoPage() {
@@ -40,6 +40,7 @@ export default function MeetingMemoPage() {
   const [notes, setNotes] = useState<Notes | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [recordSeconds, setRecordSeconds] = useState(0);
+  const [recordingDuration, setRecordingDuration] = useState(0);
   const [copied, setCopied] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<HistoryEntry | null>(null);
@@ -190,6 +191,7 @@ export default function MeetingMemoPage() {
 
   async function stopRecording() {
     if (timerRef.current) clearInterval(timerRef.current);
+    setRecordingDuration(recordSeconds);
     mediaRecorder.current?.stop();
     setStep("processing");
   }
@@ -220,8 +222,9 @@ export default function MeetingMemoPage() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      setNotes(data);
-      saveToHistory(data);
+      const dataWithDuration = { ...data, _meta: { ...data._meta, duration: recordingDuration } };
+      setNotes(dataWithDuration);
+      saveToHistory(dataWithDuration);
       setStep("result");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Notulen genereren mislukt");
@@ -233,6 +236,14 @@ export default function MeetingMemoPage() {
     return `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
   }
 
+  function formatDuration(s: number, nl: boolean) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    if (m === 0) return nl ? `${sec} sec` : `${sec} sec`;
+    if (sec === 0) return nl ? `${m} min` : `${m} min`;
+    return nl ? `${m} min ${sec} sec` : `${m} min ${sec} sec`;
+  }
+
   async function exportToDocx(n: Notes, nl: boolean) {
     const { Document, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, Packer } = await import("docx");
 
@@ -241,7 +252,8 @@ export default function MeetingMemoPage() {
     const children: any[] = [];
 
     children.push(new Paragraph({ text: title, heading: HeadingLevel.HEADING_1 }));
-    children.push(new Paragraph({ text: `${n._meta?.date ?? ""} · ${n._meta?.time ?? ""}`, spacing: { after: 200 } }));
+    const durationStr = n._meta?.duration ? ` · ⏱ ${formatDuration(n._meta.duration, nl)}` : "";
+    children.push(new Paragraph({ text: `${n._meta?.date ?? ""} · ${n._meta?.time ?? ""}${durationStr}`, spacing: { after: 200 } }));
 
     const summary = n.samenvatting || n.summary;
     if (summary) {
@@ -326,6 +338,7 @@ export default function MeetingMemoPage() {
     setNotes(null);
     setErrorMsg("");
     setRecordSeconds(0);
+    setRecordingDuration(0);
     setMeetingName("");
     setIcsImported(false);
     setAttendees([]);
@@ -504,7 +517,7 @@ export default function MeetingMemoPage() {
                 </div>
                 <div>
                   <h2 className="text-lg font-bold">{n._meta?.title}</h2>
-                  <p className={`text-xs ${muted}`}>{n._meta?.date} · {n._meta?.time}</p>
+                  <p className={`text-xs ${muted}`}>{n._meta?.date} · {n._meta?.time}{n._meta?.duration ? ` · ⏱ ${formatDuration(n._meta.duration, nl)}` : ""}</p>
                 </div>
                 {(n.samenvatting || n.summary) && <Section icon="📋" title={nl ? "Samenvatting" : "Summary"} color="blue" dark={isDark}><p>{n.samenvatting || n.summary}</p></Section>}
                 {(n.aanwezigen || n.attendees || []).length > 0 && <Section icon="👥" title={nl ? "Aanwezigen" : "Attendees"} color="purple" dark={isDark}><ul>{(n.aanwezigen || n.attendees || []).map((a, i) => <li key={i}>• {a}</li>)}</ul></Section>}
@@ -645,7 +658,7 @@ export default function MeetingMemoPage() {
               <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <h2 className="text-lg font-bold">{notes._meta?.title}</h2>
-                  <p className={`text-xs ${muted}`}>{notes._meta?.date} · {notes._meta?.time}</p>
+                  <p className={`text-xs ${muted}`}>{notes._meta?.date} · {notes._meta?.time}{notes._meta?.duration ? ` · ⏱ ${formatDuration(notes._meta.duration, isNl)}` : ""}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <button onClick={copyAll} className={`text-sm px-3 py-1 rounded-lg border transition-colors ${copied ? "bg-green-50 text-green-600 border-green-200" : isDark ? "bg-gray-700 text-gray-300 border-gray-600 hover:bg-gray-600" : "bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-100"}`}>
