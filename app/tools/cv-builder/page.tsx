@@ -8,7 +8,7 @@ import Link from "next/link";
 type Step = "setup" | "generating" | "result" | "error";
 type Lang = "nl" | "en";
 type Style = "compact" | "full" | "targeted";
-type Template = "modern" | "classic" | "bold" | "minimal";
+type Template = "modern" | "classic" | "bold" | "minimal" | "sidebar" | "executive";
 
 interface CV {
   name: string;
@@ -23,67 +23,86 @@ interface CV {
 }
 
 // ─── Template style definitions ────────────────────────────────────────────────
-// Uses inline styles (not Tailwind classes) for all template-specific colors
-// so they survive Tailwind's production purge.
-const TEMPLATE_STYLES: Record<Template, {
-  label: string;
-  dotColor: string;
-  headerStyle: React.CSSProperties;
-  bodyStyle: React.CSSProperties;
-  nameStyle: React.CSSProperties;
-  titleStyle: React.CSSProperties;
-  contactStyle: React.CSSProperties;
-  sectionStyle: React.CSSProperties;
-  accentStyle: React.CSSProperties;
-  align: "left" | "center";
-}> = {
+// All template-specific colors use inline styles so they survive Tailwind's purge.
+
+interface StandardStyle {
+  label: string; dotColor: string; layout: "standard";
+  headerStyle: React.CSSProperties; bodyStyle: React.CSSProperties;
+  nameStyle: React.CSSProperties; titleStyle: React.CSSProperties;
+  contactStyle: React.CSSProperties; sectionStyle: React.CSSProperties;
+  accentStyle: React.CSSProperties; align: "left" | "center";
+}
+interface SidebarStyle {
+  label: string; dotColor: string; layout: "sidebar";
+  sidebarBg: string;
+  sidebarNameStyle: React.CSSProperties; sidebarTitleStyle: React.CSSProperties;
+  sidebarContactStyle: React.CSSProperties; sidebarSectionLabelStyle: React.CSSProperties;
+  bodyStyle: React.CSSProperties; sectionStyle: React.CSSProperties; accentStyle: React.CSSProperties;
+}
+type TemplateStyle = StandardStyle | SidebarStyle;
+
+const TEMPLATE_STYLES: Record<Template, TemplateStyle> = {
   modern: {
-    label: "Modern",
-    dotColor: "#2563EB",
+    label: "Modern", dotColor: "#2563EB", layout: "standard", align: "left",
     headerStyle: { background: "#2563EB", padding: "20px 28px" },
     bodyStyle: { background: "#fff" },
-    nameStyle: { color: "#fff", fontSize: "22px", fontWeight: 700, lineHeight: 1.2 },
-    titleStyle: { color: "#BFDBFE", fontSize: "13px", marginTop: 2 },
-    contactStyle: { color: "#93C5FD", fontSize: "11px", marginTop: 6 },
-    sectionStyle: { color: "#2563EB", fontWeight: 700, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", borderBottom: "2px solid #2563EB", paddingBottom: 2, marginTop: 16, marginBottom: 8 },
+    nameStyle: { color: "#fff", fontSize: 22, fontWeight: 700, lineHeight: 1.2 },
+    titleStyle: { color: "#BFDBFE", fontSize: 13, marginTop: 2 },
+    contactStyle: { color: "#93C5FD", fontSize: 11, marginTop: 6 },
+    sectionStyle: { color: "#2563EB", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", borderBottom: "2px solid #2563EB", paddingBottom: 2, marginTop: 16, marginBottom: 8 },
     accentStyle: { color: "#2563EB" },
-    align: "left",
   },
   classic: {
-    label: "Classic",
-    dotColor: "#1F2937",
+    label: "Classic", dotColor: "#1F2937", layout: "standard", align: "center",
     headerStyle: { background: "#fff", padding: "20px 28px", borderBottom: "2px solid #E5E7EB" },
     bodyStyle: { background: "#fff", border: "1px solid #E5E7EB" },
-    nameStyle: { color: "#111827", fontSize: "22px", fontWeight: 700, lineHeight: 1.2, fontFamily: "Georgia, serif" },
-    titleStyle: { color: "#6B7280", fontSize: "13px", fontStyle: "italic", marginTop: 2 },
-    contactStyle: { color: "#9CA3AF", fontSize: "11px", marginTop: 6 },
-    sectionStyle: { color: "#1F2937", fontWeight: 700, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid #D1D5DB", paddingBottom: 2, marginTop: 16, marginBottom: 8 },
+    nameStyle: { color: "#111827", fontSize: 22, fontWeight: 700, lineHeight: 1.2, fontFamily: "Georgia, serif" },
+    titleStyle: { color: "#6B7280", fontSize: 13, fontStyle: "italic", marginTop: 2 },
+    contactStyle: { color: "#9CA3AF", fontSize: 11, marginTop: 6 },
+    sectionStyle: { color: "#1F2937", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.08em", borderBottom: "1px solid #D1D5DB", paddingBottom: 2, marginTop: 16, marginBottom: 8 },
     accentStyle: { color: "#4B5563" },
-    align: "center",
   },
   bold: {
-    label: "Bold",
-    dotColor: "#111827",
+    label: "Bold", dotColor: "#111827", layout: "standard", align: "left",
     headerStyle: { background: "#111827", padding: "20px 28px" },
     bodyStyle: { background: "#fff" },
-    nameStyle: { color: "#fff", fontSize: "22px", fontWeight: 700, lineHeight: 1.2 },
-    titleStyle: { color: "#2DD4BF", fontSize: "13px", marginTop: 2 },
-    contactStyle: { color: "#99F6E4", fontSize: "11px", marginTop: 6 },
-    sectionStyle: { color: "#0D9488", fontWeight: 700, fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 16, marginBottom: 8 },
+    nameStyle: { color: "#fff", fontSize: 22, fontWeight: 700, lineHeight: 1.2 },
+    titleStyle: { color: "#2DD4BF", fontSize: 13, marginTop: 2 },
+    contactStyle: { color: "#99F6E4", fontSize: 11, marginTop: 6 },
+    sectionStyle: { color: "#0D9488", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: 16, marginBottom: 8 },
     accentStyle: { color: "#0D9488" },
-    align: "left",
   },
   minimal: {
-    label: "Minimal",
-    dotColor: "#9CA3AF",
+    label: "Minimal", dotColor: "#9CA3AF", layout: "standard", align: "left",
     headerStyle: { background: "#fff", padding: "24px 28px 16px" },
     bodyStyle: { background: "#fff", border: "1px solid #F3F4F6" },
-    nameStyle: { color: "#111827", fontSize: "22px", fontWeight: 700, lineHeight: 1.2 },
-    titleStyle: { color: "#6B7280", fontSize: "13px", marginTop: 2 },
-    contactStyle: { color: "#9CA3AF", fontSize: "11px", marginTop: 6 },
-    sectionStyle: { color: "#9CA3AF", fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.2em", marginTop: 16, marginBottom: 8, borderBottom: "1px solid #F3F4F6", paddingBottom: 2 },
+    nameStyle: { color: "#111827", fontSize: 22, fontWeight: 700, lineHeight: 1.2 },
+    titleStyle: { color: "#6B7280", fontSize: 13, marginTop: 2 },
+    contactStyle: { color: "#9CA3AF", fontSize: 11, marginTop: 6 },
+    sectionStyle: { color: "#9CA3AF", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.2em", marginTop: 16, marginBottom: 8, borderBottom: "1px solid #F3F4F6", paddingBottom: 2 },
     accentStyle: { color: "#6B7280" },
-    align: "left",
+  },
+  // ── NEW ──────────────────────────────────────────────────────────────────
+  sidebar: {
+    label: "Sidebar", dotColor: "#1E3A5F", layout: "sidebar",
+    sidebarBg: "#1E3A5F",
+    sidebarNameStyle: { color: "#fff", fontSize: 17, fontWeight: 700, lineHeight: 1.3, marginTop: 10 },
+    sidebarTitleStyle: { color: "#93C5FD", fontSize: 11, marginTop: 3, lineHeight: 1.4 },
+    sidebarContactStyle: { color: "#CBD5E1", fontSize: 10, lineHeight: 1.9 },
+    sidebarSectionLabelStyle: { color: "rgba(255,255,255,0.55)", fontSize: 9, textTransform: "uppercase", letterSpacing: "0.18em", borderBottom: "1px solid rgba(255,255,255,0.15)", paddingBottom: 4, marginTop: 16, marginBottom: 6 },
+    bodyStyle: { background: "#fff" },
+    sectionStyle: { color: "#1E3A5F", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", borderBottom: "2px solid #3B82F6", paddingBottom: 2, marginTop: 16, marginBottom: 8 },
+    accentStyle: { color: "#3B82F6" },
+  },
+  executive: {
+    label: "Executive", dotColor: "#F59E0B", layout: "standard", align: "left",
+    headerStyle: { background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)", padding: "28px 28px 20px" },
+    bodyStyle: { background: "#fff" },
+    nameStyle: { color: "#fff", fontSize: 26, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.02em" },
+    titleStyle: { color: "#F59E0B", fontSize: 13, marginTop: 5, fontWeight: 500, letterSpacing: "0.02em" },
+    contactStyle: { color: "#94A3B8", fontSize: 11, marginTop: 8 },
+    sectionStyle: { color: "#0F172A", fontWeight: 700, fontSize: 10, textTransform: "uppercase", letterSpacing: "0.1em", borderLeft: "3px solid #F59E0B", paddingLeft: 8, marginTop: 20, marginBottom: 10 },
+    accentStyle: { color: "#F59E0B" },
   },
 };
 
@@ -93,31 +112,119 @@ function CVPreview({ cv, template, lang, photo }: { cv: CV; template: Template; 
   const s = TEMPLATE_STYLES[template];
   const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
 
+  // ── Sidebar layout ──────────────────────────────────────────────────────────
+  if (s.layout === "sidebar") {
+    const ss = s as SidebarStyle;
+    return (
+      <div className="rounded-xl overflow-hidden shadow-lg flex" style={{ background: "#fff", minHeight: 460 }}>
+        {/* Left sidebar */}
+        <div style={{ background: ss.sidebarBg, width: "32%", padding: "24px 16px", display: "flex", flexDirection: "column" }}>
+          {photo && (
+            <img src={photo} alt="foto" style={{ width: 72, height: 90, objectFit: "cover", borderRadius: 6, border: "2px solid rgba(255,255,255,0.25)", alignSelf: "center", marginBottom: 4 }} />
+          )}
+          <p style={ss.sidebarNameStyle}>{cv.name}</p>
+          <p style={ss.sidebarTitleStyle}>{cv.title}</p>
+
+          <p style={{ ...ss.sidebarSectionLabelStyle, marginTop: 20 }}>{nl ? "Contact" : "Contact"}</p>
+          {contactParts.map((c, i) => <p key={i} style={ss.sidebarContactStyle}>{c}</p>)}
+
+          {cv.skills.length > 0 && (
+            <>
+              <p style={ss.sidebarSectionLabelStyle}>{nl ? "Vaardigheden" : "Skills"}</p>
+              {cv.skills.map((skill, i) => <p key={i} style={{ color: "rgba(255,255,255,0.85)", fontSize: 10, lineHeight: 1.8 }}>• {skill}</p>)}
+            </>
+          )}
+          {cv.languages.length > 0 && (
+            <>
+              <p style={ss.sidebarSectionLabelStyle}>{nl ? "Talen" : "Languages"}</p>
+              {cv.languages.map((l, i) => <p key={i} style={{ color: "rgba(255,255,255,0.85)", fontSize: 10, lineHeight: 1.8 }}>{l}</p>)}
+            </>
+          )}
+          {cv.certifications && cv.certifications.length > 0 && (
+            <>
+              <p style={ss.sidebarSectionLabelStyle}>{nl ? "Certificaten" : "Certifications"}</p>
+              {cv.certifications.map((c, i) => <p key={i} style={{ color: "rgba(255,255,255,0.85)", fontSize: 10, lineHeight: 1.8 }}>• {c}</p>)}
+            </>
+          )}
+        </div>
+
+        {/* Right main content */}
+        <div style={{ flex: 1, padding: "20px 20px 24px", background: "#fff" }}>
+          <p style={ss.sectionStyle as React.CSSProperties}>{nl ? "Profiel" : "Profile"}</p>
+          <p style={{ fontSize: 11, color: "#374151", lineHeight: 1.6 }}>{cv.summary}</p>
+
+          {cv.experience.length > 0 && (
+            <>
+              <p style={ss.sectionStyle as React.CSSProperties}>{nl ? "Werkervaring" : "Experience"}</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {cv.experience.map((exp, i) => (
+                  <div key={i}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                      <div>
+                        <span style={{ fontWeight: 600, fontSize: 11, color: "#111827" }}>{exp.title}</span>
+                        <span style={{ fontSize: 11, marginLeft: 6, ...(ss.accentStyle as React.CSSProperties) }}>{exp.company}</span>
+                      </div>
+                      <span style={{ fontSize: 10, color: "#9CA3AF", whiteSpace: "nowrap" }}>{exp.period}</span>
+                    </div>
+                    {exp.description.map((d, j) => (
+                      <p key={j} style={{ fontSize: 10, color: "#6B7280", marginTop: 2, paddingLeft: 8 }}>• {d}</p>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {cv.education.length > 0 && (
+            <>
+              <p style={ss.sectionStyle as React.CSSProperties}>{nl ? "Opleiding" : "Education"}</p>
+              {cv.education.map((edu, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 6 }}>
+                  <div>
+                    <span style={{ fontWeight: 600, fontSize: 11, color: "#111827" }}>{edu.degree}</span>
+                    <span style={{ fontSize: 10, color: "#6B7280", marginLeft: 6 }}>{edu.institution}</span>
+                  </div>
+                  <span style={{ fontSize: 10, color: "#9CA3AF", whiteSpace: "nowrap" }}>{edu.period}</span>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Standard layout ─────────────────────────────────────────────────────────
+  const std = s as StandardStyle;
   const SectionLabel = ({ text }: { text: string }) => (
-    <p style={s.sectionStyle as React.CSSProperties}>{text}</p>
+    <p style={std.sectionStyle as React.CSSProperties}>{text}</p>
   );
 
   return (
-    <div className="rounded-xl overflow-hidden text-sm shadow-lg" style={s.bodyStyle}>
+    <div className="rounded-xl overflow-hidden shadow-lg" style={std.bodyStyle}>
       {/* Header */}
-      <div style={{ ...s.headerStyle, display: "flex", alignItems: "flex-start", gap: 16, flexDirection: s.align === "center" ? "column" : "row", ...(s.align === "center" ? { alignItems: "center", textAlign: "center" } : {}) }}>
-        {photo && s.align !== "center" && (
+      <div style={{
+        ...std.headerStyle,
+        display: "flex", alignItems: "flex-start", gap: 16,
+        ...(std.align === "center" ? { flexDirection: "column", alignItems: "center", textAlign: "center" } : {}),
+      }}>
+        {photo && std.align !== "center" && (
           <img src={photo} alt="foto" className="rounded shadow flex-shrink-0" style={{ width: 64, height: 80, objectFit: "cover" }} />
         )}
-        <div style={s.align === "center" ? { display: "flex", flexDirection: "column", alignItems: "center" } : {}}>
-          {photo && s.align === "center" && (
+        <div style={std.align === "center" ? { display: "flex", flexDirection: "column", alignItems: "center" } : {}}>
+          {photo && std.align === "center" && (
             <img src={photo} alt="foto" className="rounded shadow" style={{ width: 64, height: 80, objectFit: "cover", marginBottom: 12 }} />
           )}
-          <p style={s.nameStyle}>{cv.name}</p>
-          <p style={s.titleStyle}>{cv.title}</p>
-          <p style={s.contactStyle}>{contactParts.join("  ·  ")}</p>
+          <p style={std.nameStyle}>{cv.name}</p>
+          <p style={std.titleStyle}>{cv.title}</p>
+          <p style={std.contactStyle}>{contactParts.join("  ·  ")}</p>
         </div>
       </div>
 
       {/* Body */}
       <div className="px-7 pb-6">
         <SectionLabel text={nl ? "Profiel" : "Profile"} />
-        <p className="text-gray-700 leading-relaxed" style={{ fontSize: 12 }}>{cv.summary}</p>
+        <p style={{ fontSize: 12, color: "#374151", lineHeight: 1.6 }}>{cv.summary}</p>
 
         {cv.experience.length > 0 && (
           <>
@@ -127,15 +234,15 @@ function CVPreview({ cv, template, lang, photo }: { cv: CV; template: Template; 
                 <div key={i}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="font-semibold text-gray-900" style={{ fontSize: 12 }}>{exp.title}</span>
-                      <span className="ml-1.5" style={{ fontSize: 12, ...s.accentStyle }}>{exp.company}</span>
+                      <span style={{ fontWeight: 600, fontSize: 12, color: "#111827" }}>{exp.title}</span>
+                      <span style={{ fontSize: 12, marginLeft: 6, ...(std.accentStyle as React.CSSProperties) }}>{exp.company}</span>
                     </div>
-                    <span className="text-gray-400 whitespace-nowrap flex-shrink-0" style={{ fontSize: 10 }}>{exp.period}</span>
+                    <span style={{ fontSize: 10, color: "#9CA3AF", whiteSpace: "nowrap" }}>{exp.period}</span>
                   </div>
                   <ul className="mt-1 flex flex-col gap-0.5">
                     {exp.description.map((d, j) => (
-                      <li key={j} className="text-gray-600 flex gap-1.5" style={{ fontSize: 11 }}>
-                        <span className="text-gray-300 flex-shrink-0 mt-0.5">•</span>{d}
+                      <li key={j} style={{ fontSize: 11, color: "#6B7280", display: "flex", gap: 6 }}>
+                        <span style={{ color: "#D1D5DB", flexShrink: 0, marginTop: 1 }}>•</span>{d}
                       </li>
                     ))}
                   </ul>
@@ -152,10 +259,10 @@ function CVPreview({ cv, template, lang, photo }: { cv: CV; template: Template; 
               {cv.education.map((edu, i) => (
                 <div key={i} className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="font-semibold text-gray-900" style={{ fontSize: 12 }}>{edu.degree}</span>
-                    <span className="text-gray-500 ml-1.5" style={{ fontSize: 11 }}>{edu.institution}</span>
+                    <span style={{ fontWeight: 600, fontSize: 12, color: "#111827" }}>{edu.degree}</span>
+                    <span style={{ fontSize: 11, color: "#6B7280", marginLeft: 6 }}>{edu.institution}</span>
                   </div>
-                  <span className="text-gray-400 whitespace-nowrap flex-shrink-0" style={{ fontSize: 10 }}>{edu.period}</span>
+                  <span style={{ fontSize: 10, color: "#9CA3AF", whiteSpace: "nowrap" }}>{edu.period}</span>
                 </div>
               ))}
             </div>
@@ -165,14 +272,14 @@ function CVPreview({ cv, template, lang, photo }: { cv: CV; template: Template; 
         {cv.skills.length > 0 && (
           <>
             <SectionLabel text={nl ? "Vaardigheden" : "Skills"} />
-            <p className="text-gray-600" style={{ fontSize: 12 }}>{cv.skills.join("  ·  ")}</p>
+            <p style={{ fontSize: 12, color: "#6B7280" }}>{cv.skills.join("  ·  ")}</p>
           </>
         )}
 
         {cv.languages.length > 0 && (
           <>
             <SectionLabel text={nl ? "Talen" : "Languages"} />
-            <p className="text-gray-600" style={{ fontSize: 12 }}>{cv.languages.join("  ·  ")}</p>
+            <p style={{ fontSize: 12, color: "#6B7280" }}>{cv.languages.join("  ·  ")}</p>
           </>
         )}
 
@@ -181,8 +288,8 @@ function CVPreview({ cv, template, lang, photo }: { cv: CV; template: Template; 
             <SectionLabel text={nl ? "Certificaten" : "Certifications"} />
             <ul className="flex flex-col gap-0.5">
               {cv.certifications.map((c, i) => (
-                <li key={i} className="text-gray-600 flex gap-1.5" style={{ fontSize: 12 }}>
-                  <span className="text-gray-300">•</span>{c}
+                <li key={i} style={{ fontSize: 12, color: "#6B7280", display: "flex", gap: 6 }}>
+                  <span style={{ color: "#D1D5DB" }}>•</span>{c}
                 </li>
               ))}
             </ul>
@@ -236,9 +343,7 @@ export default function CVBuilderPage() {
     if (!file) return;
     setPhotoName(file.name);
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      if (ev.target?.result) setPhotoDataUrl(ev.target.result as string);
-    };
+    reader.onload = (ev) => { if (ev.target?.result) setPhotoDataUrl(ev.target.result as string); };
     reader.readAsDataURL(file);
     if (photoInputRef.current) photoInputRef.current.value = "";
   }
@@ -292,186 +397,176 @@ export default function CVBuilderPage() {
       right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
     };
 
-    const sectionLabel = (text: string) => {
-      if (template === "modern") {
-        return new Paragraph({
-          children: [new TextRun({ text, bold: true, color: "2563EB", size: 22, allCaps: true })],
-          border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "2563EB", space: 4 } },
-          spacing: { before: 280, after: 120 },
-        });
-      }
-      if (template === "classic") {
-        return new Paragraph({
-          children: [new TextRun({ text, bold: true, size: 22, color: "1F2937" })],
-          border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "9CA3AF", space: 4 } },
-          spacing: { before: 280, after: 120 },
-        });
-      }
-      if (template === "bold") {
-        return new Paragraph({
-          children: [new TextRun({ text, bold: true, color: "0D9488", size: 22, allCaps: true })],
-          spacing: { before: 280, after: 120 },
-        });
-      }
-      return new Paragraph({
-        children: [new TextRun({ text: text.toUpperCase(), color: "9CA3AF", size: 18, characterSpacing: 80 })],
-        spacing: { before: 280, after: 100 },
-      });
-    };
+    // ── Sidebar template: full 2-column table layout ────────────────────────
+    if (template === "sidebar") {
+      const fill = "1E3A5F";
+      const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone, cv.contact.linkedin].filter(Boolean) as string[];
 
-    const photoCell = (fill: string) => new TableCell({
-      width: { size: 18, type: WidthType.PERCENTAGE },
-      shading: { fill },
-      borders: noBorder,
-      verticalAlign: VerticalAlign.CENTER,
-      children: [new Paragraph({
-        alignment: AlignmentType.CENTER,
+      const leftSidebarLabel = (text: string) => new Paragraph({
+        children: [new TextRun({ text: text.toUpperCase(), size: 16, color: "FFFFFF", characterSpacing: 60 })],
         shading: { fill },
-        spacing: { before: 120, after: 120 },
-        children: [new ImageRun({ data: photoData!, transformation: { width: 80, height: 100 }, type: photoType })],
-      })],
-    });
+        border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "FFFFFF", space: 4 } },
+        spacing: { before: 160, after: 80 },
+        indent: { left: 120, right: 120 },
+      });
 
-    const headerWithPhoto = (leftCells: object[], leftFill: string, rightFill: string) =>
-      new Table({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const left: any[] = [];
+      if (photoData) {
+        left.push(new Paragraph({
+          alignment: AlignmentType.CENTER,
+          shading: { fill },
+          spacing: { before: 120, after: 80 },
+          children: [new ImageRun({ data: photoData, transformation: { width: 80, height: 100 }, type: photoType })],
+        }));
+      }
+      left.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 26, color: "FFFFFF" })], shading: { fill }, spacing: { before: photoData ? 0 : 120, after: 40 }, indent: { left: 120 } }));
+      left.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 20, color: "93C5FD" })], shading: { fill }, spacing: { after: 80 }, indent: { left: 120 } }));
+      left.push(leftSidebarLabel(nl ? "Contact" : "Contact"));
+      for (const c of contactParts) left.push(new Paragraph({ children: [new TextRun({ text: c, size: 18, color: "CBD5E1" })], shading: { fill }, spacing: { after: 40 }, indent: { left: 120 } }));
+      if (cv.skills.length > 0) {
+        left.push(leftSidebarLabel(nl ? "Vaardigheden" : "Skills"));
+        for (const sk of cv.skills) left.push(new Paragraph({ children: [new TextRun({ text: `• ${sk}`, size: 18, color: "E2E8F0" })], shading: { fill }, spacing: { after: 40 }, indent: { left: 120 } }));
+      }
+      if (cv.languages.length > 0) {
+        left.push(leftSidebarLabel(nl ? "Talen" : "Languages"));
+        for (const l of cv.languages) left.push(new Paragraph({ children: [new TextRun({ text: l, size: 18, color: "E2E8F0" })], shading: { fill }, spacing: { after: 40 }, indent: { left: 120 } }));
+      }
+      if (cv.certifications && cv.certifications.length > 0) {
+        left.push(leftSidebarLabel(nl ? "Certificaten" : "Certifications"));
+        for (const c of cv.certifications) left.push(new Paragraph({ children: [new TextRun({ text: `• ${c}`, size: 18, color: "E2E8F0" })], shading: { fill }, spacing: { after: 40 }, indent: { left: 120 } }));
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const right: any[] = [];
+      const rLabel = (text: string) => new Paragraph({
+        children: [new TextRun({ text, bold: true, color: "1E3A5F", size: 22, allCaps: true })],
+        border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "3B82F6", space: 4 } },
+        spacing: { before: 200, after: 120 },
+      });
+      right.push(rLabel(nl ? "Profiel" : "Profile"));
+      right.push(new Paragraph({ text: cv.summary, spacing: { after: 120 } }));
+      if (cv.experience.length > 0) {
+        right.push(rLabel(nl ? "Werkervaring" : "Experience"));
+        for (const exp of cv.experience) {
+          right.push(new Paragraph({ children: [new TextRun({ text: exp.title, bold: true, size: 22 }), new TextRun({ text: `  ${exp.company}`, size: 22, color: "3B82F6" }), new TextRun({ text: `  ${exp.period}`, size: 18, color: "9CA3AF" })], spacing: { before: 120, after: 60 } }));
+          for (const b of exp.description) right.push(new Paragraph({ text: b, bullet: { level: 0 }, spacing: { after: 40 } }));
+        }
+      }
+      if (cv.education.length > 0) {
+        right.push(rLabel(nl ? "Opleiding" : "Education"));
+        for (const edu of cv.education) right.push(new Paragraph({ children: [new TextRun({ text: edu.degree, bold: true, size: 22 }), new TextRun({ text: `  ${edu.institution}`, size: 22, color: "6B7280" }), new TextRun({ text: `  ${edu.period}`, size: 18, color: "9CA3AF" })], spacing: { before: 80, after: 60 } }));
+      }
+
+      children.push(new Table({
         width: { size: 100, type: WidthType.PERCENTAGE },
         borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
-        rows: [new TableRow({
-          children: [
-            new TableCell({
-              width: { size: 82, type: WidthType.PERCENTAGE },
-              shading: { fill: leftFill },
-              borders: noBorder,
-              verticalAlign: VerticalAlign.CENTER,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              children: leftCells as any[],
-            }),
-            photoCell(rightFill),
-          ],
-        })],
+        rows: [new TableRow({ children: [
+          new TableCell({ width: { size: 33, type: WidthType.PERCENTAGE }, shading: { fill }, borders: noBorder, verticalAlign: VerticalAlign.TOP, children: left }),
+          new TableCell({ width: { size: 67, type: WidthType.PERCENTAGE }, borders: noBorder, verticalAlign: VerticalAlign.TOP, margins: { left: 180, right: 180 }, children: right }),
+        ]})],
+      }));
+    } else {
+      // ── Standard templates ──────────────────────────────────────────────────
+      const sectionLabel = (text: string) => {
+        if (template === "modern") return new Paragraph({ children: [new TextRun({ text, bold: true, color: "2563EB", size: 22, allCaps: true })], border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: "2563EB", space: 4 } }, spacing: { before: 280, after: 120 } });
+        if (template === "classic") return new Paragraph({ children: [new TextRun({ text, bold: true, size: 22, color: "1F2937" })], border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: "9CA3AF", space: 4 } }, spacing: { before: 280, after: 120 } });
+        if (template === "bold") return new Paragraph({ children: [new TextRun({ text, bold: true, color: "0D9488", size: 22, allCaps: true })], spacing: { before: 280, after: 120 } });
+        if (template === "executive") return new Paragraph({ children: [new TextRun({ text, bold: true, color: "0F172A", size: 22, allCaps: true })], border: { left: { style: BorderStyle.SINGLE, size: 20, color: "F59E0B", space: 8 } }, spacing: { before: 280, after: 120 }, indent: { left: 120 } });
+        return new Paragraph({ children: [new TextRun({ text: text.toUpperCase(), color: "9CA3AF", size: 18, characterSpacing: 80 })], spacing: { before: 280, after: 100 } });
+      };
+
+      const accentColor = template === "bold" ? "0D9488" : template === "modern" ? "2563EB" : template === "executive" ? "F59E0B" : "4B5563";
+      const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone, cv.contact.linkedin].filter(Boolean) as string[];
+
+      const photoCell = (fill: string) => new TableCell({
+        width: { size: 18, type: WidthType.PERCENTAGE }, shading: { fill }, borders: noBorder, verticalAlign: VerticalAlign.CENTER,
+        children: [new Paragraph({ alignment: AlignmentType.CENTER, shading: { fill }, spacing: { before: 120, after: 120 }, children: [new ImageRun({ data: photoData!, transformation: { width: 80, height: 100 }, type: photoType })] })],
+      });
+      const makeHeaderTable = (leftCells: object[], leftFill: string, rightFill: string) => new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        borders: { ...noBorder, insideHorizontal: noBorder.top, insideVertical: noBorder.top },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        rows: [new TableRow({ children: [new TableCell({ width: { size: 82, type: WidthType.PERCENTAGE }, shading: { fill: leftFill }, borders: noBorder, verticalAlign: VerticalAlign.CENTER, children: leftCells as any[] }), photoCell(rightFill)] })],
       });
 
-    // Header
-    if (template === "modern") {
-      const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone, cv.contact.linkedin].filter(Boolean) as string[];
-      const leftChildren = [
-        new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
-        new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { after: 0 } }),
-        new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
-      ];
-      if (photoData) { children.push(headerWithPhoto(leftChildren, "2563EB", "1D4ED8")); children.push(new Paragraph({ text: "", spacing: { after: 100 } })); }
-      else { children.push(...leftChildren.map(p => { return p; })); children[children.length - 1]; }
-      if (!photoData) {
-        children.length = 0;
-        children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } }));
-        children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } }));
-        children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } }));
-      }
-    } else if (template === "classic") {
-      const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
-      if (photoData) {
-        const leftChildren = [
+      if (template === "modern") {
+        const lc = [
+          new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
+          new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, indent: { left: 200 }, spacing: { after: 0 } }),
+          new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
+        ];
+        if (photoData) { children.push(makeHeaderTable(lc, "2563EB", "1D4ED8")); children.push(new Paragraph({ text: "", spacing: { after: 100 } })); }
+        else { children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 52, color: "FFFFFF" })], shading: { fill: "2563EB" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } })); children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "BFDBFE" })], shading: { fill: "2563EB" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } })); children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("  |  "), size: 18, color: "93C5FD" })], shading: { fill: "1D4ED8" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } })); }
+      } else if (template === "classic") {
+        const lc = [
           new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })], spacing: { after: 60 } }),
           new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })], spacing: { after: 80 } }),
           new Paragraph({ children: [new TextRun({ text: contactParts.join("  ·  "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "E5E7EB", space: 8 } }, spacing: { after: 200 } }),
         ];
-        children.push(headerWithPhoto(leftChildren, "FFFFFF", "FFFFFF")); children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
-      } else {
-        children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })], alignment: AlignmentType.CENTER, spacing: { after: 60 } }));
-        children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })], alignment: AlignmentType.CENTER, spacing: { after: 80 } }));
-        children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("  ·  "), size: 18, color: "9CA3AF" })], alignment: AlignmentType.CENTER, border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "E5E7EB", space: 8 } }, spacing: { after: 200 } }));
-      }
-    } else if (template === "bold") {
-      const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
-      const leftChildren = [
-        new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
-        new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { after: 0 } }),
-        new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
-      ];
-      if (photoData) { children.push(headerWithPhoto(leftChildren, "111827", "1F2937")); children.push(new Paragraph({ text: "", spacing: { after: 120 } })); }
-      else {
-        children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } }));
-        children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } }));
-        children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } }));
-      }
-    } else {
-      const contactParts = [cv.contact.location, cv.contact.email, cv.contact.phone].filter(Boolean) as string[];
-      if (photoData) {
-        const leftChildren = [
-          new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } }),
-          new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } }),
-          new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } }, spacing: { after: 200 } }),
+        if (photoData) { children.push(makeHeaderTable(lc, "FFFFFF", "FFFFFF")); children.push(new Paragraph({ text: "", spacing: { after: 40 } })); }
+        else { children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 44, color: "111827" })], alignment: AlignmentType.CENTER, spacing: { after: 60 } })); children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "6B7280", italics: true })], alignment: AlignmentType.CENTER, spacing: { after: 80 } })); children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("  ·  "), size: 18, color: "9CA3AF" })], alignment: AlignmentType.CENTER, border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: "E5E7EB", space: 8 } }, spacing: { after: 200 } })); }
+      } else if (template === "bold") {
+        const lc = [
+          new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { before: 120, after: 0 } }),
+          new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, indent: { left: 200 }, spacing: { after: 0 } }),
+          new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, indent: { left: 200 }, spacing: { before: 0, after: 120 } }),
         ];
-        children.push(headerWithPhoto(leftChildren, "FFFFFF", "FFFFFF")); children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
+        if (photoData) { children.push(makeHeaderTable(lc, "111827", "1F2937")); children.push(new Paragraph({ text: "", spacing: { after: 120 } })); }
+        else { children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 56, color: "FFFFFF" })], shading: { fill: "111827" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } })); children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "2DD4BF" })], shading: { fill: "111827" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } })); children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "6EE7B7" })], shading: { fill: "1F2937" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } })); }
+      } else if (template === "executive") {
+        const lc = [
+          new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 60, color: "FFFFFF" })], shading: { fill: "0F172A" }, indent: { left: 200 }, spacing: { before: 160, after: 0 } }),
+          new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "F59E0B" })], shading: { fill: "0F172A" }, indent: { left: 200 }, spacing: { after: 0 } }),
+          new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "94A3B8" })], shading: { fill: "1E293B" }, indent: { left: 200 }, spacing: { before: 0, after: 160 } }),
+        ];
+        if (photoData) { children.push(makeHeaderTable(lc, "0F172A", "1E293B")); children.push(new Paragraph({ text: "", spacing: { after: 120 } })); }
+        else { children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 60, color: "FFFFFF" })], shading: { fill: "0F172A" }, spacing: { before: 0, after: 0 }, indent: { left: 200, right: 200 } })); children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 24, color: "F59E0B" })], shading: { fill: "0F172A" }, spacing: { after: 0 }, indent: { left: 200, right: 200 } })); children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "94A3B8" })], shading: { fill: "1E293B" }, spacing: { after: 200 }, indent: { left: 200, right: 200 } })); }
       } else {
-        children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } }));
-        children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } }));
-        children.push(new Paragraph({ children: [new TextRun({ text: contactParts.join("   "), size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } }, spacing: { after: 200 } }));
-      }
-    }
-
-    children.push(sectionLabel(nl ? "Profiel" : "Profile"));
-    children.push(new Paragraph({ text: cv.summary, spacing: { after: 120 } }));
-
-    if (cv.experience.length > 0) {
-      children.push(sectionLabel(nl ? "Werkervaring" : "Experience"));
-      for (const exp of cv.experience) {
-        children.push(new Paragraph({
-          children: [
-            new TextRun({ text: exp.title, bold: true, size: 22 }),
-            new TextRun({ text: `  ${exp.company}`, size: 22, color: template === "bold" ? "0D9488" : template === "modern" ? "2563EB" : "4B5563" }),
-            new TextRun({ text: `  ${exp.period}`, size: 18, color: "9CA3AF" }),
-          ],
-          spacing: { before: 120, after: 60 },
-        }));
-        for (const bullet of exp.description) {
-          children.push(new Paragraph({ text: bullet, bullet: { level: 0 }, spacing: { after: 40 } }));
+        // minimal
+        const cp = contactParts.join("   ");
+        if (photoData) {
+          const lc = [new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } }), new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } }), new Paragraph({ children: [new TextRun({ text: cp, size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } }, spacing: { after: 200 } })];
+          children.push(makeHeaderTable(lc, "FFFFFF", "FFFFFF")); children.push(new Paragraph({ text: "", spacing: { after: 40 } }));
+        } else {
+          children.push(new Paragraph({ children: [new TextRun({ text: cv.name, bold: true, size: 48, color: "111827" })], spacing: { after: 40 } })); children.push(new Paragraph({ children: [new TextRun({ text: cv.title, size: 22, color: "6B7280" })], spacing: { after: 60 } })); children.push(new Paragraph({ children: [new TextRun({ text: cp, size: 18, color: "9CA3AF" })], border: { bottom: { style: BorderStyle.SINGLE, size: 2, color: "E5E7EB", space: 6 } }, spacing: { after: 200 } }));
         }
       }
-    }
 
-    if (cv.education.length > 0) {
-      children.push(sectionLabel(nl ? "Opleiding" : "Education"));
-      for (const edu of cv.education) {
-        children.push(new Paragraph({
-          children: [
-            new TextRun({ text: edu.degree, bold: true, size: 22 }),
-            new TextRun({ text: `  ${edu.institution}`, size: 22, color: "6B7280" }),
-            new TextRun({ text: `  ${edu.period}`, size: 18, color: "9CA3AF" }),
-          ],
-          spacing: { before: 80, after: 60 },
-        }));
+      children.push(sectionLabel(nl ? "Profiel" : "Profile"));
+      children.push(new Paragraph({ text: cv.summary, spacing: { after: 120 } }));
+
+      if (cv.experience.length > 0) {
+        children.push(sectionLabel(nl ? "Werkervaring" : "Experience"));
+        for (const exp of cv.experience) {
+          children.push(new Paragraph({ children: [new TextRun({ text: exp.title, bold: true, size: 22 }), new TextRun({ text: `  ${exp.company}`, size: 22, color: accentColor }), new TextRun({ text: `  ${exp.period}`, size: 18, color: "9CA3AF" })], spacing: { before: 120, after: 60 }, ...(template === "executive" ? { indent: { left: 120 } } : {}) }));
+          for (const b of exp.description) children.push(new Paragraph({ text: b, bullet: { level: 0 }, spacing: { after: 40 } }));
+        }
       }
-    }
-
-    if (cv.skills.length > 0) {
-      children.push(sectionLabel(nl ? "Vaardigheden" : "Skills"));
-      children.push(new Paragraph({ text: cv.skills.join("  ·  "), spacing: { after: 80 } }));
-    }
-
-    if (cv.languages.length > 0) {
-      children.push(sectionLabel(nl ? "Talen" : "Languages"));
-      children.push(new Paragraph({ text: cv.languages.join("  ·  "), spacing: { after: 80 } }));
-    }
-
-    if (cv.certifications && cv.certifications.length > 0) {
-      children.push(sectionLabel(nl ? "Certificaten" : "Certifications"));
-      for (const cert of cv.certifications) {
-        children.push(new Paragraph({ text: cert, bullet: { level: 0 } }));
+      if (cv.education.length > 0) {
+        children.push(sectionLabel(nl ? "Opleiding" : "Education"));
+        for (const edu of cv.education) children.push(new Paragraph({ children: [new TextRun({ text: edu.degree, bold: true, size: 22 }), new TextRun({ text: `  ${edu.institution}`, size: 22, color: "6B7280" }), new TextRun({ text: `  ${edu.period}`, size: 18, color: "9CA3AF" })], spacing: { before: 80, after: 60 }, ...(template === "executive" ? { indent: { left: 120 } } : {}) }));
+      }
+      if (cv.skills.length > 0) {
+        children.push(sectionLabel(nl ? "Vaardigheden" : "Skills"));
+        children.push(new Paragraph({ text: cv.skills.join("  ·  "), spacing: { after: 80 }, ...(template === "executive" ? { indent: { left: 120 } } : {}) }));
+      }
+      if (cv.languages.length > 0) {
+        children.push(sectionLabel(nl ? "Talen" : "Languages"));
+        children.push(new Paragraph({ text: cv.languages.join("  ·  "), spacing: { after: 80 }, ...(template === "executive" ? { indent: { left: 120 } } : {}) }));
+      }
+      if (cv.certifications && cv.certifications.length > 0) {
+        children.push(sectionLabel(nl ? "Certificaten" : "Certifications"));
+        for (const cert of cv.certifications) children.push(new Paragraph({ text: cert, bullet: { level: 0 } }));
       }
     }
 
     void HeadingLevel; void UnderlineType; void VerticalAlign;
 
+    const fontMap: Record<Template, string> = { modern: "Calibri", classic: "Georgia", bold: "Calibri", minimal: "Helvetica", sidebar: "Calibri", executive: "Calibri" };
     const doc = new Document({
-      styles: {
-        default: {
-          document: {
-            run: { font: template === "classic" ? "Georgia" : template === "minimal" ? "Helvetica" : "Calibri", size: 22 },
-          },
-        },
-      },
-      sections: [{ properties: { page: { margin: { top: 720, bottom: 720, left: 900, right: 900 } } }, children }],
+      styles: { default: { document: { run: { font: fontMap[template], size: 22 } } } },
+      sections: [{ properties: { page: { margin: { top: template === "sidebar" ? 0 : 720, bottom: 720, left: template === "sidebar" ? 0 : 900, right: template === "sidebar" ? 0 : 900 } } }, children }],
     });
 
     const blob = await Packer.toBlob(doc);
@@ -543,12 +638,9 @@ export default function CVBuilderPage() {
               </div>
             </div>
 
-            {/* Job description */}
             {style === "targeted" && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {lang === "nl" ? "Vacaturetekst" : "Job description"}
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{lang === "nl" ? "Vacaturetekst" : "Job description"}</label>
                 <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} rows={5}
                   placeholder={lang === "nl" ? "Plak hier de vacaturetekst..." : "Paste the job description here..."}
                   className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
@@ -563,27 +655,20 @@ export default function CVBuilderPage() {
                 className={`w-full py-3 mb-3 rounded-xl text-sm font-medium border-2 border-dashed transition-colors flex items-center justify-center gap-2
                   ${pdfName ? "border-green-400 text-green-600 bg-green-50" : "border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"}
                   ${pdfLoading ? "opacity-60 cursor-wait" : ""}`}>
-                {pdfLoading ? (
-                  <><div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /> PDF wordt ingelezen...</>
-                ) : pdfName ? (
-                  <>✓ {pdfName} — klik om ander bestand te kiezen</>
-                ) : (
-                  <>📄 Upload PDF <span className="text-gray-400 font-normal">(bestaand CV of LinkedIn → Meer → Profiel opslaan als PDF)</span></>
-                )}
+                {pdfLoading ? (<><div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" /> PDF wordt ingelezen...</>)
+                  : pdfName ? <>✓ {pdfName} — klik om ander bestand te kiezen</>
+                  : <>📄 Upload PDF <span className="text-gray-400 font-normal">(bestaand CV of LinkedIn → Meer → Profiel opslaan als PDF)</span></>}
               </button>
-
               <div className="relative mb-3">
                 <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200" /></div>
                 <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-gray-400">of plak tekst</span></div>
               </div>
-
               <textarea value={profileText} onChange={(e) => setProfileText(e.target.value)} rows={6}
                 placeholder="Plak je CV of LinkedIn profiel tekst hier..."
                 className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
             </div>
 
             {errorMsg && <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{errorMsg}</p>}
-
             <button onClick={generate} disabled={!profileText.trim() || (style === "targeted" && !jobDescription.trim())}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white rounded-xl py-3 text-sm font-medium transition-colors">
               {lang === "nl" ? "Genereer CV →" : "Generate CV →"}
@@ -606,15 +691,17 @@ export default function CVBuilderPage() {
 
             {/* Template switcher + photo */}
             <div className="bg-white rounded-2xl shadow-lg p-4 flex flex-col gap-3">
-              {/* Template pills */}
               <div>
                 <p className="text-xs text-gray-500 font-medium mb-2">Opmaak</p>
-                <div className="flex gap-2">
-                  {(Object.entries(TEMPLATE_STYLES) as [Template, typeof TEMPLATE_STYLES[Template]][]).map(([key, s]) => (
+                <div className="flex flex-wrap gap-2">
+                  {(Object.entries(TEMPLATE_STYLES) as [Template, TemplateStyle][]).map(([key, ts]) => (
                     <button key={key} onClick={() => setTemplate(key as Template)}
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${template === key ? "border-blue-500 bg-blue-50 text-blue-700 shadow-sm" : "border-gray-200 text-gray-600 hover:border-gray-300"}`}>
-                      <span className="w-2 h-2 rounded-full" style={{ background: s.dotColor }} />
-                      {s.label}
+                      <span className="w-2 h-2 rounded-full" style={{ background: ts.dotColor }} />
+                      {ts.label}
+                      {(key === "sidebar" || key === "executive") && (
+                        <span className="ml-0.5 text-[9px] bg-amber-100 text-amber-700 px-1 py-0.5 rounded font-semibold">NIEUW</span>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -631,8 +718,7 @@ export default function CVBuilderPage() {
                     <button onClick={() => { setPhotoDataUrl(null); setPhotoName(""); }} className="text-xs text-red-400 hover:underline">Verwijderen</button>
                   </div>
                 ) : (
-                  <button onClick={() => photoInputRef.current?.click()}
-                    className="flex items-center gap-2 text-xs text-gray-500 hover:text-blue-600 transition-colors">
+                  <button onClick={() => photoInputRef.current?.click()} className="flex items-center gap-2 text-xs text-gray-500 hover:text-blue-600 transition-colors">
                     <span className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-base">🖼️</span>
                     <span>Foto toevoegen <span className="text-gray-400">(optioneel)</span></span>
                   </button>
@@ -649,8 +735,7 @@ export default function CVBuilderPage() {
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3 text-sm font-semibold transition-colors shadow-lg shadow-blue-100">
                 📥 Download als Word{photoDataUrl ? " + foto" : ""}
               </button>
-              <button onClick={reset}
-                className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl px-4 py-3 text-sm font-medium transition-colors">
+              <button onClick={reset} className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl px-4 py-3 text-sm font-medium transition-colors">
                 Opnieuw
               </button>
             </div>
@@ -663,9 +748,7 @@ export default function CVBuilderPage() {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-3xl">!</div>
             <p className="text-red-600 font-medium">Er is iets misgegaan</p>
             <p className="text-sm text-gray-500 text-center">{errorMsg}</p>
-            <button onClick={reset} className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg px-6 py-2 text-sm font-medium">
-              Probeer opnieuw
-            </button>
+            <button onClick={reset} className="bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg px-6 py-2 text-sm font-medium">Probeer opnieuw</button>
           </div>
         )}
       </main>
