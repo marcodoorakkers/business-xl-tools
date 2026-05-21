@@ -13,26 +13,65 @@ interface User {
   total_usage: number;
 }
 
+interface Idea {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  votes: number;
+  created_at: string;
+  user_id: string;
+}
+
+const STATUS_OPTIONS = ["nieuw", "overweging", "ontwikkeling", "live"] as const;
+type Status = typeof STATUS_OPTIONS[number];
+
+const STATUS_STYLES: Record<Status, { label: string; bg: string; color: string }> = {
+  nieuw:        { label: "Nieuw",           bg: "#F3F4F6", color: "#6B7280" },
+  overweging:   { label: "In overweging",   bg: "#FEF3C7", color: "#D97706" },
+  ontwikkeling: { label: "In ontwikkeling", bg: "#DBEAFE", color: "#2563EB" },
+  live:         { label: "Live! 🎉",        bg: "#D1FAE5", color: "#059669" },
+};
+
 export default function AdminPage() {
+  const [tab, setTab] = useState<"users" | "ideas">("users");
+
+  // — Users state —
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [loadingUsers, setLoadingUsers] = useState(true);
   const [editId, setEditId] = useState<string | null>(null);
   const [amount, setAmount] = useState("");
   const [mode, setMode] = useState<"add" | "set">("add");
   const [saving, setSaving] = useState(false);
   const [successId, setSuccessId] = useState<string | null>(null);
 
+  // — Ideas state —
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [loadingIdeas, setLoadingIdeas] = useState(false);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const [error, setError] = useState("");
+
   async function loadUsers() {
-    setLoading(true);
+    setLoadingUsers(true);
     const res = await fetch("/api/admin/users");
-    if (res.status === 401) { setError("Geen toegang."); setLoading(false); return; }
+    if (res.status === 401) { setError("Geen toegang."); setLoadingUsers(false); return; }
     const data = await res.json();
     setUsers(data.users || []);
-    setLoading(false);
+    setLoadingUsers(false);
+  }
+
+  async function loadIdeas() {
+    setLoadingIdeas(true);
+    const res = await fetch("/api/admin/ideas");
+    if (res.status === 401) { setError("Geen toegang."); setLoadingIdeas(false); return; }
+    const data = await res.json();
+    setIdeas(data.ideas || []);
+    setLoadingIdeas(false);
   }
 
   useEffect(() => { loadUsers(); }, []);
+  useEffect(() => { if (tab === "ideas" && ideas.length === 0) loadIdeas(); }, [tab]);
 
   async function saveCredits(userId: string) {
     setSaving(true);
@@ -53,10 +92,30 @@ export default function AdminPage() {
         setAmount("");
         setError("");
       }
-    } catch (e) {
+    } catch {
       setError("Netwerkfout bij opslaan.");
     }
     setSaving(false);
+  }
+
+  async function updateStatus(ideaId: string, status: Status) {
+    setUpdatingId(ideaId);
+    try {
+      const res = await fetch("/api/admin/ideas", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: ideaId, status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIdeas(ideas.map((i) => i.id === ideaId ? { ...i, status } : i));
+      } else {
+        setError(`Fout: ${data.error}`);
+      }
+    } catch {
+      setError("Netwerkfout bij opslaan.");
+    }
+    setUpdatingId(null);
   }
 
   return (
@@ -67,97 +126,201 @@ export default function AdminPage() {
         <span className="font-semibold text-gray-900 text-sm">⚙️ Admin</span>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Gebruikersbeheer</h1>
+      <main className="max-w-5xl mx-auto px-6 py-10">
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-8">
+          <button
+            onClick={() => setTab("users")}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold transition-colors ${
+              tab === "users"
+                ? "bg-blue-600 text-white shadow"
+                : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            👥 Gebruikers
+          </button>
+          <button
+            onClick={() => setTab("ideas")}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold transition-colors ${
+              tab === "ideas"
+                ? "bg-blue-600 text-white shadow"
+                : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            💡 Ideeën
+          </button>
+        </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 mb-6">{error}</div>
         )}
 
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">E-mail</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Aangemeld</th>
-                  <th className="text-center px-4 py-3 font-medium text-gray-600">Credits</th>
-                  <th className="text-center px-4 py-3 font-medium text-gray-600">Gebruik</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">Actie</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 text-gray-900">{user.email}</td>
-                    <td className="px-4 py-3 text-gray-500">
-                      {new Date(user.created_at).toLocaleDateString("nl-NL")}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {successId === user.id ? (
-                        <span className="text-green-600 font-semibold">✓ {user.credits}</span>
-                      ) : (
-                        <span className={`font-semibold ${user.credits === 0 ? "text-red-500" : "text-blue-600"}`}>
-                          {user.credits}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center text-gray-500">{user.total_usage}x</td>
-                    <td className="px-4 py-3 text-right">
-                      {editId === user.id ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <select
-                            value={mode}
-                            onChange={(e) => setMode(e.target.value as "add" | "set")}
-                            className="border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none"
-                          >
-                            <option value="add">Toevoegen</option>
-                            <option value="set">Instellen op</option>
-                          </select>
-                          <input
-                            type="number"
-                            value={amount}
-                            onChange={(e) => setAmount(e.target.value)}
-                            placeholder="0"
-                            className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            autoFocus
-                          />
-                          <button
-                            onClick={() => saveCredits(user.id)}
-                            disabled={saving || !amount}
-                            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg px-3 py-1 text-xs font-medium"
-                          >
-                            {saving ? "..." : "Opslaan"}
-                          </button>
-                          <button
-                            onClick={() => { setEditId(null); setAmount(""); }}
-                            className="text-gray-400 hover:text-gray-600 text-xs px-2 py-1"
-                          >
-                            Annuleer
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => { setEditId(user.id); setAmount(""); setMode("add"); }}
-                          className="text-blue-600 hover:text-blue-800 text-xs font-medium"
-                        >
-                          Credits aanpassen
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {users.length === 0 && (
-              <p className="text-center text-gray-400 py-8 text-sm">Nog geen gebruikers.</p>
+        {/* ── Users tab ── */}
+        {tab === "users" && (
+          <>
+            <h1 className="text-2xl font-bold text-gray-900 mb-6">Gebruikersbeheer</h1>
+            {loadingUsers ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium text-gray-600">E-mail</th>
+                      <th className="text-left px-4 py-3 font-medium text-gray-600">Aangemeld</th>
+                      <th className="text-center px-4 py-3 font-medium text-gray-600">Credits</th>
+                      <th className="text-center px-4 py-3 font-medium text-gray-600">Gebruik</th>
+                      <th className="text-right px-4 py-3 font-medium text-gray-600">Actie</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {users.map((user) => (
+                      <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3 text-gray-900">{user.email}</td>
+                        <td className="px-4 py-3 text-gray-500">
+                          {new Date(user.created_at).toLocaleDateString("nl-NL")}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {successId === user.id ? (
+                            <span className="text-green-600 font-semibold">✓ {user.credits}</span>
+                          ) : (
+                            <span className={`font-semibold ${user.credits === 0 ? "text-red-500" : "text-blue-600"}`}>
+                              {user.credits}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-500">{user.total_usage}x</td>
+                        <td className="px-4 py-3 text-right">
+                          {editId === user.id ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <select
+                                value={mode}
+                                onChange={(e) => setMode(e.target.value as "add" | "set")}
+                                className="border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none"
+                              >
+                                <option value="add">Toevoegen</option>
+                                <option value="set">Instellen op</option>
+                              </select>
+                              <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(e.target.value)}
+                                placeholder="0"
+                                className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                autoFocus
+                              />
+                              <button
+                                onClick={() => saveCredits(user.id)}
+                                disabled={saving || !amount}
+                                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg px-3 py-1 text-xs font-medium"
+                              >
+                                {saving ? "..." : "Opslaan"}
+                              </button>
+                              <button
+                                onClick={() => { setEditId(null); setAmount(""); }}
+                                className="text-gray-400 hover:text-gray-600 text-xs px-2 py-1"
+                              >
+                                Annuleer
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => { setEditId(user.id); setAmount(""); setMode("add"); }}
+                              className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                            >
+                              Credits aanpassen
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {users.length === 0 && (
+                  <p className="text-center text-gray-400 py-8 text-sm">Nog geen gebruikers.</p>
+                )}
+              </div>
             )}
-          </div>
+          </>
+        )}
+
+        {/* ── Ideas tab ── */}
+        {tab === "ideas" && (
+          <>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">Ideeënbeheer</h1>
+              <button
+                onClick={loadIdeas}
+                className="text-xs text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 bg-white"
+              >
+                ↻ Verversen
+              </button>
+            </div>
+
+            {loadingIdeas ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {ideas.map((idea) => {
+                  const s = STATUS_STYLES[idea.status as Status] ?? STATUS_STYLES.nieuw;
+                  return (
+                    <div
+                      key={idea.id}
+                      className="bg-white rounded-2xl border border-gray-200 shadow-sm px-5 py-4 flex items-start gap-4"
+                    >
+                      {/* vote count */}
+                      <div className="flex flex-col items-center min-w-[40px] pt-0.5">
+                        <span className="text-lg font-bold text-gray-700">▲</span>
+                        <span className="text-sm font-semibold text-gray-900">{idea.votes}</span>
+                      </div>
+
+                      {/* content */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 text-sm mb-0.5">{idea.title}</p>
+                        {idea.description && (
+                          <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{idea.description}</p>
+                        )}
+                        <p className="text-xs text-gray-400 mt-1">
+                          {new Date(idea.created_at).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}
+                        </p>
+                      </div>
+
+                      {/* status badge + dropdown */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                          style={{ backgroundColor: s.bg, color: s.color }}
+                        >
+                          {s.label}
+                        </span>
+                        <select
+                          value={idea.status}
+                          disabled={updatingId === idea.id}
+                          onChange={(e) => updateStatus(idea.id, e.target.value as Status)}
+                          className="border border-gray-200 rounded-lg px-2 py-1 text-xs text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50"
+                        >
+                          {STATUS_OPTIONS.map((s) => (
+                            <option key={s} value={s}>{STATUS_STYLES[s].label}</option>
+                          ))}
+                        </select>
+                        {updatingId === idea.id && (
+                          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+                {ideas.length === 0 && (
+                  <p className="text-center text-gray-400 py-12 text-sm">Nog geen ideeën ingediend.</p>
+                )}
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>
