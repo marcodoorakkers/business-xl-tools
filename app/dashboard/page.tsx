@@ -92,6 +92,16 @@ export default async function DashboardPage() {
             </Link>
           ))}
         </div>
+
+        {/* Mobile tip */}
+        <Link href="/mobiel" className="mt-8 flex items-center gap-4 bg-white border border-gray-200 rounded-2xl px-5 py-4 hover:border-blue-300 hover:shadow-sm transition-all group">
+          <span className="text-2xl">📱</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-900">Gebruik je TimeSaverTools ook op je telefoon?</p>
+            <p className="text-xs text-gray-500">Voeg het toe aan je beginscherm — werkt als een echte app.</p>
+          </div>
+          <span className="text-gray-400 group-hover:text-blue-500 transition-colors text-sm">→</span>
+        </Link>
       </main>
     </div>
   );
