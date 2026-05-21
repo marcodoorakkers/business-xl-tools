@@ -153,9 +153,12 @@ ${profileText.slice(0, 3000)}`,
 
   const title = profileData.titles[0] ?? "professional";
   const title2 = profileData.titles[1] ?? title;
+  const title3 = profileData.titles[2] ?? title2;
 
-  const [nlJobs, remoteJobs, intJobs1, intJobs2] = await Promise.all([
-    searchAdzuna("nl", `${title} freelance`, "nl"),
+  const [nlJobs1, nlJobs2, nlJobs3, remoteJobs, intJobs1, intJobs2] = await Promise.all([
+    searchAdzuna("nl", title, "nl"),                           // breed: alleen functietitel
+    searchAdzuna("nl", `${title2} freelance`, "nl"),           // tweede titel + freelance
+    searchAdzuna("nl", `${title3} ZZP`, "nl"),                 // derde titel + ZZP
     searchAdzuna("gb", `${title} remote contract`, "remote"),
     searchAdzuna("gb", `${title} freelance contract`, "international"),
     searchAdzuna("gb", `${title2} contract`, "international"),
@@ -163,7 +166,7 @@ ${profileText.slice(0, 3000)}`,
 
   const seen = new Set<string>();
   const allVacancies: Vacancy[] = [];
-  for (const v of [...nlJobs, ...remoteJobs, ...intJobs1, ...intJobs2]) {
+  for (const v of [...nlJobs1, ...nlJobs2, ...nlJobs3, ...remoteJobs, ...intJobs1, ...intJobs2]) {
     const key = `${v.title.toLowerCase()}-${v.company.toLowerCase()}`;
     if (!seen.has(key)) {
       seen.add(key);
