@@ -14,6 +14,8 @@ interface AdzunaJob {
   salary_min?: number;
   salary_max?: number;
   created: string;
+  contract_type?: string; // "permanent" | "contract"
+  contract_time?: string; // "full_time" | "part_time"
 }
 
 interface Vacancy {
@@ -26,6 +28,19 @@ interface Vacancy {
   salary?: string;
   created: string;
   scope: "nl" | "remote" | "international";
+  contractType: string;
+}
+
+function deriveContractType(job: AdzunaJob): string {
+  const ct = (job.contract_type ?? "").toLowerCase();
+  const ctime = (job.contract_time ?? "").toLowerCase();
+  const title = (job.title ?? "").toLowerCase();
+  const desc = (job.description ?? "").toLowerCase();
+
+  if (ct === "permanent" || title.includes("permanent") || title.includes(" vast ") || desc.includes("vast dienstverband")) return "permanent";
+  if (ctime === "part_time" || title.includes("part-time") || title.includes("part time")) return "part-time";
+  if (ct === "contract" || title.includes("freelance") || title.includes("zzp") || title.includes("interim") || desc.includes("freelance")) return "freelance";
+  return "contract";
 }
 
 async function searchAdzuna(
@@ -67,6 +82,7 @@ async function searchAdzuna(
       salary: formatSalary(j.salary_min, j.salary_max),
       created: j.created,
       scope,
+      contractType: deriveContractType(j),
     }));
   } catch (err) {
     console.error(`[vacancy-finder] Adzuna ${country} fetch error:`, err);
@@ -99,13 +115,12 @@ export async function POST(req: NextRequest) {
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  // Step 1: analyze profile
   const analysis = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 512,
     messages: [{
       role: "user",
-      content: `Analyseer dit LinkedIn profiel/CV voor een vacaturezoeker gericht op freelance/ZZP werk.
+      content: `Analyseer dit CV voor een vacaturezoeker gericht op freelance/ZZP werk.
 Geef ALLEEN een JSON object terug, zonder extra tekst of markdown:
 {
   "titles": ["meest relevante Engelstalige functietitel (kort, 1-3 woorden)", "tweede optie", "derde optie"],
@@ -139,7 +154,6 @@ ${profileText.slice(0, 3000)}`,
   const title = profileData.titles[0] ?? "professional";
   const title2 = profileData.titles[1] ?? title;
 
-  // Step 2: parallel searches — no contract=1 filter, use keywords instead
   const [nlJobs, remoteJobs, intJobs1, intJobs2] = await Promise.all([
     searchAdzuna("nl", `${title} freelance`, "nl"),
     searchAdzuna("gb", `${title} remote contract`, "remote"),
@@ -147,7 +161,6 @@ ${profileText.slice(0, 3000)}`,
     searchAdzuna("gb", `${title2} contract`, "international"),
   ]);
 
-  // Deduplicate by title+company
   const seen = new Set<string>();
   const allVacancies: Vacancy[] = [];
   for (const v of [...nlJobs, ...remoteJobs, ...intJobs1, ...intJobs2]) {
