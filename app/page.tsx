@@ -70,7 +70,7 @@ export default function LandingPage() {
           </span>
         </h1>
         <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-          AI-tools die dagelijkse klusjes van je overnemen. Van e-mails schrijven tot vergaderingen samenvatten — jij doet de leuke dingen, wij de rest.
+          Een groeiende collectie AI-tools die dagelijkse klusjes van je overnemen. Jij doet de leuke dingen, wij de rest.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link href="/auth/register"
@@ -88,7 +88,7 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 pb-24">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Wat kun je ermee?</h2>
-          <p className="text-gray-500">5 tools, elk ontworpen om jou tijd te besparen.</p>
+          <p className="text-gray-500">Steeds meer tools, elk ontworpen om jou tijd te besparen.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {tools.map((tool) => (
