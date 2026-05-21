@@ -72,7 +72,7 @@ export default async function DashboardPage() {
       <main className="max-w-4xl mx-auto px-6 py-10">
         <div className="mb-8">
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Jouw tools</h1>
-          <p className="text-gray-500 text-sm">Kies een tool om te starten. Elke actie kost 1 credit.</p>
+          <p className="text-gray-500 text-sm">Kies een tool om te starten. Eenvoudige tools kosten 1 credit, uitgebreidere tools 2 credits.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {tools.map((tool) => (
