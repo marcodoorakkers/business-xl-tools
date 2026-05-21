@@ -15,11 +15,12 @@ export default function Navbar({ credits, isAdmin = false }: { credits: number; 
 
   return (
     <nav className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-      <Link href="/dashboard" className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2">
         <span className="text-xl">⚡</span>
         <span className="font-bold text-gray-900 text-lg">TimeSaver<span className="text-blue-600">Tools</span></span>
       </Link>
       <div className="flex items-center gap-3">
+        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">Dashboard</Link>
         <span className="text-sm bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full font-semibold">
           ⚡ {credits} credits
         </span>
