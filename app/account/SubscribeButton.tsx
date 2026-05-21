@@ -28,7 +28,7 @@ export default function SubscribeButton({ priceId }: { priceId: string }) {
       disabled={loading}
       className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-colors whitespace-nowrap"
     >
-      {loading ? "Laden..." : "Pro starten voor €4,99/mnd →"}
+      {loading ? "Laden..." : "Maandelijks starten voor €4,99/mnd →"}
     </button>
   );
 }

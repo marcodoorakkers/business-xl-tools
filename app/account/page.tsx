@@ -52,7 +52,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         )}
         {paymentStatus === "subscribed" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
-            🎉 Welkom bij Pro! 50 credits zijn toegevoegd.
+            🎉 Welkom bij Maandelijks! 50 credits zijn toegevoegd.
           </div>
         )}
         {paymentStatus === "cancelled" && (
@@ -68,12 +68,12 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <p className="text-blue-200 text-sm mt-1">credits beschikbaar</p>
         </div>
 
-        {/* Pro subscription section */}
+        {/* Maandelijks subscription section */}
         {!subscriptionStatus && (
           <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg shadow-amber-200">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-lg">⭐</span>
-              <h2 className="font-bold text-lg">Pro abonnement</h2>
+              <h2 className="font-bold text-lg">Maandelijks abonnement</h2>
             </div>
             <p className="text-amber-100 text-sm mb-4">
               50 credits per maand · automatisch verlengd · opzegbaar wanneer je wil
@@ -92,7 +92,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-green-600 font-bold text-lg">✓</span>
-              <h2 className="font-bold text-green-800 text-lg">Pro abonnement actief</h2>
+              <h2 className="font-bold text-green-800 text-lg">Maandelijks abonnement actief</h2>
             </div>
             <p className="text-green-700 text-sm">Je ontvangt elke maand 50 nieuwe credits.</p>
             {formattedPeriodEnd && (

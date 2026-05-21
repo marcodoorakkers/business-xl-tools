@@ -135,7 +135,7 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 py-24">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Simpele prijzen</h2>
-          <p className="text-gray-500">Begin gratis of kies het Pro abonnement voor de beste waarde.</p>
+          <p className="text-gray-500">Begin gratis of kies het Maandelijks abonnement voor de beste waarde.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
           {/* Gratis */}
@@ -154,13 +154,13 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Pro */}
+          {/* Maandelijks */}
           <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-amber-500 text-white shadow-xl shadow-amber-200 scale-105">
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-amber-600 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
               ⭐ Aanbevolen
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-amber-100">Pro</p>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-amber-100">Maandelijks</p>
               <p className="text-4xl font-extrabold text-white">€4,99</p>
               <p className="text-sm mt-1 text-amber-100">/maand</p>
             </div>
@@ -170,7 +170,7 @@ export default function LandingPage() {
             <p className="text-xs text-amber-100">Maandelijks opzegbaar</p>
             <Link href="/account"
               className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-white text-amber-600 hover:bg-amber-50">
-              Start Pro →
+              Start Maandelijks →
             </Link>
           </div>
 
