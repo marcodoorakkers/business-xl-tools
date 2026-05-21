@@ -23,6 +23,37 @@ interface Idea {
   user_id: string;
 }
 
+interface ToolStat {
+  tool: string;
+  count: number;
+  credits: number;
+}
+
+interface DayStat {
+  date: string;
+  count: number;
+}
+
+interface Stats {
+  totalUsers: number;
+  totalUsage: number;
+  creditsSpent: number;
+  creditsSold: number;
+  byTool: ToolStat[];
+  byDay: DayStat[];
+}
+
+const TOOL_NAMES: Record<string, string> = {
+  "voice-mail": "Voice Mail Draft",
+  "meeting-notes": "Meeting Memo",
+  "dinner-plan": "Weekmenu Planner",
+  "vacancy-finder": "Vacaturezoeker",
+  "cv-builder": "CV Builder",
+  "credits_purchase": "Losse credits gekocht",
+  "subscription_start": "Maandelijks abonnement gestart",
+  "subscription_renewal": "Maandelijks verlengd",
+};
+
 const STATUS_OPTIONS = ["nieuw", "overweging", "ontwikkeling", "live"] as const;
 type Status = typeof STATUS_OPTIONS[number];
 
@@ -34,7 +65,7 @@ const STATUS_STYLES: Record<Status, { label: string; bg: string; color: string }
 };
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<"users" | "ideas">("users");
+  const [tab, setTab] = useState<"users" | "ideas" | "stats">("users");
 
   // — Users state —
   const [users, setUsers] = useState<User[]>([]);
@@ -49,6 +80,10 @@ export default function AdminPage() {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loadingIdeas, setLoadingIdeas] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // — Stats state —
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(false);
 
   const [error, setError] = useState("");
 
@@ -70,8 +105,18 @@ export default function AdminPage() {
     setLoadingIdeas(false);
   }
 
+  async function loadStats() {
+    setLoadingStats(true);
+    const res = await fetch("/api/admin/stats");
+    if (res.status === 401) { setError("Geen toegang."); setLoadingStats(false); return; }
+    const data = await res.json();
+    setStats(data);
+    setLoadingStats(false);
+  }
+
   useEffect(() => { loadUsers(); }, []);
   useEffect(() => { if (tab === "ideas" && ideas.length === 0) loadIdeas(); }, [tab]);
+  useEffect(() => { if (tab === "stats" && !stats) loadStats(); }, [tab]);
 
   async function saveCredits(userId: string) {
     setSaving(true);
@@ -154,6 +199,16 @@ export default function AdminPage() {
             }`}
           >
             💡 Ideeën
+          </button>
+          <button
+            onClick={() => setTab("stats")}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold transition-colors ${
+              tab === "stats"
+                ? "bg-blue-600 text-white shadow"
+                : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            📊 Rapportage
           </button>
         </div>
 
@@ -250,6 +305,127 @@ export default function AdminPage() {
                   <p className="text-center text-gray-400 py-8 text-sm">Nog geen gebruikers.</p>
                 )}
               </div>
+            )}
+          </>
+        )}
+
+        {/* ── Stats tab ── */}
+        {tab === "stats" && (
+          <>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">Rapportage</h1>
+              <button
+                onClick={loadStats}
+                className="text-xs text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 bg-white"
+              >
+                ↻ Verversen
+              </button>
+            </div>
+
+            {loadingStats ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : stats ? (
+              <>
+                {/* KPI cards */}
+                <div className="grid grid-cols-2 gap-4 mb-8 sm:grid-cols-4">
+                  <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                    <p className="text-xs text-gray-500 mb-1">Totaal gebruikers</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.totalUsers}</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                    <p className="text-xs text-gray-500 mb-1">Tool-gebruik (acties)</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.totalUsage}</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                    <p className="text-xs text-gray-500 mb-1">Credits gebruikt</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.creditsSpent}</p>
+                  </div>
+                  <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                    <p className="text-xs text-gray-500 mb-1">Credits verkocht</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.creditsSold}</p>
+                  </div>
+                </div>
+
+                {/* Tool usage table */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+                  <div className="px-5 py-4 border-b border-gray-100">
+                    <h2 className="font-semibold text-gray-900 text-sm">Gebruik per tool</h2>
+                  </div>
+                  {stats.byTool.length === 0 ? (
+                    <p className="text-center text-gray-400 py-8 text-sm">Nog geen gebruik geregistreerd.</p>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                          <th className="text-left px-4 py-3 font-medium text-gray-600">Tool</th>
+                          <th className="text-center px-4 py-3 font-medium text-gray-600">Aantal keer gebruikt</th>
+                          <th className="text-center px-4 py-3 font-medium text-gray-600">Credits gebruikt</th>
+                          <th className="px-4 py-3 w-40"></th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {(() => {
+                          const maxCount = Math.max(...stats.byTool.map((t) => t.count), 1);
+                          return stats.byTool.map((t) => (
+                            <tr key={t.tool} className="hover:bg-gray-50 transition-colors">
+                              <td className="px-4 py-3 text-gray-900 font-medium">
+                                {TOOL_NAMES[t.tool] ?? t.tool}
+                              </td>
+                              <td className="px-4 py-3 text-center text-gray-700">{t.count}</td>
+                              <td className="px-4 py-3 text-center text-gray-700">{t.credits}</td>
+                              <td className="px-4 py-3">
+                                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-blue-500 rounded-full"
+                                    style={{ width: `${Math.round((t.count / maxCount) * 100)}%` }}
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          ));
+                        })()}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+
+                {/* Daily bar chart */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+                  <h2 className="font-semibold text-gray-900 text-sm mb-4">Gebruik afgelopen 30 dagen</h2>
+                  {stats.byDay.every((d) => d.count === 0) ? (
+                    <p className="text-center text-gray-400 py-8 text-sm">Geen gebruik in de afgelopen 30 dagen.</p>
+                  ) : (
+                    <div className="flex items-end gap-1" style={{ height: 120 }}>
+                      {(() => {
+                        const maxCount = Math.max(...stats.byDay.map((d) => d.count), 1);
+                        return stats.byDay.map((d, i) => {
+                          const heightPct = Math.round((d.count / maxCount) * 100);
+                          const date = new Date(d.date + "T12:00:00");
+                          const showLabel = i % 5 === 0;
+                          const label = date.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+                          return (
+                            <div key={d.date} className="flex flex-col items-center flex-1 min-w-0" title={`${d.date}: ${d.count}`}>
+                              <div className="w-full flex items-end" style={{ height: 100 }}>
+                                <div
+                                  className="w-full rounded-t bg-blue-500"
+                                  style={{ height: `${heightPct}%`, minHeight: d.count > 0 ? 2 : 0 }}
+                                />
+                              </div>
+                              <div className="text-gray-400 mt-1 overflow-hidden text-center" style={{ fontSize: 9, height: 16 }}>
+                                {showLabel ? label : ""}
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <p className="text-center text-gray-400 py-12 text-sm">Kon statistieken niet laden.</p>
             )}
           </>
         )}
