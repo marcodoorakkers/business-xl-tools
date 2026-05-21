@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     .eq("id", user.id)
     .single();
 
-  if (!profile || profile.credits < 1) {
+  if (!profile || profile.credits < 2) {
     return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
   }
 
@@ -45,14 +45,15 @@ export async function POST(req: NextRequest) {
     const clean = content.text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
     const notes = JSON.parse(clean);
 
-    // Deduct 1 credit
+    // Deduct 2 credits
+    await supabase.rpc("decrement_credits", { user_id: user.id });
     await supabase.rpc("decrement_credits", { user_id: user.id });
 
     // Log usage
     await supabase.from("usage_logs").insert({
       user_id: user.id,
       tool: "meeting-memo",
-      credits_used: 1,
+      credits_used: 2,
     });
 
     const now = new Date();

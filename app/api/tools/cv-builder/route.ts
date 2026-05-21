@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { data: profile } = await supabase.from("profiles").select("credits").eq("id", user.id).single();
-  if (!profile || profile.credits < 1) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
+  if (!profile || profile.credits < 2) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
 
   const { profileText, lang, style, jobDescription } = await req.json();
   if (!profileText?.trim()) return NextResponse.json({ error: "Geen profiel opgegeven" }, { status: 400 });
@@ -117,7 +117,8 @@ ${profileText.slice(0, 4000)}`;
     const cv = JSON.parse(match[0]);
 
     await supabase.rpc("decrement_credits", { user_id: user.id });
-    await supabase.from("usage_logs").insert({ user_id: user.id, tool: "cv-builder", credits_used: 1 });
+    await supabase.rpc("decrement_credits", { user_id: user.id });
+    await supabase.from("usage_logs").insert({ user_id: user.id, tool: "cv-builder", credits_used: 2 });
 
     return NextResponse.json(cv);
   } catch (err) {

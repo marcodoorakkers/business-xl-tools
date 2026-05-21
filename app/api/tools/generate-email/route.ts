@@ -49,14 +49,15 @@ ${transcript}`,
 
     const email = JSON.parse(jsonMatch[0]);
 
-    // Deduct 1 credit
+    // Deduct 2 credits
+    await supabase.rpc("decrement_credits", { user_id: user.id });
     await supabase.rpc("decrement_credits", { user_id: user.id });
 
     // Log usage
     await supabase.from("usage_logs").insert({
       user_id: user.id,
       tool: "voice-mail",
-      credits_used: 1,
+      credits_used: 2,
     });
 
     return NextResponse.json(email);
