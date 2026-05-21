@@ -32,7 +32,7 @@ const tools = [
   {
     icon: "📋",
     name: "CV Builder",
-    description: "Maak een professioneel CV van je LinkedIn profiel — compact, uitgebreid of gericht op een vacature.",
+    description: "Maak een professioneel CV van je LinkedIn profiel of bestaand CV — kies uit 6 templates en download direct als Word.",
     color: "from-rose-500 to-pink-500",
     bg: "bg-rose-50",
   },
@@ -88,7 +88,7 @@ export default function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 pb-24">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Wat kun je ermee?</h2>
-          <p className="text-gray-500">4 tools, elk ontworpen om jou tijd te besparen.</p>
+          <p className="text-gray-500">5 tools, elk ontworpen om jou tijd te besparen.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {tools.map((tool) => (
@@ -114,7 +114,7 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
             {[
-              { step: "1", title: "Maak een account", desc: "Registreer gratis en ontvang je eerste credits.", icon: "👤" },
+              { step: "1", title: "Maak een account", desc: "Registreer gratis en ontvang direct 10 credits.", icon: "👤" },
               { step: "2", title: "Kies een tool", desc: "Kies wat je nodig hebt en vul in wat gevraagd wordt.", icon: "🛠️" },
               { step: "3", title: "Ontvang je resultaat", desc: "Binnen seconden klaar — kopiëren, downloaden of mailen.", icon: "🎉" },
             ].map((item) => (
@@ -139,10 +139,10 @@ export default function LandingPage() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            { name: "Probeer", price: "Gratis", credits: 10, perCredit: null, description: "Bij registratie", highlight: false, cta: "Begin gratis" },
+            { name: "Probeer", price: "Gratis", credits: 10, perCredit: null, description: "10 credits bij registratie", highlight: false, cta: "Begin gratis" },
             { name: "Starter", price: "€9,99", credits: 50, perCredit: "€0,20 per credit", description: "Voor af en toe gebruik", highlight: false, cta: "Koop credits" },
-            { name: "Popular", price: "€29,99", credits: 200, perCredit: "€0,15 per credit", description: "Meest gekozen", highlight: true, cta: "Koop credits" },
-            { name: "Best value", price: "€59,99", credits: 500, perCredit: "€0,12 per credit", description: "Voor intensief gebruik", highlight: false, cta: "Koop credits" },
+            { name: "Populair", price: "€29,99", credits: 200, perCredit: "€0,15 per credit", description: "Meest gekozen", highlight: true, cta: "Koop credits" },
+            { name: "Beste koop", price: "€59,99", credits: 500, perCredit: "€0,12 per credit", description: "Voor intensief gebruik", highlight: false, cta: "Koop credits" },
           ].map((tier) => (
             <div key={tier.name} className={`relative rounded-3xl p-7 flex flex-col gap-4 ${tier.highlight ? "bg-blue-600 text-white shadow-xl shadow-blue-200 scale-105" : "bg-gray-50"}`}>
               {tier.highlight && (

@@ -42,7 +42,7 @@ const tools = [
   },
   {
     name: "CV Builder",
-    description: "Upload je LinkedIn PDF en ontvang een professioneel CV op maat — compact, uitgebreid of gericht op een vacature.",
+    description: "Upload je LinkedIn PDF of bestaand CV en kies uit 6 templates — compact, uitgebreid of gericht op een vacature.",
     href: "/tools/cv-builder",
     credits: 1,
     icon: "📋",
