@@ -26,6 +26,7 @@ export default function Navbar({ credits, isAdmin = false }: { credits: number; 
         {isAdmin && (
           <Link href="/admin" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">Admin</Link>
         )}
+        <Link href="/ideas" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">💡 Ideeën</Link>
         <Link href="/account" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">Account</Link>
         <button onClick={handleLogout} className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-3 py-1.5 rounded-xl transition-colors">Uitloggen</button>
       </div>
