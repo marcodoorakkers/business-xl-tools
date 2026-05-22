@@ -15,6 +15,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TimeSaverTools — Doe meer in minder tijd",
   description: "AI-tools die dagelijkse klusjes van je overnemen. Van e-mails schrijven tot vergaderingen samenvatten.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "TimeSaverTools",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({
