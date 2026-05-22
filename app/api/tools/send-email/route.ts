@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { error } = await resend.emails.send({
-    from: "Voice Mail Draft <startwithadraft@business-xl.nl>",
+    from: "Voice Mail Draft <noreply@timesavertools.nl>",
     to,
     subject: `[CONCEPT] ${subject}`,
     text: body,
