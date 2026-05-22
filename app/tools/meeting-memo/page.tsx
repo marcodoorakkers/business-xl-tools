@@ -50,6 +50,7 @@ export default function MeetingMemoPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const icsInputRef = useRef<HTMLInputElement>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("mm-theme") as Theme | null;
@@ -168,6 +169,27 @@ export default function MeetingMemoPage() {
     };
     reader.readAsText(file);
     if (icsInputRef.current) icsInputRef.current.value = "";
+  }
+
+  async function handleAudioUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!audioInputRef.current) return;
+    audioInputRef.current.value = "";
+    if (!file) return;
+
+    setStep("processing");
+    try {
+      const formData = new FormData();
+      formData.append("audio", file, file.name);
+      const res = await fetch("/api/tools/meeting-transcribe", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setTranscript(data.text);
+      setStep("review");
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Transcriptie mislukt");
+      setStep("error");
+    }
   }
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -491,6 +513,19 @@ export default function MeetingMemoPage() {
               <div className="flex flex-col gap-2">
                 <button onClick={startRecording} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2">
                   🎙️ {isNl ? "Start live opname" : "Start live recording"}
+                </button>
+                <input
+                  ref={audioInputRef}
+                  type="file"
+                  accept="audio/m4a,audio/mp4,audio/mpeg,audio/wav,audio/x-m4a,audio/aac,.m4a,.mp3,.wav,.mp4,.aac"
+                  className="hidden"
+                  onChange={handleAudioUpload}
+                />
+                <button
+                  onClick={() => audioInputRef.current?.click()}
+                  className={`rounded-lg py-3 text-sm font-medium transition-colors border-2 border-dashed flex items-center justify-center gap-2 ${isDark ? "border-gray-600 text-gray-300 hover:border-blue-400 hover:text-blue-400" : "border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"}`}
+                >
+                  🎤 {isNl ? "Upload audio opname (iPhone)" : "Upload audio recording (iPhone)"}
                 </button>
                 <input
                   ref={uploadInputRef}
