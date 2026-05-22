@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logUsage } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -177,8 +178,7 @@ ${profileText.slice(0, 3000)}`,
   console.log(`[vacancy-finder] Total unique vacancies: ${allVacancies.length}`);
 
   await supabase.rpc("decrement_credits", { user_id: user.id });
-  const { error: logErr } = await supabase.from("usage_logs").insert({ user_id: user.id, tool: "vacancy-finder", credits_used: 1 });
-  if (logErr) console.error("[vacancy-finder] usage_logs insert failed:", logErr.message);
+  await logUsage(user.id, "vacancy-finder", 1);
 
   return NextResponse.json({ profile: profileData, vacancies: allVacancies });
 }

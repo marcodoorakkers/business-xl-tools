@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logUsage } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -63,8 +64,7 @@ Geef ALLEEN een JSON object terug, zonder markdown of uitleg:
     const outline = JSON.parse(match[0]);
 
     await supabase.rpc("decrement_credits", { user_id: user.id });
-    const { error: logErr } = await supabase.from("usage_logs").insert({ user_id: user.id, tool: "presentation-outline", credits_used: 1 });
-    if (logErr) console.error("[presentation-outline] usage_logs insert failed:", logErr.message);
+    await logUsage(user.id, "presentation-outline", 1);
 
     return NextResponse.json(outline);
   } catch (err) {

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logUsage } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -49,13 +50,7 @@ export async function POST(req: NextRequest) {
     await supabase.rpc("decrement_credits", { user_id: user.id });
     await supabase.rpc("decrement_credits", { user_id: user.id });
 
-    // Log usage
-    const { error: logErr } = await supabase.from("usage_logs").insert({
-      user_id: user.id,
-      tool: "meeting-memo",
-      credits_used: 2,
-    });
-    if (logErr) console.error("[meeting-notes] usage_logs insert failed:", logErr.message);
+    await logUsage(user.id, "meeting-memo", 2);
 
     const now = new Date();
     notes._meta = {

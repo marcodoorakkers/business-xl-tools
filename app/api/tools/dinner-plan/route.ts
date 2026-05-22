@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logUsage } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -70,8 +71,7 @@ Regels:
     const plan = JSON.parse(jsonMatch[0]);
 
     await supabase.rpc("decrement_credits", { user_id: user.id });
-    const { error: logErr } = await supabase.from("usage_logs").insert({ user_id: user.id, tool: "dinner-planner", credits_used: 1 });
-    if (logErr) console.error("[dinner-plan] usage_logs insert failed:", logErr.message);
+    await logUsage(user.id, "dinner-planner", 1);
 
     return NextResponse.json(plan);
   } catch (err) {

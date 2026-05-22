@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logUsage } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -53,13 +54,7 @@ ${transcript}`,
     await supabase.rpc("decrement_credits", { user_id: user.id });
     await supabase.rpc("decrement_credits", { user_id: user.id });
 
-    // Log usage
-    const { error: logErr } = await supabase.from("usage_logs").insert({
-      user_id: user.id,
-      tool: "voice-mail",
-      credits_used: 2,
-    });
-    if (logErr) console.error("[generate-email] usage_logs insert failed:", logErr.message);
+    await logUsage(user.id, "voice-mail", 2);
 
     return NextResponse.json(email);
   } catch {

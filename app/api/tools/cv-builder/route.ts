@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { logUsage } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -118,8 +119,7 @@ ${profileText.slice(0, 4000)}`;
 
     await supabase.rpc("decrement_credits", { user_id: user.id });
     await supabase.rpc("decrement_credits", { user_id: user.id });
-    const { error: logErr } = await supabase.from("usage_logs").insert({ user_id: user.id, tool: "cv-builder", credits_used: 2 });
-    if (logErr) console.error("[cv-builder] usage_logs insert failed:", logErr.message);
+    await logUsage(user.id, "cv-builder", 2);
 
     return NextResponse.json(cv);
   } catch (err) {
