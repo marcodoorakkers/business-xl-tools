@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
 const tools = [
   {
@@ -52,7 +53,11 @@ const tools = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const loggedIn = !!user;
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -63,12 +68,20 @@ export default function LandingPage() {
           <span className="font-bold text-gray-900 text-lg">TimeSaver<span className="text-blue-600">Tools</span></span>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/auth/login" className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors">
-            Inloggen
-          </Link>
-          <Link href="/auth/register" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors">
-            Gratis starten
-          </Link>
+          {loggedIn ? (
+            <Link href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors">
+              Naar mijn tools →
+            </Link>
+          ) : (
+            <>
+              <Link href="/auth/login" className="text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors">
+                Inloggen
+              </Link>
+              <Link href="/auth/register" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition-colors">
+                Gratis starten
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -87,14 +100,23 @@ export default function LandingPage() {
           Een groeiende collectie tools die dagelijkse klusjes van je overnemen. Jij doet de leuke dingen, wij de rest.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link href="/auth/register"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3.5 rounded-2xl text-base transition-colors shadow-lg shadow-blue-200">
-            Begin gratis →
-          </Link>
-          <Link href="/auth/login"
-            className="text-gray-600 hover:text-gray-900 font-medium px-6 py-3.5 rounded-2xl text-base transition-colors border border-gray-200 hover:border-gray-300">
-            Al een account? Log in
-          </Link>
+          {loggedIn ? (
+            <Link href="/dashboard"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3.5 rounded-2xl text-base transition-colors shadow-lg shadow-blue-200">
+              Naar mijn tools →
+            </Link>
+          ) : (
+            <>
+              <Link href="/auth/register"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3.5 rounded-2xl text-base transition-colors shadow-lg shadow-blue-200">
+                Begin gratis →
+              </Link>
+              <Link href="/auth/login"
+                className="text-gray-600 hover:text-gray-900 font-medium px-6 py-3.5 rounded-2xl text-base transition-colors border border-gray-200 hover:border-gray-300">
+                Al een account? Log in
+              </Link>
+            </>
+          )}
         </div>
       </section>
 
@@ -233,10 +255,17 @@ export default function LandingPage() {
           <p className="text-blue-200 text-lg mb-8 max-w-xl mx-auto">
             Maak vandaag nog een gratis account en ontdek hoe makkelijk het is.
           </p>
-          <Link href="/auth/register"
-            className="inline-block bg-white text-blue-600 font-bold px-8 py-3.5 rounded-2xl text-base hover:bg-blue-50 transition-colors shadow-lg">
-            Gratis starten →
-          </Link>
+          {loggedIn ? (
+            <Link href="/dashboard"
+              className="inline-block bg-white text-blue-600 font-bold px-8 py-3.5 rounded-2xl text-base hover:bg-blue-50 transition-colors shadow-lg">
+              Naar mijn tools →
+            </Link>
+          ) : (
+            <Link href="/auth/register"
+              className="inline-block bg-white text-blue-600 font-bold px-8 py-3.5 rounded-2xl text-base hover:bg-blue-50 transition-colors shadow-lg">
+              Gratis starten →
+            </Link>
+          )}
         </div>
       </section>
 
