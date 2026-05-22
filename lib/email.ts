@@ -5,7 +5,7 @@ export async function sendAdminNotification(subject: string, html: string) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { error } = await resend.emails.send({
-    from: "TimeSaverTools <noreply@business-xl.nl>",
+    from: "TimeSaverTools <noreply@timesavertools.nl>",
     to: process.env.ADMIN_EMAIL,
     subject,
     html,
