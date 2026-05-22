@@ -49,6 +49,7 @@ export default function MeetingMemoPage() {
   const audioChunks = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const icsInputRef = useRef<HTMLInputElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("mm-theme") as Theme | null;
@@ -167,6 +168,27 @@ export default function MeetingMemoPage() {
     };
     reader.readAsText(file);
     if (icsInputRef.current) icsInputRef.current.value = "";
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!uploadInputRef.current) return;
+    uploadInputRef.current.value = "";
+    if (!file) return;
+
+    setStep("processing");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/tools/meeting-upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setTranscript(data.text);
+      setStep("review");
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Verwerken mislukt");
+      setStep("error");
+    }
   }
 
   async function startRecording() {
@@ -466,9 +488,24 @@ export default function MeetingMemoPage() {
                 )}
               </div>
 
-              <button onClick={startRecording} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 text-sm font-medium transition-colors">
-                {isNl ? "Start opname" : "Start recording"}
-              </button>
+              <div className="flex flex-col gap-2">
+                <button onClick={startRecording} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                  🎙️ {isNl ? "Start live opname" : "Start live recording"}
+                </button>
+                <input
+                  ref={uploadInputRef}
+                  type="file"
+                  accept=".pdf,image/jpeg,image/png,image/webp,image/jpg"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+                <button
+                  onClick={() => uploadInputRef.current?.click()}
+                  className={`rounded-lg py-3 text-sm font-medium transition-colors border-2 border-dashed flex items-center justify-center gap-2 ${isDark ? "border-gray-600 text-gray-300 hover:border-blue-400 hover:text-blue-400" : "border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"}`}
+                >
+                  📄 {isNl ? "Upload notulen (PDF of foto)" : "Upload notes (PDF or photo)"}
+                </button>
+              </div>
             </div>
           )}
 
@@ -625,7 +662,7 @@ export default function MeetingMemoPage() {
           {step === "processing" && (
             <div className="flex flex-col items-center gap-4 py-8">
               <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <p className={`text-sm ${muted}`}>{isNl ? "Audio wordt verwerkt..." : "Processing audio..."}</p>
+              <p className={`text-sm ${muted}`}>{isNl ? "Bestand wordt verwerkt..." : "Processing file..."}</p>
             </div>
           )}
 
