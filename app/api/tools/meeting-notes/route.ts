@@ -50,11 +50,12 @@ export async function POST(req: NextRequest) {
     await supabase.rpc("decrement_credits", { user_id: user.id });
 
     // Log usage
-    await supabase.from("usage_logs").insert({
+    const { error: logErr } = await supabase.from("usage_logs").insert({
       user_id: user.id,
       tool: "meeting-memo",
       credits_used: 2,
     });
+    if (logErr) console.error("[meeting-notes] usage_logs insert failed:", logErr.message);
 
     const now = new Date();
     notes._meta = {

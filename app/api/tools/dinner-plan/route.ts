@@ -70,7 +70,8 @@ Regels:
     const plan = JSON.parse(jsonMatch[0]);
 
     await supabase.rpc("decrement_credits", { user_id: user.id });
-    await supabase.from("usage_logs").insert({ user_id: user.id, tool: "dinner-planner", credits_used: 1 });
+    const { error: logErr } = await supabase.from("usage_logs").insert({ user_id: user.id, tool: "dinner-planner", credits_used: 1 });
+    if (logErr) console.error("[dinner-plan] usage_logs insert failed:", logErr.message);
 
     return NextResponse.json(plan);
   } catch (err) {

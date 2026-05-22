@@ -177,7 +177,8 @@ ${profileText.slice(0, 3000)}`,
   console.log(`[vacancy-finder] Total unique vacancies: ${allVacancies.length}`);
 
   await supabase.rpc("decrement_credits", { user_id: user.id });
-  await supabase.from("usage_logs").insert({ user_id: user.id, tool: "vacancy-finder", credits_used: 1 });
+  const { error: logErr } = await supabase.from("usage_logs").insert({ user_id: user.id, tool: "vacancy-finder", credits_used: 1 });
+  if (logErr) console.error("[vacancy-finder] usage_logs insert failed:", logErr.message);
 
   return NextResponse.json({ profile: profileData, vacancies: allVacancies });
 }

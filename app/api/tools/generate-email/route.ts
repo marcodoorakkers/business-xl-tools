@@ -54,11 +54,12 @@ ${transcript}`,
     await supabase.rpc("decrement_credits", { user_id: user.id });
 
     // Log usage
-    await supabase.from("usage_logs").insert({
+    const { error: logErr } = await supabase.from("usage_logs").insert({
       user_id: user.id,
       tool: "voice-mail",
       credits_used: 2,
     });
+    if (logErr) console.error("[generate-email] usage_logs insert failed:", logErr.message);
 
     return NextResponse.json(email);
   } catch {
