@@ -57,7 +57,7 @@ async function searchAdzuna(
     app_id: appId,
     app_key: appKey,
     what,
-    results_per_page: "10",
+    results_per_page: "15",
     sort_by: "date",
   });
 
@@ -156,18 +156,21 @@ ${profileText.slice(0, 3000)}`,
   const title2 = profileData.titles[1] ?? title;
   const title3 = profileData.titles[2] ?? title2;
 
-  const [nlJobs1, nlJobs2, nlJobs3, remoteJobs, intJobs1, intJobs2] = await Promise.all([
-    searchAdzuna("nl", title, "nl"),                           // breed: alleen functietitel
-    searchAdzuna("nl", `${title2} freelance`, "nl"),           // tweede titel + freelance
-    searchAdzuna("nl", `${title3} ZZP`, "nl"),                 // derde titel + ZZP
-    searchAdzuna("gb", `${title} remote contract`, "remote"),
-    searchAdzuna("gb", `${title} freelance contract`, "international"),
-    searchAdzuna("gb", `${title2} contract`, "international"),
+  const [nlJobs1, nlJobs2, nlJobs3, beJobs, deJobs, remoteJobs1, remoteJobs2, intJobs1, intJobs2] = await Promise.all([
+    searchAdzuna("nl", title, "nl"),                          // NL breed: alleen functietitel
+    searchAdzuna("nl", title2, "nl"),                         // NL tweede titel breed
+    searchAdzuna("nl", `${title} freelance`, "nl"),           // NL + freelance
+    searchAdzuna("be", title, "nl"),                          // België breed
+    searchAdzuna("de", title, "international"),               // Duitsland breed
+    searchAdzuna("gb", `${title} remote`, "remote"),          // UK remote breed
+    searchAdzuna("gb", `${title2} remote`, "remote"),         // UK remote tweede titel
+    searchAdzuna("gb", `${title} contract`, "international"), // UK contract breed
+    searchAdzuna("gb", `${title3} freelance`, "international"), // UK freelance derde titel
   ]);
 
   const seen = new Set<string>();
   const allVacancies: Vacancy[] = [];
-  for (const v of [...nlJobs1, ...nlJobs2, ...nlJobs3, ...remoteJobs, ...intJobs1, ...intJobs2]) {
+  for (const v of [...nlJobs1, ...nlJobs2, ...nlJobs3, ...beJobs, ...deJobs, ...remoteJobs1, ...remoteJobs2, ...intJobs1, ...intJobs2]) {
     const key = `${v.title.toLowerCase()}-${v.company.toLowerCase()}`;
     if (!seen.has(key)) {
       seen.add(key);
