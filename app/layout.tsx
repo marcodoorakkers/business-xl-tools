@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "TimeSaverTools",
   },
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
   other: {
     "mobile-web-app-capable": "yes",
   },
