@@ -43,19 +43,22 @@ Geef ALLEEN een JSON object terug, zonder markdown of uitleg:
   ]
 }`;
 
-  const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 4096,
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  const content = message.content[0];
-  if (content.type !== "text") return NextResponse.json({ error: "Onverwacht antwoord" }, { status: 500 });
-
   try {
+    const message = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 4096,
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    const content = message.content[0];
+    if (content.type !== "text") return NextResponse.json({ error: "Onverwacht antwoord van AI" }, { status: 500 });
+
     const cleaned = content.text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
     const match = cleaned.match(/\{[\s\S]*\}/);
-    if (!match) return NextResponse.json({ error: "Outline kon niet worden gegenereerd" }, { status: 500 });
+    if (!match) {
+      console.error("[presentation-outline] No JSON found in response:", content.text.slice(0, 200));
+      return NextResponse.json({ error: "Outline kon niet worden gegenereerd. Probeer een korter onderwerp." }, { status: 500 });
+    }
 
     const outline = JSON.parse(match[0]);
 
@@ -64,7 +67,7 @@ Geef ALLEEN een JSON object terug, zonder markdown of uitleg:
 
     return NextResponse.json(outline);
   } catch (err) {
-    console.error("[presentation-outline] JSON parse error:", err);
-    return NextResponse.json({ error: "Outline kon niet worden verwerkt" }, { status: 500 });
+    console.error("[presentation-outline] Error:", err);
+    return NextResponse.json({ error: "Er is een fout opgetreden. Probeer het opnieuw." }, { status: 500 });
   }
 }

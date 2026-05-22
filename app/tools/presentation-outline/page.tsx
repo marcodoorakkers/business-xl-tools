@@ -75,9 +75,15 @@ export default function PresentationOutlinePage() {
           style: style || undefined,
         }),
       });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      setOutline(data);
+      const text = await res.text();
+      let data: Record<string, unknown>;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("De server gaf een onverwacht antwoord. Probeer het opnieuw.");
+      }
+      if (data.error) throw new Error(data.error as string);
+      setOutline(data as unknown as Outline);
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Er is iets misgegaan");
     } finally {
