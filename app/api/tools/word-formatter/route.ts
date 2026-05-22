@@ -6,7 +6,7 @@ import Anthropic from "@anthropic-ai/sdk";
 export const maxDuration = 60;
 
 interface Section {
-  level: number; // 0=title, 1=H1, 2=H2, 3=H3
+  level: number; // 1=H1, 2=H2, 3=H3
   heading: string;
   paragraphs: string[];
 }
@@ -19,6 +19,70 @@ interface DocStructure {
 
 type Style = "zakelijk" | "minimaal" | "modern";
 
+interface TemplateTheme {
+  accent: string;
+  heading1: string;
+  heading2: string;
+  font: string;
+}
+
+// Extract brand colors and fonts from a template DOCX
+async function extractTemplateTheme(buffer: Buffer): Promise<TemplateTheme | null> {
+  try {
+    const JSZip = (await import("jszip")).default;
+    const zip = await JSZip.loadAsync(buffer);
+
+    let accent = "2563EB";
+    let heading1 = "1E3A8A";
+    let heading2 = "2563EB";
+    let font = "Calibri";
+
+    // Read theme colors from word/theme/theme1.xml
+    const themeFile = zip.file("word/theme/theme1.xml");
+    if (themeFile) {
+      const xml = await themeFile.async("text");
+      // Accent1 is the primary brand color
+      const accent1 = xml.match(/<a:accent1>\s*<a:srgbClr val="([A-Fa-f0-9]{6})"/);
+      const dk1 = xml.match(/<a:dk1>\s*<a:srgbClr val="([A-Fa-f0-9]{6})"/);
+      const accent2 = xml.match(/<a:accent2>\s*<a:srgbClr val="([A-Fa-f0-9]{6})"/);
+      if (accent1) { accent = accent1[1]; heading2 = accent1[1]; }
+      if (dk1) heading1 = dk1[1];
+      if (accent2 && !accent1) accent = accent2[1];
+
+      // Try to get font from theme
+      const majorFont = xml.match(/<a:majorFont>\s*<a:latin typeface="([^"]+)"/);
+      if (majorFont) font = majorFont[1];
+    }
+
+    // Read heading styles from word/styles.xml (overrides theme if explicit color set)
+    const stylesFile = zip.file("word/styles.xml");
+    if (stylesFile) {
+      const xml = await stylesFile.async("text");
+
+      // Extract Heading 1 color and font
+      const h1Block = xml.match(/<w:style[^>]*w:styleId="Heading1"[^>]*>([\s\S]*?)<\/w:style>/);
+      if (h1Block) {
+        const h1Color = h1Block[1].match(/<w:color w:val="([A-Fa-f0-9]{6})"/);
+        const h1Font = h1Block[1].match(/<w:rFonts[^>]*w:ascii="([^"]+)"/);
+        if (h1Color) heading1 = h1Color[1];
+        if (h1Font) font = h1Font[1];
+      }
+
+      // Extract Heading 2 color
+      const h2Block = xml.match(/<w:style[^>]*w:styleId="Heading2"[^>]*>([\s\S]*?)<\/w:style>/);
+      if (h2Block) {
+        const h2Color = h2Block[1].match(/<w:color w:val="([A-Fa-f0-9]{6})"/);
+        if (h2Color) heading2 = h2Color[1];
+      }
+    }
+
+    return { accent, heading1, heading2, font };
+  } catch (err) {
+    console.error("[word-formatter] template extraction error:", err);
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -29,12 +93,13 @@ export async function POST(req: NextRequest) {
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
+  const templateFile = formData.get("template") as File | null;
   const style = (formData.get("style") as Style) ?? "zakelijk";
 
   if (!file) return NextResponse.json({ error: "Geen bestand ontvangen" }, { status: 400 });
   if (!file.name.endsWith(".docx")) return NextResponse.json({ error: "Alleen .docx bestanden worden ondersteund" }, { status: 400 });
 
-  // Extract text from DOCX using mammoth
+  // Extract text from document
   let rawText = "";
   try {
     const mammoth = (await import("mammoth")).default;
@@ -50,7 +115,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Het document lijkt leeg te zijn." }, { status: 400 });
   }
 
-  // Use Claude to identify structure
+  // Extract theme from template (if provided)
+  let templateTheme: TemplateTheme | null = null;
+  if (templateFile && templateFile.name.endsWith(".docx")) {
+    const templateBuffer = Buffer.from(await templateFile.arrayBuffer());
+    templateTheme = await extractTemplateTheme(templateBuffer);
+    console.log("[word-formatter] Extracted template theme:", templateTheme);
+  }
+
+  // Use Claude to identify document structure
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const analysis = await anthropic.messages.create({
@@ -104,25 +177,23 @@ ${rawText.slice(0, 6000)}`,
     const {
       Document, Paragraph, TextRun, HeadingLevel, Header, Footer,
       PageNumber, NumberFormat, AlignmentType, TableOfContents,
-      StyleLevel, Packer, PageBreak, Tab,
+      StyleLevel, Packer, PageBreak,
     } = await import("docx");
 
-    // Style themes
-    const themes: Record<Style, { accent: string; heading1: string; heading2: string }> = {
-      zakelijk: { accent: "2563EB", heading1: "1E3A8A", heading2: "2563EB" },
-      minimaal: { accent: "111827", heading1: "111827", heading2: "374151" },
-      modern:   { accent: "059669", heading1: "064E3B", heading2: "059669" },
+    // Determine theme: template takes priority over style picker
+    const builtinThemes: Record<Style, TemplateTheme> = {
+      zakelijk: { accent: "2563EB", heading1: "1E3A8A", heading2: "2563EB", font: "Calibri" },
+      minimaal: { accent: "111827", heading1: "111827", heading2: "374151", font: "Calibri" },
+      modern:   { accent: "059669", heading1: "064E3B", heading2: "059669", font: "Calibri" },
     };
-    const theme = themes[style] ?? themes.zakelijk;
+    const theme = templateTheme ?? builtinThemes[style] ?? builtinThemes.zakelijk;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const children: any[] = [];
 
-    // Title page
+    // Title page with vertical centering via empty paragraphs
     children.push(
-      new Paragraph({
-        children: [new TextRun({ text: "", break: 6 })],
-      }),
+      new Paragraph({ children: [new TextRun({ text: "", break: 6 })] }),
       new Paragraph({
         text: docStructure.title,
         heading: HeadingLevel.TITLE,
@@ -136,20 +207,14 @@ ${rawText.slice(0, 6000)}`,
         new Paragraph({
           alignment: AlignmentType.CENTER,
           spacing: { after: 400 },
-          children: [
-            new TextRun({ text: docStructure.subtitle, color: "6B7280", size: 26 }),
-          ],
+          children: [new TextRun({ text: docStructure.subtitle, color: "6B7280", size: 26 })],
         }),
       );
     }
 
-    // Page break after title
+    // Page break → Table of Contents
     children.push(
       new Paragraph({ children: [new PageBreak()] }),
-    );
-
-    // Table of Contents
-    children.push(
       new Paragraph({
         children: [new TextRun({ text: "Inhoudsopgave", bold: true, size: 28, color: theme.heading1 })],
         spacing: { after: 200 },
@@ -166,7 +231,7 @@ ${rawText.slice(0, 6000)}`,
       new Paragraph({ children: [new PageBreak()] }),
     );
 
-    // Sections
+    // Document body
     for (const section of docStructure.sections) {
       const headingLevel =
         section.level === 1 ? HeadingLevel.HEADING_1 :
@@ -195,33 +260,31 @@ ${rawText.slice(0, 6000)}`,
 
     const doc = new Document({
       numbering: {
-        config: [
-          {
-            reference: "page-numbering",
-            levels: [{ level: 0, format: NumberFormat.DECIMAL, text: "%1", alignment: AlignmentType.CENTER }],
-          },
-        ],
+        config: [{
+          reference: "page-numbering",
+          levels: [{ level: 0, format: NumberFormat.DECIMAL, text: "%1", alignment: AlignmentType.CENTER }],
+        }],
       },
       styles: {
         default: {
           document: {
-            run: { font: "Calibri", size: 24, color: "1F2937" },
+            run: { font: theme.font, size: 24, color: "1F2937" },
             paragraph: { spacing: { line: 276 } },
           },
           heading1: {
-            run: { font: "Calibri", size: 32, bold: true, color: theme.heading1 },
+            run: { font: theme.font, size: 32, bold: true, color: theme.heading1 },
             paragraph: { spacing: { before: 400, after: 160 } },
           },
           heading2: {
-            run: { font: "Calibri", size: 28, bold: true, color: theme.heading2 },
+            run: { font: theme.font, size: 28, bold: true, color: theme.heading2 },
             paragraph: { spacing: { before: 280, after: 120 } },
           },
           heading3: {
-            run: { font: "Calibri", size: 26, bold: true, color: "374151" },
+            run: { font: theme.font, size: 26, bold: true, color: "374151" },
             paragraph: { spacing: { before: 200, after: 80 } },
           },
           title: {
-            run: { font: "Calibri", size: 52, bold: true, color: theme.heading1 },
+            run: { font: theme.font, size: 52, bold: true, color: theme.heading1 },
           },
         },
       },

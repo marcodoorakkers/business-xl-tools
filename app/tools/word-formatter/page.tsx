@@ -30,11 +30,13 @@ const STYLES: { id: Style; label: string; description: string; preview: string }
 
 export default function WordFormatterPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [template, setTemplate] = useState<File | null>(null);
   const [style, setStyle] = useState<Style>("zakelijk");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const templateInputRef = useRef<HTMLInputElement>(null);
 
   function handleFilePick(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -48,6 +50,17 @@ export default function WordFormatterPage() {
     setDone(false);
   }
 
+  function handleTemplatePick(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!f.name.endsWith(".docx")) {
+      setError("De bedrijfstemplate moet ook een .docx bestand zijn.");
+      return;
+    }
+    setTemplate(f);
+    setError("");
+  }
+
   async function handleSubmit() {
     if (!file) return;
     setLoading(true);
@@ -58,6 +71,7 @@ export default function WordFormatterPage() {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("style", style);
+      if (template) formData.append("template", template);
 
       const res = await fetch("/api/tools/word-formatter", {
         method: "POST",
@@ -94,9 +108,11 @@ export default function WordFormatterPage() {
 
   function reset() {
     setFile(null);
+    setTemplate(null);
     setError("");
     setDone(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (templateInputRef.current) templateInputRef.current.value = "";
   }
 
   return (
@@ -152,29 +168,80 @@ export default function WordFormatterPage() {
             </button>
           </div>
 
-          {/* Style picker */}
+          {/* Template upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Opmaakstijl
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bedrijfstemplate <span className="text-gray-400 font-normal">(optioneel)</span>
             </label>
-            <div className="grid grid-cols-3 gap-3">
-              {STYLES.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setStyle(s.id)}
-                  className={`rounded-xl border-2 p-3 text-left transition-colors ${
-                    style === s.id
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <div className="text-xl mb-1">{s.preview}</div>
-                  <div className="text-sm font-semibold text-gray-900">{s.label}</div>
-                  <div className="text-xs text-gray-500 mt-0.5 leading-snug">{s.description}</div>
-                </button>
-              ))}
-            </div>
+            <p className="text-xs text-gray-400 mb-2">
+              Upload een bestaand Word-document met jullie huisstijl. De kleuren en lettertypen worden automatisch overgenomen.
+            </p>
+            <input
+              ref={templateInputRef}
+              type="file"
+              accept=".docx"
+              className="hidden"
+              onChange={handleTemplatePick}
+            />
+            <button
+              onClick={() => templateInputRef.current?.click()}
+              className={`w-full py-3 rounded-xl border-2 border-dashed transition-colors flex items-center justify-center gap-2 text-sm ${
+                template
+                  ? "border-teal-400 bg-teal-50 text-teal-700"
+                  : "border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500"
+              }`}
+            >
+              {template ? (
+                <>
+                  <span>✅</span>
+                  <span className="font-medium">{template.name}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setTemplate(null); if (templateInputRef.current) templateInputRef.current.value = ""; }}
+                    className="ml-1 text-teal-500 hover:text-red-400 font-bold"
+                  >
+                    ×
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span>🏢</span>
+                  <span>Klik om een bedrijfstemplate te uploaden</span>
+                </>
+              )}
+            </button>
           </div>
+
+          {/* Style picker — only shown when no template */}
+          {!template && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Opmaakstijl
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {STYLES.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setStyle(s.id)}
+                    className={`rounded-xl border-2 p-3 text-left transition-colors ${
+                      style === s.id
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="text-xl mb-1">{s.preview}</div>
+                    <div className="text-sm font-semibold text-gray-900">{s.label}</div>
+                    <div className="text-xs text-gray-500 mt-0.5 leading-snug">{s.description}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {template && (
+            <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 text-xs text-teal-700">
+              🎨 Kleuren en lettertypen worden overgenomen uit de bedrijfstemplate.
+            </div>
+          )}
 
           {/* Error */}
           {error && (
