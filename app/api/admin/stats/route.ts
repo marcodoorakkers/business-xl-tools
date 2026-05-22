@@ -21,9 +21,11 @@ export async function GET() {
     .select("*", { count: "exact", head: true });
 
   // All usage logs for aggregation
-  const { data: allLogs } = await admin
+  const { data: allLogs, error: logsErr } = await admin
     .from("usage_logs")
     .select("tool, credits_used, created_at");
+
+  if (logsErr) console.error("[admin/stats] usage_logs query failed:", logsErr.message);
 
   const logs = allLogs ?? [];
 
