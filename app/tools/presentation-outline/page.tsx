@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState } from "react";
 import ToolNav from "@/components/ToolNav";
+import pptxgen from "pptxgenjs";
 
 type SlideType = "titel" | "agenda" | "inhoud" | "afsluiting" | "vragen";
 
@@ -88,6 +89,90 @@ export default function PresentationOutlinePage() {
     setOutline(null);
     setErrorMsg("");
     setCopied(false);
+  }
+
+  async function downloadPptx() {
+    if (!outline) return;
+    const prs = new pptxgen();
+    prs.layout = "LAYOUT_WIDE"; // 16:9, 13.33" x 7.5"
+
+    const BRAND_BLUE = "2563EB";
+    const BRAND_INDIGO = "6366F1";
+    const WHITE = "FFFFFF";
+    const DARK = "111827";
+    const GRAY = "6B7280";
+
+    const TYPE_BG: Record<SlideType, string> = {
+      titel: BRAND_BLUE,
+      agenda: "1E40AF",
+      inhoud: WHITE,
+      afsluiting: "065F46",
+      vragen: "92400E",
+    };
+
+    for (const slide of outline.slides) {
+      const s = prs.addSlide();
+      const isBgSlide = slide.type !== "inhoud";
+      const bgColor = isBgSlide ? TYPE_BG[slide.type] : WHITE;
+      s.background = { color: bgColor };
+
+      if (isBgSlide) {
+        // Full-colour slide: centred title + bullets in white
+        s.addText(slide.title, {
+          x: 0.6, y: 2.2, w: 12.1, h: 1.4,
+          fontSize: 36, bold: true, color: WHITE,
+          align: "center", valign: "middle",
+          fontFace: "Calibri",
+        });
+        if (slide.bullets.length > 0) {
+          s.addText(
+            slide.bullets.map((b) => ({ text: b, options: { bullet: { type: "bullet" } } })),
+            {
+              x: 1.5, y: 4.0, w: 10.3, h: 2.5,
+              fontSize: 18, color: "D1D5DB",
+              fontFace: "Calibri", valign: "top",
+            }
+          );
+        }
+      } else {
+        // White slide: blue header bar + title + bullets
+        s.addShape(prs.ShapeType.rect, {
+          x: 0, y: 0, w: 13.33, h: 1.5,
+          fill: { color: BRAND_BLUE },
+          line: { color: BRAND_BLUE },
+        });
+        // Slide number
+        s.addText(`${slide.number}`, {
+          x: 0.3, y: 0.15, w: 0.7, h: 1.2,
+          fontSize: 28, bold: true, color: "93C5FD",
+          fontFace: "Calibri", valign: "middle",
+        });
+        // Title in bar
+        s.addText(slide.title, {
+          x: 1.1, y: 0.15, w: 11.9, h: 1.2,
+          fontSize: 24, bold: true, color: WHITE,
+          fontFace: "Calibri", valign: "middle",
+        });
+        // Bullets
+        if (slide.bullets.length > 0) {
+          s.addText(
+            slide.bullets.map((b) => ({ text: b, options: { bullet: { type: "bullet" } } })),
+            {
+              x: 0.6, y: 1.8, w: 12.1, h: 4.2,
+              fontSize: 18, color: DARK,
+              fontFace: "Calibri", valign: "top",
+            }
+          );
+        }
+      }
+
+      // Speaker note
+      if (slide.speakerTip) {
+        s.addNotes(slide.speakerTip);
+      }
+    }
+
+    await prs.writeFile({ fileName: `${outline.title.replace(/[^a-z0-9]/gi, "_")}.pptx` });
   }
 
   async function copyAll() {
@@ -288,7 +373,14 @@ export default function PresentationOutlinePage() {
             </div>
 
             {/* Bottom actions */}
-            <div className="flex gap-3 pb-4">
+            <div className="flex gap-3 pb-4 flex-wrap">
+              <button
+                onClick={downloadPptx}
+                className="flex-1 py-3 rounded-xl text-sm font-semibold transition-colors text-white"
+                style={{ background: "#7C3AED" }}
+              >
+                ⬇️ Download PowerPoint
+              </button>
               <button
                 onClick={copyAll}
                 className="flex-1 py-3 rounded-xl text-sm font-medium border border-gray-200 bg-white hover:bg-gray-50 transition-colors"
