@@ -36,6 +36,13 @@ const tools = [
     color: "from-rose-500 to-pink-500",
     bg: "bg-rose-50",
   },
+  {
+    icon: "🎯",
+    name: "Presentatie Outline",
+    description: "Geef je onderwerp en duur op en ontvang direct een complete slideopbouw met spreektips.",
+    color: "from-violet-500 to-purple-500",
+    bg: "bg-violet-50",
+  },
 ];
 
 export default function LandingPage() {
