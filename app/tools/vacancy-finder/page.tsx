@@ -320,10 +320,26 @@ export default function VacancyFinderPage() {
                       {/* Footer */}
                       <div className="flex items-center justify-between pt-1">
                         <span className="text-xs text-gray-300">{timeAgo(v.created)}</span>
-                        <a href={v.url} target="_blank" rel="noopener noreferrer"
-                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
-                          Bekijk →
-                        </a>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              sessionStorage.setItem("cv-vacancy", JSON.stringify({
+                                title: v.title,
+                                company: v.company,
+                                description: v.description,
+                                url: v.url,
+                              }));
+                              window.location.href = "/tools/cv-builder";
+                            }}
+                            className="bg-violet-100 hover:bg-violet-200 text-violet-700 text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+                          >
+                            CV aanpassen
+                          </button>
+                          <a href={v.url} target="_blank" rel="noopener noreferrer"
+                            className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg transition-colors">
+                            Bekijk →
+                          </a>
+                        </div>
                       </div>
                     </div>
                   );

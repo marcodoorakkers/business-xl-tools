@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import ToolNav from "@/components/ToolNav";
 
@@ -309,6 +309,7 @@ export default function CVBuilderPage() {
   const [template, setTemplate] = useState<Template>("modern");
   const [profileText, setProfileText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
+  const [prefilledVacancy, setPrefilledVacancy] = useState<{ title: string; company: string; url: string } | null>(null);
   const [cv, setCv] = useState<CV | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [pdfLoading, setPdfLoading] = useState(false);
@@ -317,6 +318,20 @@ export default function CVBuilderPage() {
   const [photoName, setPhotoName] = useState("");
   const pdfInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  // Pick up vacancy pre-filled from Vacaturezoeker
+  useEffect(() => {
+    const stored = sessionStorage.getItem("cv-vacancy");
+    if (stored) {
+      try {
+        const v = JSON.parse(stored);
+        setJobDescription(v.description ?? "");
+        setStyle("targeted");
+        setPrefilledVacancy({ title: v.title, company: v.company, url: v.url });
+      } catch { /* ignore */ }
+      sessionStorage.removeItem("cv-vacancy");
+    }
+  }, []);
 
   async function handlePdf(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -637,6 +652,19 @@ export default function CVBuilderPage() {
 
             {style === "targeted" && (
               <div>
+                {prefilledVacancy && (
+                  <div className="flex items-start gap-3 bg-violet-50 border border-violet-200 rounded-xl px-4 py-3 mb-3">
+                    <span className="text-lg">🎯</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-violet-800 leading-snug">{prefilledVacancy.title}</p>
+                      <p className="text-xs text-violet-600 mt-0.5">{prefilledVacancy.company}</p>
+                    </div>
+                    <a href={prefilledVacancy.url} target="_blank" rel="noopener noreferrer"
+                      className="text-xs text-violet-600 hover:text-violet-800 font-medium whitespace-nowrap">
+                      Bekijk →
+                    </a>
+                  </div>
+                )}
                 <label className="block text-sm font-medium text-gray-700 mb-2">{lang === "nl" ? "Vacaturetekst" : "Job description"}</label>
                 <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} rows={5}
                   placeholder={lang === "nl" ? "Plak hier de vacaturetekst..." : "Paste the job description here..."}
