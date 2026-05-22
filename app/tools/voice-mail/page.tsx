@@ -127,7 +127,7 @@ export default function VoiceMailPage() {
       <main className="max-w-xl mx-auto px-4 py-10">
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <h1 className="text-xl font-bold text-gray-900 mb-1">Voice Mail Draft</h1>
-          <p className="text-gray-500 text-sm mb-6">Spreek in wat je wilt mailen — de app maakt er een concept mail van. Kost 1 credit.</p>
+          <p className="text-gray-500 text-sm mb-6">Spreek in wat je wilt mailen — de app maakt er een concept mail van. Kost 2 credits.</p>
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Stuur concept naar</label>

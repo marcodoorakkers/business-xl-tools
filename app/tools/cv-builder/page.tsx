@@ -617,7 +617,7 @@ export default function CVBuilderPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8 flex flex-col gap-6">
             <div>
               <h1 className="text-xl font-bold text-gray-900 mb-1">CV Builder</h1>
-              <p className="text-gray-500 text-sm">Upload je CV of LinkedIn PDF en ontvang een professioneel CV in Word. Kost 1 credit.</p>
+              <p className="text-gray-500 text-sm">Upload je CV of LinkedIn PDF en ontvang een professioneel CV in Word. Kost 2 credits.</p>
             </div>
 
             {/* Language */}

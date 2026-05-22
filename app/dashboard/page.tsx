@@ -131,7 +131,7 @@ export default async function DashboardPage() {
                       <h3 className="font-bold text-gray-900 text-lg mb-1">{tool.name}</h3>
                       <p className="text-sm text-gray-600 leading-relaxed">{tool.description}</p>
                     </div>
-                    <span className="text-xs text-blue-600 font-semibold">{tool.credits} credit per gebruik →</span>
+                    <span className="text-xs text-blue-600 font-semibold">{tool.credits} {tool.credits === 1 ? "credit" : "credits"} per gebruik →</span>
                   </Link>
                 ))}
               </div>
