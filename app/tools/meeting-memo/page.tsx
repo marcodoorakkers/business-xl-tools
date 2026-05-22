@@ -42,6 +42,7 @@ export default function MeetingMemoPage() {
   const [recordSeconds, setRecordSeconds] = useState(0);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [processingMsg, setProcessingMsg] = useState("");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<HistoryEntry | null>(null);
 
@@ -50,6 +51,7 @@ export default function MeetingMemoPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const icsInputRef = useRef<HTMLInputElement>(null);
   const uploadInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("mm-theme") as Theme | null;
@@ -168,6 +170,64 @@ export default function MeetingMemoPage() {
     };
     reader.readAsText(file);
     if (icsInputRef.current) icsInputRef.current.value = "";
+  }
+
+  async function handleAudioUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!audioInputRef.current) return;
+    audioInputRef.current.value = "";
+    if (!file) return;
+
+    const nl = lang === "nl";
+    setStep("processing");
+
+    async function transcribeBlob(blob: Blob, name: string): Promise<string> {
+      const fd = new FormData();
+      fd.append("audio", blob, name);
+      const res = await fetch("/api/tools/meeting-transcribe", { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      return data.text as string;
+    }
+
+    try {
+      if (file.size <= 24 * 1024 * 1024) {
+        setProcessingMsg(nl ? "Audio wordt getranscribeerd..." : "Transcribing audio...");
+        setTranscript(await transcribeBlob(file, file.name));
+      } else {
+        setProcessingMsg(nl ? "Audio wordt gedecodeerd..." : "Decoding audio...");
+        const arrayBuffer = await file.arrayBuffer();
+        const audioCtx = new AudioContext();
+        const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+        await audioCtx.close();
+
+        const RATE = 16000;
+        const CHUNK_SAMPLES = RATE * 5 * 60; // 5 minutes per chunk → ~9.6 MB WAV
+        const totalSamples = Math.ceil(decoded.duration * RATE);
+        const numChunks = Math.ceil(totalSamples / CHUNK_SAMPLES);
+
+        const offlineCtx = new OfflineAudioContext(1, totalSamples, RATE);
+        const src = offlineCtx.createBufferSource();
+        src.buffer = decoded;
+        src.connect(offlineCtx.destination);
+        src.start();
+        const rendered = await offlineCtx.startRendering();
+        const pcm = rendered.getChannelData(0);
+
+        const parts: string[] = [];
+        for (let i = 0; i < numChunks; i++) {
+          setProcessingMsg(nl ? `Deel ${i + 1} van ${numChunks} wordt getranscribeerd...` : `Transcribing part ${i + 1} of ${numChunks}...`);
+          const start = i * CHUNK_SAMPLES;
+          const wav = encodeWAV(pcm.slice(start, Math.min(start + CHUNK_SAMPLES, pcm.length)), RATE);
+          parts.push(await transcribeBlob(wav, `chunk_${i}.wav`));
+        }
+        setTranscript(parts.join(" "));
+      }
+      setStep("review");
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : (nl ? "Transcriptie mislukt" : "Transcription failed"));
+      setStep("error");
+    }
   }
 
   async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -364,6 +424,7 @@ export default function MeetingMemoPage() {
     setMeetingName("");
     setIcsImported(false);
     setAttendees([]);
+    setProcessingMsg("");
   }
 
   const isNl = lang === "nl";
@@ -491,6 +552,19 @@ export default function MeetingMemoPage() {
               <div className="flex flex-col gap-2">
                 <button onClick={startRecording} className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2">
                   🎙️ {isNl ? "Start live opname" : "Start live recording"}
+                </button>
+                <input
+                  ref={audioInputRef}
+                  type="file"
+                  accept="audio/m4a,audio/mp4,audio/mpeg,audio/wav,audio/x-m4a,audio/aac,.m4a,.mp3,.wav,.mp4,.aac"
+                  className="hidden"
+                  onChange={handleAudioUpload}
+                />
+                <button
+                  onClick={() => audioInputRef.current?.click()}
+                  className={`rounded-lg py-3 text-sm font-medium transition-colors border-2 border-dashed flex items-center justify-center gap-2 ${isDark ? "border-gray-600 text-gray-300 hover:border-blue-400 hover:text-blue-400" : "border-gray-300 text-gray-500 hover:border-blue-400 hover:text-blue-500"}`}
+                >
+                  🎤 {isNl ? "Upload audio opname (iPhone)" : "Upload audio recording (iPhone)"}
                 </button>
                 <input
                   ref={uploadInputRef}
@@ -662,7 +736,7 @@ export default function MeetingMemoPage() {
           {step === "processing" && (
             <div className="flex flex-col items-center gap-4 py-8">
               <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <p className={`text-sm ${muted}`}>{isNl ? "Bestand wordt verwerkt..." : "Processing file..."}</p>
+              <p className={`text-sm ${muted} text-center`}>{processingMsg || (isNl ? "Bestand wordt verwerkt..." : "Processing file...")}</p>
             </div>
           )}
 
@@ -739,6 +813,23 @@ export default function MeetingMemoPage() {
       </main>
     </div>
   );
+}
+
+function encodeWAV(samples: Float32Array, sampleRate: number): Blob {
+  const buf = new ArrayBuffer(44 + samples.length * 2);
+  const v = new DataView(buf);
+  const str = (o: number, s: string) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, "RIFF"); v.setUint32(4, 36 + samples.length * 2, true);
+  str(8, "WAVE"); str(12, "fmt ");
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sampleRate, true); v.setUint32(28, sampleRate * 2, true);
+  v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, "data"); v.setUint32(40, samples.length * 2, true);
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    v.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+  return new Blob([buf], { type: "audio/wav" });
 }
 
 function Section({ icon, title, color, dark, children }: { icon: string; title: string; color: string; dark: boolean; children: React.ReactNode }) {
