@@ -82,14 +82,14 @@ export async function POST(req: NextRequest) {
       <div style="background:#f8fafc;border-radius:12px;padding:20px">${shoppingCategories}</div>
     </div>
     <div style="padding:20px 28px;border-top:1px solid #f1f5f9;text-align:center">
-      <p style="margin:0;font-size:12px;color:#94a3b8">Gegenereerd via <strong>Business XL Tools</strong> · business-xl.nl</p>
+      <p style="margin:0;font-size:12px;color:#94a3b8">Gegenereerd via <strong>TimeSaverTools</strong> · timesavertools.nl</p>
     </div>
   </div>
 </body>
 </html>`;
 
   const { error } = await resend.emails.send({
-    from: "Business XL Tools <startwithadraft@business-xl.nl>",
+    from: "TimeSaverTools <noreply@timesavertools.nl>",
     to,
     subject: "🍽️ Jouw weekmenu",
     html,
