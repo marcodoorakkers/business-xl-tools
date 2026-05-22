@@ -473,7 +473,7 @@ export default function MeetingMemoPage() {
             <div className="flex flex-col gap-5">
               <div>
                 <h1 className="text-xl font-bold mb-1">Meeting Memo</h1>
-                <p className={`text-sm ${muted}`}>{isNl ? "Neem je vergadering op en ontvang automatisch notulen. Kost 1 credit." : "Record your meeting and receive automatic notes. Costs 1 credit."}</p>
+                <p className={`text-sm ${muted}`}>{isNl ? "Neem je vergadering op en ontvang automatisch notulen. Kost 2 credits." : "Record your meeting and receive automatic notes. Costs 2 credits."}</p>
               </div>
 
               <div className="flex gap-2">
