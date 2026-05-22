@@ -58,6 +58,15 @@ const tools = [
     color: "from-violet-500 to-purple-500",
     bg: "bg-violet-50",
   },
+  {
+    name: "Document Opmaken",
+    description: "Upload een Word-document en ontvang een professioneel opgemaakt versie met inhoudsopgave, koppen en paginanummers.",
+    href: "/tools/word-formatter",
+    credits: 2,
+    icon: "✨",
+    color: "from-teal-500 to-cyan-500",
+    bg: "bg-teal-50",
+  },
 ];
 
 export default async function DashboardPage() {

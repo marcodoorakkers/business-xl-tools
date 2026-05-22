@@ -43,6 +43,13 @@ const tools = [
     color: "from-violet-500 to-purple-500",
     bg: "bg-violet-50",
   },
+  {
+    icon: "✨",
+    name: "Document Opmaken",
+    description: "Upload een Word-document en ontvang een professioneel opgemaakte versie met inhoudsopgave, koppen en paginanummers.",
+    color: "from-teal-500 to-cyan-500",
+    bg: "bg-teal-50",
+  },
 ];
 
 export default function LandingPage() {
