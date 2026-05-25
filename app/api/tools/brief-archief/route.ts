@@ -17,6 +17,16 @@ export async function POST(req: NextRequest) {
   const file = formData.get("file") as File | null;
   if (!file) return NextResponse.json({ error: "Geen bestand meegegeven" }, { status: 400 });
 
+  const familyMembersRaw = formData.get("family_members") as string | null;
+  let familyMemberNames: string[] = [];
+  if (familyMembersRaw) {
+    try {
+      familyMemberNames = JSON.parse(familyMembersRaw);
+    } catch {
+      familyMemberNames = [];
+    }
+  }
+
   const buffer = Buffer.from(await file.arrayBuffer());
   const base64 = buffer.toString("base64");
 
@@ -43,6 +53,11 @@ export async function POST(req: NextRequest) {
         },
       };
 
+  const familyInstruction =
+    familyMemberNames.length > 0
+      ? `\n\nDe gezinsleden zijn: ${familyMemberNames.join(", ")}. Voeg een veld 'gezinslid' toe met de meest waarschijnlijke ontvanger op basis van de naam/adres op het document (of null als onduidelijk).`
+      : "";
+
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 1024,
@@ -64,7 +79,7 @@ Formaat:
   "mappad": "logisch archief-mappad in het Nederlands, bijv. Financiën/Belasting/2024 of Woning/Hypotheek of Zorg/Verzekering",
   "bestandsnaam": "bestandsnaam zonder extensie, formaat: YYYY-MM-DD_onderwerp_afzender (alles lowercase, spaties als koppelteken)",
   "samenvatting": "één zin die het document beschrijft"
-}`,
+}${familyInstruction}`,
           },
         ],
       },
