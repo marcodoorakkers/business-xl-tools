@@ -15,6 +15,18 @@ export async function GET() {
     .eq("user_id", user.id)
     .single();
 
+  const { data: dropboxRow } = await admin
+    .from("dropbox_tokens")
+    .select("archive_root")
+    .eq("user_id", user.id)
+    .single();
+
+  const { data: archiveSettings } = await admin
+    .from("archive_settings")
+    .select("storage_preference")
+    .eq("user_id", user.id)
+    .single();
+
   const { data: members } = await admin
     .from("archive_family_members")
     .select("name")
@@ -25,6 +37,9 @@ export async function GET() {
     connected: !!tokenRow,
     archiveRoot: tokenRow?.archive_root ?? "Archief",
     familyMembers: (members ?? []).map((m: { name: string }) => m.name),
+    dropboxConnected: !!dropboxRow,
+    dropboxArchiveRoot: dropboxRow?.archive_root ?? "Archief",
+    storagePreference: archiveSettings?.storage_preference ?? "local",
   });
 }
 
@@ -33,16 +48,43 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const { archiveRoot } = await req.json();
-  if (typeof archiveRoot !== "string" || !archiveRoot.trim()) {
-    return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
+  const body = await req.json();
+  const admin = createAdminClient();
+
+  if (typeof body.archiveRoot === "string") {
+    if (!body.archiveRoot.trim()) {
+      return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
+    }
+    await admin.from("onedrive_tokens").update({
+      archive_root: body.archiveRoot.trim(),
+      updated_at: new Date().toISOString(),
+    }).eq("user_id", user.id);
+    return NextResponse.json({ ok: true });
   }
 
-  const admin = createAdminClient();
-  await admin.from("onedrive_tokens").update({
-    archive_root: archiveRoot.trim(),
-    updated_at: new Date().toISOString(),
-  }).eq("user_id", user.id);
+  if (typeof body.dropboxArchiveRoot === "string") {
+    if (!body.dropboxArchiveRoot.trim()) {
+      return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
+    }
+    await admin.from("dropbox_tokens").update({
+      archive_root: body.dropboxArchiveRoot.trim(),
+      updated_at: new Date().toISOString(),
+    }).eq("user_id", user.id);
+    return NextResponse.json({ ok: true });
+  }
 
-  return NextResponse.json({ ok: true });
+  if (typeof body.storagePreference === "string") {
+    const valid = ["local", "onedrive", "dropbox"];
+    if (!valid.includes(body.storagePreference)) {
+      return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
+    }
+    await admin.from("archive_settings").upsert({
+      user_id: user.id,
+      storage_preference: body.storagePreference,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "user_id" });
+    return NextResponse.json({ ok: true });
+  }
+
+  return NextResponse.json({ error: "Ongeldige aanvraag" }, { status: 400 });
 }
