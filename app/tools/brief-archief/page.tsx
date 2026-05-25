@@ -3,9 +3,11 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import Link from "next/link";
 import ToolNav from "@/components/ToolNav";
 
 type Step = "idle" | "analyzing" | "suggestion" | "saving" | "done" | "error";
+type FolderStatus = "idle" | "loading" | "exists" | "new";
 
 interface Analysis {
   type: string;
@@ -15,6 +17,7 @@ interface Analysis {
   mappad: string;
   bestandsnaam: string;
   samenvatting: string;
+  gezinslid?: string | null;
 }
 
 const DOC_ICONS: Record<string, string> = {
@@ -104,31 +107,77 @@ export default function BriefArchiefPage() {
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [mappad, setMappad] = useState("");
   const [bestandsnaam, setBestandsnaam] = useState("");
+  const [gezinslid, setGezinslid] = useState("");
   const [savedPath, setSavedPath] = useState("");
+  const [savedUrl, setSavedUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [archiveHandle, setArchiveHandle] = useState<FileSystemDirectoryHandle | null>(null);
   const [archiveName, setArchiveName] = useState<string | null>(null);
   const [fsApiSupported, setFsApiSupported] = useState(true);
   const [shareApiSupported, setShareApiSupported] = useState(false);
+  const [oneDriveConnected, setOneDriveConnected] = useState(false);
+  const [archiveRoot, setArchiveRoot] = useState("Archief");
+  const [familyMembers, setFamilyMembers] = useState<string[]>([]);
+  const [folderStatus, setFolderStatus] = useState<FolderStatus>("idle");
+  const [folderCheckPath, setFolderCheckPath] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const folderCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!("showDirectoryPicker" in window) || !(window as any).showDirectoryPicker) {
       setFsApiSupported(false);
-      // Check if Web Share API with files is available (iOS Safari)
       if (navigator.canShare?.({ files: [new File([], "test")] })) {
         setShareApiSupported(true);
       }
+    } else {
+      loadArchiveHandle().then((handle) => {
+        if (handle) {
+          setArchiveHandle(handle);
+          setArchiveName(handle.name);
+        }
+      });
+    }
+
+    fetch("/api/tools/brief-archief/onedrive/status")
+      .then((r) => r.json())
+      .then((data: { connected: boolean; archiveRoot: string; familyMembers: string[] }) => {
+        setOneDriveConnected(data.connected);
+        setArchiveRoot(data.archiveRoot ?? "Archief");
+        setFamilyMembers(data.familyMembers ?? []);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (step !== "suggestion" || !oneDriveConnected) return;
+    if (!mappad && !gezinslid) {
+      setFolderStatus("idle");
       return;
     }
-    loadArchiveHandle().then((handle) => {
-      if (handle) {
-        setArchiveHandle(handle);
-        setArchiveName(handle.name);
+
+    if (folderCheckTimer.current) clearTimeout(folderCheckTimer.current);
+    setFolderStatus("loading");
+
+    folderCheckTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/tools/brief-archief/onedrive/check-folder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ familyMember: gezinslid, mappad }),
+        });
+        const data = await res.json();
+        setFolderCheckPath(data.fullPath ?? "");
+        setFolderStatus(data.exists ? "exists" : "new");
+      } catch {
+        setFolderStatus("idle");
       }
-    });
-  }, []);
+    }, 600);
+
+    return () => {
+      if (folderCheckTimer.current) clearTimeout(folderCheckTimer.current);
+    };
+  }, [mappad, gezinslid, step, oneDriveConnected]);
 
   const handleFile = useCallback((f: File) => {
     setFile(f);
@@ -147,6 +196,9 @@ export default function BriefArchiefPage() {
     setErrorMsg("");
     const formData = new FormData();
     formData.append("file", f);
+    if (familyMembers.length > 0) {
+      formData.append("family_members", JSON.stringify(familyMembers));
+    }
     try {
       const res = await fetch("/api/tools/brief-archief", { method: "POST", body: formData });
       const data = await res.json();
@@ -154,6 +206,12 @@ export default function BriefArchiefPage() {
       setAnalysis(data);
       setMappad(data.mappad ?? "");
       setBestandsnaam(data.bestandsnaam ?? "");
+      const aiGezinslid = data.gezinslid ?? null;
+      if (aiGezinslid && familyMembers.includes(aiGezinslid)) {
+        setGezinslid(aiGezinslid);
+      } else {
+        setGezinslid("");
+      }
       setStep("suggestion");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Er is iets misgegaan");
@@ -174,7 +232,34 @@ export default function BriefArchiefPage() {
     }
   }
 
-  async function handleSave() {
+  async function handleUploadOneDrive() {
+    if (!file || !analysis) return;
+    setStep("saving");
+
+    const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
+
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("familyMember", gezinslid);
+    fd.append("mappad", mappad);
+    fd.append("bestandsnaam", bestandsnaam);
+
+    try {
+      const res = await fetch("/api/tools/brief-archief/onedrive/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload mislukt");
+      setSavedPath(data.path);
+      setSavedUrl(data.webUrl ?? null);
+      setStep("done");
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Upload mislukt");
+      setStep("error");
+    }
+
+    void ext;
+  }
+
+  async function handleSaveLocal() {
     if (!file || !analysis) return;
     setStep("saving");
 
@@ -187,9 +272,9 @@ export default function BriefArchiefPage() {
         try {
           await navigator.share({ files: [shareFile], title: fullName });
           setSavedPath(`${mappad}/${fullName}`);
+          setSavedUrl(null);
           setStep("done");
         } catch (err: unknown) {
-          // User cancelled share sheet — go back to suggestion
           if (err instanceof Error && err.name !== "AbortError") {
             setErrorMsg(err.message);
             setStep("error");
@@ -198,7 +283,6 @@ export default function BriefArchiefPage() {
           }
         }
       } else {
-        // Plain download fallback
         const url = URL.createObjectURL(file);
         const a = document.createElement("a");
         a.href = url;
@@ -206,6 +290,7 @@ export default function BriefArchiefPage() {
         a.click();
         URL.revokeObjectURL(url);
         setSavedPath(`${mappad}/${fullName} (gedownload)`);
+        setSavedUrl(null);
         setStep("done");
       }
       return;
@@ -233,6 +318,7 @@ export default function BriefArchiefPage() {
       const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
       const path = await saveToArchive(handle, mappad, bestandsnaam, file, ext);
       setSavedPath(path);
+      setSavedUrl(null);
       setStep("done");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Opslaan mislukt");
@@ -247,26 +333,50 @@ export default function BriefArchiefPage() {
     setAnalysis(null);
     setMappad("");
     setBestandsnaam("");
+    setGezinslid("");
     setSavedPath("");
+    setSavedUrl(null);
     setErrorMsg("");
+    setFolderStatus("idle");
+    setFolderCheckPath("");
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
   const docIcon = analysis ? (DOC_ICONS[analysis.type?.toLowerCase()] ?? "📄") : "📄";
+  const ext = file?.name.includes(".") ? "." + file.name.split(".").pop() : "";
+  const oneDrivePath = oneDriveConnected
+    ? [archiveRoot, gezinslid, mappad, bestandsnaam ? `${bestandsnaam}${ext}` : ""]
+        .filter(Boolean)
+        .join(" / ")
+    : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
       <ToolNav label="Brief Archief" />
       <main className="max-w-2xl mx-auto px-6 py-10">
-        <div className="mb-8">
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Brief Archief</h1>
-          <p className="text-gray-500 text-sm">
-            Upload een scan of foto van een brief. AI analyseert het document en plaatst het in de juiste map.
-          </p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Brief Archief</h1>
+            <p className="text-gray-500 text-sm">
+              Upload een scan of foto van een brief. AI analyseert het document en plaatst het in de juiste map.
+            </p>
+          </div>
+          <Link
+            href="/tools/brief-archief/instellingen"
+            className="shrink-0 ml-4 text-gray-400 hover:text-gray-700 transition-colors"
+            title="Instellingen"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </Link>
         </div>
 
-        {/* Folder info bar */}
-        {fsApiSupported && (
+        {fsApiSupported && !oneDriveConnected && (
           <div className="mb-6 flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-3">
             <span className="text-lg">🗂️</span>
             <div className="flex-1 min-w-0">
@@ -284,7 +394,6 @@ export default function BriefArchiefPage() {
           </div>
         )}
 
-        {/* STEP: idle */}
         {step === "idle" && (
           <div
             className={`border-2 border-dashed rounded-3xl p-12 text-center transition-colors cursor-pointer ${
@@ -306,6 +415,13 @@ export default function BriefArchiefPage() {
             <p className="font-semibold text-gray-800 mb-1">Sleep een bestand hierheen</p>
             <p className="text-sm text-gray-500 mb-4">of klik om te bladeren</p>
             <p className="text-xs text-gray-400">JPG, PNG, WEBP of PDF · max 20 MB</p>
+            {!oneDriveConnected && (
+              <p className="text-xs text-gray-400 mt-3">
+                <Link href="/tools/brief-archief/instellingen" className="text-blue-500 hover:text-blue-700">
+                  OneDrive koppelen →
+                </Link>
+              </p>
+            )}
             <input
               ref={fileInputRef}
               type="file"
@@ -316,7 +432,6 @@ export default function BriefArchiefPage() {
           </div>
         )}
 
-        {/* STEP: analyzing */}
         {step === "analyzing" && (
           <div className="bg-white border border-gray-200 rounded-3xl p-10 text-center">
             {preview && (
@@ -335,10 +450,8 @@ export default function BriefArchiefPage() {
           </div>
         )}
 
-        {/* STEP: suggestion */}
         {step === "suggestion" && analysis && (
           <div className="space-y-4">
-            {/* Document summary card */}
             <div className="bg-white border border-gray-200 rounded-3xl p-6">
               <div className="flex items-start gap-4">
                 {preview ? (
@@ -365,9 +478,25 @@ export default function BriefArchiefPage() {
               </div>
             </div>
 
-            {/* Editable fields */}
             <div className="bg-white border border-gray-200 rounded-3xl p-6 space-y-4">
               <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Opslaan als</h2>
+
+              {familyMembers.length > 0 && (
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Gezinslid</label>
+                  <select
+                    value={gezinslid}
+                    onChange={(e) => setGezinslid(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  >
+                    <option value="">Geen / Gezamenlijk</option>
+                    {familyMembers.map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Mappad</label>
                 <input
@@ -377,7 +506,9 @@ export default function BriefArchiefPage() {
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
                   placeholder="bijv. Financiën/Belasting/2024"
                 />
-                <p className="text-xs text-gray-400 mt-1">Submappen worden automatisch aangemaakt.</p>
+                {!oneDriveConnected && (
+                  <p className="text-xs text-gray-400 mt-1">Submappen worden automatisch aangemaakt.</p>
+                )}
               </div>
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Bestandsnaam</label>
@@ -392,38 +523,93 @@ export default function BriefArchiefPage() {
                   Extensie ({file?.name.split(".").pop()}) wordt automatisch toegevoegd.
                 </p>
               </div>
+
+              {oneDriveConnected && (
+                <div className="pt-2 space-y-2">
+                  {folderStatus === "loading" && (
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      Map controleren…
+                    </div>
+                  )}
+                  {folderStatus === "exists" && (
+                    <p className="text-xs text-green-600 font-medium">✓ Map bestaat al</p>
+                  )}
+                  {folderStatus === "new" && (
+                    <p className="text-xs text-blue-600 font-medium">✨ Nieuwe map wordt aangemaakt</p>
+                  )}
+                  {oneDrivePath && (
+                    <p className="text-xs text-gray-400 font-mono break-all">{oneDrivePath}</p>
+                  )}
+                </div>
+              )}
             </div>
 
-            {!fsApiSupported && !shareApiSupported && (
+            {!oneDriveConnected && !fsApiSupported && !shareApiSupported && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800">
                 Jouw browser ondersteunt direct opslaan niet. Het bestand wordt gedownload — plaats het zelf in de juiste map.
               </div>
             )}
 
-            {shareApiSupported && (
+            {!oneDriveConnected && shareApiSupported && (
               <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800">
                 Tik op <strong>Delen</strong> en kies <strong>Opslaan in Bestanden</strong> om het bestand in de juiste map te plaatsen.
               </div>
             )}
 
-            <div className="flex gap-3">
-              <button
-                onClick={handleSave}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-colors"
-              >
-                {fsApiSupported ? "Opslaan in archief" : shareApiSupported ? "Delen / Opslaan in Bestanden" : "Downloaden"}
-              </button>
-              <button
-                onClick={reset}
-                className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors"
-              >
-                Annuleren
-              </button>
-            </div>
+            {oneDriveConnected ? (
+              <div className="flex gap-3">
+                <button
+                  onClick={handleUploadOneDrive}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-colors"
+                >
+                  Uploaden naar OneDrive
+                </button>
+                {fsApiSupported && (
+                  <button
+                    onClick={handleSaveLocal}
+                    className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors"
+                  >
+                    Opslaan lokaal
+                  </button>
+                )}
+                <button
+                  onClick={reset}
+                  className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors"
+                >
+                  Annuleren
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSaveLocal}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-colors"
+                >
+                  {fsApiSupported ? "Opslaan in archief" : shareApiSupported ? "Delen / Opslaan in Bestanden" : "Downloaden"}
+                </button>
+                <button
+                  onClick={reset}
+                  className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors"
+                >
+                  Annuleren
+                </button>
+              </div>
+            )}
+
+            {!oneDriveConnected && (
+              <p className="text-center text-xs text-gray-400">
+                <Link href="/tools/brief-archief/instellingen" className="text-blue-500 hover:text-blue-700">
+                  OneDrive koppelen →
+                </Link>
+              </p>
+            )}
           </div>
         )}
 
-        {/* STEP: saving */}
         {step === "saving" && (
           <div className="bg-white border border-gray-200 rounded-3xl p-10 text-center">
             <div className="inline-flex items-center gap-2 text-blue-600 font-medium">
@@ -436,13 +622,22 @@ export default function BriefArchiefPage() {
           </div>
         )}
 
-        {/* STEP: done */}
         {step === "done" && (
           <div className="bg-white border border-green-200 rounded-3xl p-8 text-center space-y-4">
             <div className="text-5xl">✅</div>
             <div>
               <h2 className="font-bold text-gray-900 text-lg mb-1">Opgeslagen!</h2>
               <p className="text-sm text-gray-500 font-mono bg-gray-50 rounded-xl px-4 py-2 break-all">{savedPath}</p>
+              {savedUrl && (
+                <a
+                  href={savedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Openen in OneDrive →
+                </a>
+              )}
             </div>
             <button
               onClick={reset}
@@ -453,7 +648,6 @@ export default function BriefArchiefPage() {
           </div>
         )}
 
-        {/* STEP: error */}
         {step === "error" && (
           <div className="bg-white border border-red-200 rounded-3xl p-8 text-center space-y-4">
             <div className="text-5xl">⚠️</div>
