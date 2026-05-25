@@ -8,6 +8,7 @@ import ToolNav from "@/components/ToolNav";
 
 type Step = "idle" | "analyzing" | "suggestion" | "saving" | "done" | "error";
 type FolderStatus = "idle" | "loading" | "exists" | "new";
+type StorageOption = "local" | "onedrive" | "dropbox";
 
 interface Analysis {
   type: string;
@@ -116,7 +117,11 @@ export default function BriefArchiefPage() {
   const [fsApiSupported, setFsApiSupported] = useState(true);
   const [shareApiSupported, setShareApiSupported] = useState(false);
   const [oneDriveConnected, setOneDriveConnected] = useState(false);
+  const [dropboxConnected, setDropboxConnected] = useState(false);
   const [archiveRoot, setArchiveRoot] = useState("Archief");
+  const [dropboxArchiveRoot, setDropboxArchiveRoot] = useState("Archief");
+  const [storagePreference, setStoragePreference] = useState<StorageOption>("local");
+  const [selectedStorage, setSelectedStorage] = useState<StorageOption>("local");
   const [familyMembers, setFamilyMembers] = useState<string[]>([]);
   const [folderStatus, setFolderStatus] = useState<FolderStatus>("idle");
   const [folderCheckPath, setFolderCheckPath] = useState("");
@@ -141,16 +146,38 @@ export default function BriefArchiefPage() {
 
     fetch("/api/tools/brief-archief/onedrive/status")
       .then((r) => r.json())
-      .then((data: { connected: boolean; archiveRoot: string; familyMembers: string[] }) => {
+      .then((data: {
+        connected: boolean;
+        archiveRoot: string;
+        familyMembers: string[];
+        dropboxConnected: boolean;
+        dropboxArchiveRoot: string;
+        storagePreference: string;
+      }) => {
         setOneDriveConnected(data.connected);
+        setDropboxConnected(data.dropboxConnected);
         setArchiveRoot(data.archiveRoot ?? "Archief");
+        setDropboxArchiveRoot(data.dropboxArchiveRoot ?? "Archief");
         setFamilyMembers(data.familyMembers ?? []);
+        const pref = (data.storagePreference ?? "local") as StorageOption;
+        setStoragePreference(pref);
+        if (pref === "onedrive" && data.connected) {
+          setSelectedStorage("onedrive");
+        } else if (pref === "dropbox" && data.dropboxConnected) {
+          setSelectedStorage("dropbox");
+        } else {
+          setSelectedStorage("local");
+        }
       })
       .catch(() => {});
   }, []);
 
+  const cloudConnected = selectedStorage === "onedrive" ? oneDriveConnected : selectedStorage === "dropbox" ? dropboxConnected : false;
+  const effectiveArchiveRoot = selectedStorage === "dropbox" ? dropboxArchiveRoot : archiveRoot;
+
   useEffect(() => {
-    if (step !== "suggestion" || !oneDriveConnected) return;
+    if (step !== "suggestion" || selectedStorage === "local") return;
+    if (!cloudConnected) return;
     if (!mappad && !gezinslid) {
       setFolderStatus("idle");
       return;
@@ -159,9 +186,13 @@ export default function BriefArchiefPage() {
     if (folderCheckTimer.current) clearTimeout(folderCheckTimer.current);
     setFolderStatus("loading");
 
+    const endpoint = selectedStorage === "dropbox"
+      ? "/api/tools/brief-archief/dropbox/check-folder"
+      : "/api/tools/brief-archief/onedrive/check-folder";
+
     folderCheckTimer.current = setTimeout(async () => {
       try {
-        const res = await fetch("/api/tools/brief-archief/onedrive/check-folder", {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ familyMember: gezinslid, mappad }),
@@ -177,7 +208,7 @@ export default function BriefArchiefPage() {
     return () => {
       if (folderCheckTimer.current) clearTimeout(folderCheckTimer.current);
     };
-  }, [mappad, gezinslid, step, oneDriveConnected]);
+  }, [mappad, gezinslid, step, selectedStorage, cloudConnected]);
 
   const handleFile = useCallback((f: File) => {
     setFile(f);
@@ -232,11 +263,9 @@ export default function BriefArchiefPage() {
     }
   }
 
-  async function handleUploadOneDrive() {
+  async function handleUploadCloud() {
     if (!file || !analysis) return;
     setStep("saving");
-
-    const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
 
     const fd = new FormData();
     fd.append("file", file);
@@ -244,19 +273,21 @@ export default function BriefArchiefPage() {
     fd.append("mappad", mappad);
     fd.append("bestandsnaam", bestandsnaam);
 
+    const endpoint = selectedStorage === "dropbox"
+      ? "/api/tools/brief-archief/dropbox/upload"
+      : "/api/tools/brief-archief/onedrive/upload";
+
     try {
-      const res = await fetch("/api/tools/brief-archief/onedrive/upload", { method: "POST", body: fd });
+      const res = await fetch(endpoint, { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Upload mislukt");
       setSavedPath(data.path);
-      setSavedUrl(data.webUrl ?? null);
+      setSavedUrl(data.webUrl || null);
       setStep("done");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Upload mislukt");
       setStep("error");
     }
-
-    void ext;
   }
 
   async function handleSaveLocal() {
@@ -344,11 +375,30 @@ export default function BriefArchiefPage() {
 
   const docIcon = analysis ? (DOC_ICONS[analysis.type?.toLowerCase()] ?? "📄") : "📄";
   const ext = file?.name.includes(".") ? "." + file.name.split(".").pop() : "";
-  const oneDrivePath = oneDriveConnected
-    ? [archiveRoot, gezinslid, mappad, bestandsnaam ? `${bestandsnaam}${ext}` : ""]
+  const cloudPath = cloudConnected
+    ? [effectiveArchiveRoot, gezinslid, mappad, bestandsnaam ? `${bestandsnaam}${ext}` : ""]
         .filter(Boolean)
         .join(" / ")
     : null;
+
+  const availableStorageOptions: { value: StorageOption; label: string; icon: string }[] = [
+    ...(oneDriveConnected ? [{ value: "onedrive" as StorageOption, label: "OneDrive", icon: "☁️" }] : []),
+    ...(dropboxConnected ? [{ value: "dropbox" as StorageOption, label: "Dropbox", icon: "📦" }] : []),
+    { value: "local" as StorageOption, label: "Lokaal", icon: "💻" },
+  ];
+
+  const primaryButtonLabel =
+    selectedStorage === "onedrive"
+      ? "Uploaden naar OneDrive"
+      : selectedStorage === "dropbox"
+      ? "Uploaden naar Dropbox"
+      : fsApiSupported
+      ? "Opslaan in archief"
+      : shareApiSupported
+      ? "Delen / Opslaan in Bestanden"
+      : "Downloaden";
+
+  const isCloudSelected = selectedStorage === "onedrive" || selectedStorage === "dropbox";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -376,7 +426,7 @@ export default function BriefArchiefPage() {
           </Link>
         </div>
 
-        {fsApiSupported && !oneDriveConnected && (
+        {fsApiSupported && !oneDriveConnected && !dropboxConnected && (
           <div className="mb-6 flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-3">
             <span className="text-lg">🗂️</span>
             <div className="flex-1 min-w-0">
@@ -415,10 +465,10 @@ export default function BriefArchiefPage() {
             <p className="font-semibold text-gray-800 mb-1">Sleep een bestand hierheen</p>
             <p className="text-sm text-gray-500 mb-4">of klik om te bladeren</p>
             <p className="text-xs text-gray-400">JPG, PNG, WEBP of PDF · max 20 MB</p>
-            {!oneDriveConnected && (
+            {!oneDriveConnected && !dropboxConnected && (
               <p className="text-xs text-gray-400 mt-3">
                 <Link href="/tools/brief-archief/instellingen" className="text-blue-500 hover:text-blue-700">
-                  OneDrive koppelen →
+                  Cloudopslag koppelen →
                 </Link>
               </p>
             )}
@@ -481,6 +531,31 @@ export default function BriefArchiefPage() {
             <div className="bg-white border border-gray-200 rounded-3xl p-6 space-y-4">
               <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Opslaan als</h2>
 
+              {availableStorageOptions.length > 1 && (
+                <div>
+                  <label className="text-xs text-gray-500 mb-1.5 block">Opslaan naar</label>
+                  <div className="flex gap-2">
+                    {availableStorageOptions.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => {
+                          setSelectedStorage(opt.value);
+                          setFolderStatus("idle");
+                        }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-colors ${
+                          selectedStorage === opt.value
+                            ? "border-blue-500 bg-blue-50 text-blue-700"
+                            : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        <span>{opt.icon}</span>
+                        <span>{opt.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {familyMembers.length > 0 && (
                 <div>
                   <label className="text-xs text-gray-500 mb-1 block">Gezinslid</label>
@@ -506,7 +581,7 @@ export default function BriefArchiefPage() {
                   className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
                   placeholder="bijv. Financiën/Belasting/2024"
                 />
-                {!oneDriveConnected && (
+                {selectedStorage === "local" && (
                   <p className="text-xs text-gray-400 mt-1">Submappen worden automatisch aangemaakt.</p>
                 )}
               </div>
@@ -524,7 +599,7 @@ export default function BriefArchiefPage() {
                 </p>
               </div>
 
-              {oneDriveConnected && (
+              {isCloudSelected && cloudConnected && (
                 <div className="pt-2 space-y-2">
                   {folderStatus === "loading" && (
                     <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -541,41 +616,33 @@ export default function BriefArchiefPage() {
                   {folderStatus === "new" && (
                     <p className="text-xs text-blue-600 font-medium">✨ Nieuwe map wordt aangemaakt</p>
                   )}
-                  {oneDrivePath && (
-                    <p className="text-xs text-gray-400 font-mono break-all">{oneDrivePath}</p>
+                  {cloudPath && (
+                    <p className="text-xs text-gray-400 font-mono break-all">{cloudPath}</p>
                   )}
                 </div>
               )}
             </div>
 
-            {!oneDriveConnected && !fsApiSupported && !shareApiSupported && (
+            {selectedStorage === "local" && !fsApiSupported && !shareApiSupported && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800">
                 Jouw browser ondersteunt direct opslaan niet. Het bestand wordt gedownload — plaats het zelf in de juiste map.
               </div>
             )}
 
-            {!oneDriveConnected && shareApiSupported && (
+            {selectedStorage === "local" && shareApiSupported && (
               <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800">
                 Tik op <strong>Delen</strong> en kies <strong>Opslaan in Bestanden</strong> om het bestand in de juiste map te plaatsen.
               </div>
             )}
 
-            {oneDriveConnected ? (
+            <div className="flex flex-col gap-2">
               <div className="flex gap-3">
                 <button
-                  onClick={handleUploadOneDrive}
+                  onClick={isCloudSelected ? handleUploadCloud : handleSaveLocal}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-colors"
                 >
-                  Uploaden naar OneDrive
+                  {primaryButtonLabel}
                 </button>
-                {fsApiSupported && (
-                  <button
-                    onClick={handleSaveLocal}
-                    className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors"
-                  >
-                    Opslaan lokaal
-                  </button>
-                )}
                 <button
                   onClick={reset}
                   className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors"
@@ -583,27 +650,20 @@ export default function BriefArchiefPage() {
                   Annuleren
                 </button>
               </div>
-            ) : (
-              <div className="flex gap-3">
+              {isCloudSelected && fsApiSupported && (
                 <button
                   onClick={handleSaveLocal}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-colors"
+                  className="text-xs text-gray-500 hover:text-gray-700 text-center py-1 transition-colors"
                 >
-                  {fsApiSupported ? "Opslaan in archief" : shareApiSupported ? "Delen / Opslaan in Bestanden" : "Downloaden"}
+                  Opslaan lokaal
                 </button>
-                <button
-                  onClick={reset}
-                  className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors"
-                >
-                  Annuleren
-                </button>
-              </div>
-            )}
+              )}
+            </div>
 
-            {!oneDriveConnected && (
+            {!oneDriveConnected && !dropboxConnected && (
               <p className="text-center text-xs text-gray-400">
                 <Link href="/tools/brief-archief/instellingen" className="text-blue-500 hover:text-blue-700">
-                  OneDrive koppelen →
+                  Cloudopslag koppelen →
                 </Link>
               </p>
             )}
