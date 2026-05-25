@@ -109,12 +109,17 @@ export default function BriefArchiefPage() {
   const [archiveHandle, setArchiveHandle] = useState<FileSystemDirectoryHandle | null>(null);
   const [archiveName, setArchiveName] = useState<string | null>(null);
   const [fsApiSupported, setFsApiSupported] = useState(true);
+  const [shareApiSupported, setShareApiSupported] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (!("showDirectoryPicker" in window) || !(window as any).showDirectoryPicker) {
       setFsApiSupported(false);
+      // Check if Web Share API with files is available (iOS Safari)
+      if (navigator.canShare?.({ files: [new File([], "test")] })) {
+        setShareApiSupported(true);
+      }
       return;
     }
     loadArchiveHandle().then((handle) => {
@@ -174,16 +179,35 @@ export default function BriefArchiefPage() {
     setStep("saving");
 
     if (!fsApiSupported) {
-      // Fallback: download the file
       const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
-      const url = URL.createObjectURL(file);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${bestandsnaam}${ext}`;
-      a.click();
-      URL.revokeObjectURL(url);
-      setSavedPath(`${mappad}/${bestandsnaam}${ext} (gedownload)`);
-      setStep("done");
+      const fullName = `${bestandsnaam}${ext}`;
+      const shareFile = new File([file], fullName, { type: file.type });
+
+      if (shareApiSupported && navigator.canShare?.({ files: [shareFile] })) {
+        try {
+          await navigator.share({ files: [shareFile], title: fullName });
+          setSavedPath(`${mappad}/${fullName}`);
+          setStep("done");
+        } catch (err: unknown) {
+          // User cancelled share sheet — go back to suggestion
+          if (err instanceof Error && err.name !== "AbortError") {
+            setErrorMsg(err.message);
+            setStep("error");
+          } else {
+            setStep("suggestion");
+          }
+        }
+      } else {
+        // Plain download fallback
+        const url = URL.createObjectURL(file);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fullName;
+        a.click();
+        URL.revokeObjectURL(url);
+        setSavedPath(`${mappad}/${fullName} (gedownload)`);
+        setStep("done");
+      }
       return;
     }
 
@@ -370,9 +394,15 @@ export default function BriefArchiefPage() {
               </div>
             </div>
 
-            {!fsApiSupported && (
+            {!fsApiSupported && !shareApiSupported && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800">
                 Jouw browser ondersteunt direct opslaan niet. Het bestand wordt gedownload — plaats het zelf in de juiste map.
+              </div>
+            )}
+
+            {shareApiSupported && (
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl px-4 py-3 text-sm text-blue-800">
+                Tik op <strong>Delen</strong> en kies <strong>Opslaan in Bestanden</strong> om het bestand in de juiste map te plaatsen.
               </div>
             )}
 
@@ -381,7 +411,7 @@ export default function BriefArchiefPage() {
                 onClick={handleSave}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-2xl transition-colors"
               >
-                {fsApiSupported ? "Opslaan in archief" : "Downloaden"}
+                {fsApiSupported ? "Opslaan in archief" : shareApiSupported ? "Delen / Opslaan in Bestanden" : "Downloaden"}
               </button>
               <button
                 onClick={reset}
