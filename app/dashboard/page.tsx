@@ -86,9 +86,9 @@ const categories = [
         bg: "bg-orange-50",
       },
       {
-        name: "Brief Archief",
+        name: "MijnDossier",
         description: "Upload een scan of foto van een brief. AI analyseert het document en plaatst het automatisch in de juiste map op jouw computer.",
-        href: "/tools/brief-archief",
+        href: "/tools/mijn-dossier",
         credits: 1,
         icon: "📬",
         color: "from-sky-500 to-blue-600",

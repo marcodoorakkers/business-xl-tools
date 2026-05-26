@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, logUsage } from "@/lib/supabase/admin";
-import { getValidAccessToken, uploadFileToOneDrive } from "@/lib/onedrive";
+import { getValidDropboxToken, uploadFileToDropbox } from "@/lib/dropbox";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -11,12 +11,12 @@ export async function POST(req: NextRequest) {
   const { data: profile } = await supabase.from("profiles").select("credits").eq("id", user.id).single();
   if (!profile || profile.credits < 1) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
 
-  const accessToken = await getValidAccessToken(user.id);
-  if (!accessToken) return NextResponse.json({ error: "OneDrive niet gekoppeld" }, { status: 400 });
+  const accessToken = await getValidDropboxToken(user.id);
+  if (!accessToken) return NextResponse.json({ error: "Dropbox niet gekoppeld" }, { status: 400 });
 
   const admin = createAdminClient();
   const { data: tokenRow } = await admin
-    .from("onedrive_tokens")
+    .from("dropbox_tokens")
     .select("archive_root")
     .eq("user_id", user.id)
     .single();
@@ -40,10 +40,10 @@ export async function POST(req: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const { webUrl } = await uploadFileToOneDrive(accessToken, fullPath, buffer, file.type || "application/octet-stream");
+  const { webUrl } = await uploadFileToDropbox(accessToken, fullPath, buffer, file.type || "application/octet-stream");
 
   await supabase.from("profiles").update({ credits: profile.credits - 1 }).eq("id", user.id);
-  await logUsage(user.id, "brief-archief", 1);
+  await logUsage(user.id, "mijn-dossier", 1);
 
   return NextResponse.json({ webUrl, path: fullPath });
 }

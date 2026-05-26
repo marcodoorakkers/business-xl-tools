@@ -32,7 +32,7 @@ const DOC_ICONS: Record<string, string> = {
   overig: "📄",
 };
 
-const DB_NAME = "brief-archief-db";
+const DB_NAME = "mijn-dossier-db";
 const STORE_NAME = "handles";
 
 async function openHandleDB(): Promise<IDBDatabase> {
@@ -144,7 +144,7 @@ export default function BriefArchiefPage() {
       });
     }
 
-    fetch("/api/tools/brief-archief/onedrive/status")
+    fetch("/api/tools/mijn-dossier/onedrive/status")
       .then((r) => r.json())
       .then((data: {
         connected: boolean;
@@ -187,8 +187,8 @@ export default function BriefArchiefPage() {
     setFolderStatus("loading");
 
     const endpoint = selectedStorage === "dropbox"
-      ? "/api/tools/brief-archief/dropbox/check-folder"
-      : "/api/tools/brief-archief/onedrive/check-folder";
+      ? "/api/tools/mijn-dossier/dropbox/check-folder"
+      : "/api/tools/mijn-dossier/onedrive/check-folder";
 
     folderCheckTimer.current = setTimeout(async () => {
       try {
@@ -231,7 +231,7 @@ export default function BriefArchiefPage() {
       formData.append("family_members", JSON.stringify(familyMembers));
     }
     try {
-      const res = await fetch("/api/tools/brief-archief", { method: "POST", body: formData });
+      const res = await fetch("/api/tools/mijn-dossier", { method: "POST", body: formData });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setAnalysis(data);
@@ -274,8 +274,8 @@ export default function BriefArchiefPage() {
     fd.append("bestandsnaam", bestandsnaam);
 
     const endpoint = selectedStorage === "dropbox"
-      ? "/api/tools/brief-archief/dropbox/upload"
-      : "/api/tools/brief-archief/onedrive/upload";
+      ? "/api/tools/mijn-dossier/dropbox/upload"
+      : "/api/tools/mijn-dossier/onedrive/upload";
 
     try {
       const res = await fetch(endpoint, { method: "POST", body: fd });
@@ -402,17 +402,17 @@ export default function BriefArchiefPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ToolNav label="Brief Archief" />
+      <ToolNav label="MijnDossier" />
       <main className="max-w-2xl mx-auto px-6 py-10">
         <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Brief Archief</h1>
+            <h1 className="text-2xl font-extrabold text-gray-900 mb-1">MijnDossier</h1>
             <p className="text-gray-500 text-sm">
               Upload een scan of foto van een brief. AI analyseert het document en plaatst het in de juiste map.
             </p>
           </div>
           <Link
-            href="/tools/brief-archief/instellingen"
+            href="/tools/mijn-dossier/instellingen"
             className="shrink-0 ml-4 text-gray-400 hover:text-gray-700 transition-colors"
             title="Instellingen"
           >
@@ -467,7 +467,7 @@ export default function BriefArchiefPage() {
             <p className="text-xs text-gray-400">JPG, PNG, WEBP of PDF · max 20 MB</p>
             {!oneDriveConnected && !dropboxConnected && (
               <p className="text-xs text-gray-400 mt-3">
-                <Link href="/tools/brief-archief/instellingen" className="text-blue-500 hover:text-blue-700">
+                <Link href="/tools/mijn-dossier/instellingen" className="text-blue-500 hover:text-blue-700">
                   Cloudopslag koppelen →
                 </Link>
               </p>
@@ -662,7 +662,7 @@ export default function BriefArchiefPage() {
 
             {!oneDriveConnected && !dropboxConnected && (
               <p className="text-center text-xs text-gray-400">
-                <Link href="/tools/brief-archief/instellingen" className="text-blue-500 hover:text-blue-700">
+                <Link href="/tools/mijn-dossier/instellingen" className="text-blue-500 hover:text-blue-700">
                   Cloudopslag koppelen →
                 </Link>
               </p>

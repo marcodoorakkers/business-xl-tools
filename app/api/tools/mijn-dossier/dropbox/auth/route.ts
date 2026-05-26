@@ -7,22 +7,21 @@ export async function GET(request: NextRequest) {
   if (!user) return NextResponse.redirect(new URL("/auth/login", request.url));
 
   const origin = request.nextUrl.origin;
-  const redirectUri = `${origin}/api/tools/brief-archief/onedrive/callback`;
+  const redirectUri = `${origin}/api/tools/mijn-dossier/dropbox/callback`;
   const state = crypto.randomUUID();
 
   const params = new URLSearchParams({
-    client_id: process.env.MICROSOFT_CLIENT_ID!,
+    client_id: process.env.DROPBOX_CLIENT_ID!,
     response_type: "code",
     redirect_uri: redirectUri,
-    scope: "Files.ReadWrite offline_access User.Read",
-    response_mode: "query",
+    token_access_type: "offline",
     state,
   });
 
-  const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${params}`;
+  const authUrl = `https://www.dropbox.com/oauth2/authorize?${params}`;
 
   const response = NextResponse.redirect(authUrl);
-  response.cookies.set("ms_oauth_state", state, {
+  response.cookies.set("dropbox_oauth_state", state, {
     httpOnly: true,
     maxAge: 600,
     sameSite: "lax",
