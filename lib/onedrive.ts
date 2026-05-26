@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
-const TOKEN_ENDPOINT = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+const TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
 
 export async function getValidAccessToken(userId: string): Promise<string | null> {
   const admin = createAdminClient();
