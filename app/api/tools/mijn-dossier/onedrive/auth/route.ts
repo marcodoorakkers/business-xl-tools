@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     state,
   });
 
-  const authUrl = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${params}`;
+  const authUrl = `https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?${params}`;
 
   const response = NextResponse.redirect(authUrl);
   response.cookies.set("ms_oauth_state", state, {
