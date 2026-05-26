@@ -85,7 +85,7 @@ const categories = [
         color: "from-orange-400 to-pink-500",
         bg: "bg-orange-50",
       },
-      {
+      ...(process.env.MIJN_DOSSIER_ENABLED === "true" ? [{
         name: "MijnDossier",
         description: "Upload een scan of foto van een brief. AI analyseert het document en plaatst het automatisch in de juiste map op jouw computer.",
         href: "/tools/mijn-dossier",
@@ -93,7 +93,7 @@ const categories = [
         icon: "📬",
         color: "from-sky-500 to-blue-600",
         bg: "bg-sky-50",
-      },
+      }] : []),
     ],
   },
 ];

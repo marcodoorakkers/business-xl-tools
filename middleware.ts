@@ -33,6 +33,14 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/account") ||
     request.nextUrl.pathname.startsWith("/admin");
 
+  const isMijnDossier =
+    request.nextUrl.pathname.startsWith("/tools/mijn-dossier") ||
+    request.nextUrl.pathname.startsWith("/api/tools/mijn-dossier");
+
+  if (isMijnDossier && process.env.MIJN_DOSSIER_ENABLED !== "true") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   if (!user && isProtected) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
