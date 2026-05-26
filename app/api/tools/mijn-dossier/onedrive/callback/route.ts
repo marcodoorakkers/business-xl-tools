@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
-const TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
+const TOKEN_ENDPOINT = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
