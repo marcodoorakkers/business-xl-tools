@@ -97,7 +97,7 @@ Formaat:
   }
 
   await supabase.from("profiles").update({ credits: profile.credits - 1 }).eq("id", user.id);
-  await logUsage(user.id, "brief-archief", 1);
+  await logUsage(user.id, "mijn-dossier", 1);
 
   return NextResponse.json(result);
 }

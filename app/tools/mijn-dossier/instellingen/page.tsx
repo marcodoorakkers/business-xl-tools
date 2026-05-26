@@ -47,7 +47,7 @@ function InstellingenContent() {
   }, [searchParams, showToast]);
 
   useEffect(() => {
-    fetch("/api/tools/brief-archief/onedrive/status")
+    fetch("/api/tools/mijn-dossier/onedrive/status")
       .then((r) => r.json())
       .then((data: StatusData) => {
         setStatus(data);
@@ -56,7 +56,7 @@ function InstellingenContent() {
         setStoragePreference(data.storagePreference);
       });
 
-    fetch("/api/tools/brief-archief/onedrive/family")
+    fetch("/api/tools/mijn-dossier/onedrive/family")
       .then((r) => r.json())
       .then((data: { familyMembers: FamilyMember[] }) => {
         setFamilyMembers(data.familyMembers ?? []);
@@ -66,7 +66,7 @@ function InstellingenContent() {
   async function saveStoragePreference(value: string) {
     setStoragePreference(value);
     try {
-      await fetch("/api/tools/brief-archief/onedrive/status", {
+      await fetch("/api/tools/mijn-dossier/onedrive/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ storagePreference: value }),
@@ -79,7 +79,7 @@ function InstellingenContent() {
   async function saveArchiveRoot() {
     setSavingRoot(true);
     try {
-      const res = await fetch("/api/tools/brief-archief/onedrive/status", {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ archiveRoot }),
@@ -96,7 +96,7 @@ function InstellingenContent() {
   async function saveDropboxArchiveRoot() {
     setSavingDropboxRoot(true);
     try {
-      const res = await fetch("/api/tools/brief-archief/onedrive/status", {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dropboxArchiveRoot }),
@@ -114,7 +114,7 @@ function InstellingenContent() {
     if (!newMemberName.trim()) return;
     setAddingMember(true);
     try {
-      const res = await fetch("/api/tools/brief-archief/onedrive/family", {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/family", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newMemberName.trim() }),
@@ -132,7 +132,7 @@ function InstellingenContent() {
 
   async function deleteMember(id: string) {
     try {
-      const res = await fetch("/api/tools/brief-archief/onedrive/family", {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/family", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
@@ -152,7 +152,7 @@ function InstellingenContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ToolNav label="Brief Archief — Instellingen" />
+      <ToolNav label="MijnDossier — Instellingen" />
 
       {toast && (
         <div
@@ -202,7 +202,7 @@ function InstellingenContent() {
               <span className="text-green-500 text-xl">✓</span>
               <span className="text-sm font-medium text-gray-900">OneDrive is gekoppeld</span>
               <a
-                href="/api/tools/brief-archief/onedrive/auth"
+                href="/api/tools/mijn-dossier/onedrive/auth"
                 className="ml-auto text-xs text-blue-600 hover:text-blue-800 font-medium border border-blue-200 rounded-xl px-3 py-1.5 transition-colors"
               >
                 Vernieuwen / Opnieuw koppelen
@@ -213,7 +213,7 @@ function InstellingenContent() {
               <span className="text-gray-400 text-xl">○</span>
               <span className="text-sm text-gray-600">OneDrive is nog niet gekoppeld</span>
               <a
-                href="/api/tools/brief-archief/onedrive/auth"
+                href="/api/tools/mijn-dossier/onedrive/auth"
                 className="ml-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
               >
                 OneDrive koppelen
@@ -253,7 +253,7 @@ function InstellingenContent() {
               <span className="text-green-500 text-xl">✓</span>
               <span className="text-sm font-medium text-gray-900">Dropbox is gekoppeld</span>
               <a
-                href="/api/tools/brief-archief/dropbox/auth"
+                href="/api/tools/mijn-dossier/dropbox/auth"
                 className="ml-auto text-xs text-blue-600 hover:text-blue-800 font-medium border border-blue-200 rounded-xl px-3 py-1.5 transition-colors"
               >
                 Opnieuw koppelen
@@ -264,7 +264,7 @@ function InstellingenContent() {
               <span className="text-gray-400 text-xl">○</span>
               <span className="text-sm text-gray-600">Dropbox is nog niet gekoppeld</span>
               <a
-                href="/api/tools/brief-archief/dropbox/auth"
+                href="/api/tools/mijn-dossier/dropbox/auth"
                 className="ml-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
               >
                 Dropbox koppelen
@@ -339,10 +339,10 @@ function InstellingenContent() {
 
         <div className="pt-2">
           <Link
-            href="/tools/brief-archief"
+            href="/tools/mijn-dossier"
             className="text-sm text-blue-600 hover:text-blue-800 font-medium"
           >
-            ← Terug naar Brief Archief
+            ← Terug naar MijnDossier
           </Link>
         </div>
       </main>

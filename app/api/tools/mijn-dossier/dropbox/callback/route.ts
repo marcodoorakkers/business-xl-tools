@@ -2,14 +2,14 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
 
-const TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
+const TOKEN_ENDPOINT = "https://api.dropbox.com/oauth2/token";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   const origin = request.nextUrl.origin;
-  const failUrl = `${origin}/tools/brief-archief/instellingen?error=auth_failed`;
+  const failUrl = `${origin}/tools/mijn-dossier/instellingen?error=auth_failed`;
 
   if (!user) return NextResponse.redirect(failUrl);
 
@@ -20,14 +20,14 @@ export async function GET(request: NextRequest) {
 
   if (error || !code || !state) return NextResponse.redirect(failUrl);
 
-  const storedState = request.cookies.get("ms_oauth_state")?.value;
+  const storedState = request.cookies.get("dropbox_oauth_state")?.value;
   if (!storedState || storedState !== state) return NextResponse.redirect(failUrl);
 
-  const redirectUri = `${origin}/api/tools/brief-archief/onedrive/callback`;
+  const redirectUri = `${origin}/api/tools/mijn-dossier/dropbox/callback`;
 
   const params = new URLSearchParams({
-    client_id: process.env.MICROSOFT_CLIENT_ID!,
-    client_secret: process.env.MICROSOFT_CLIENT_SECRET!,
+    client_id: process.env.DROPBOX_CLIENT_ID!,
+    client_secret: process.env.DROPBOX_CLIENT_SECRET!,
     grant_type: "authorization_code",
     code,
     redirect_uri: redirectUri,
@@ -44,10 +44,11 @@ export async function GET(request: NextRequest) {
   const tokens = await tokenRes.json();
   if (!tokens.access_token || !tokens.refresh_token) return NextResponse.redirect(failUrl);
 
-  const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
+  const expiresIn = typeof tokens.expires_in === "number" ? tokens.expires_in : 4 * 3600;
+  const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
 
   const admin = createAdminClient();
-  await admin.from("onedrive_tokens").upsert({
+  await admin.from("dropbox_tokens").upsert({
     user_id: user.id,
     access_token: tokens.access_token,
     refresh_token: tokens.refresh_token,
@@ -56,8 +57,8 @@ export async function GET(request: NextRequest) {
     updated_at: new Date().toISOString(),
   }, { onConflict: "user_id" });
 
-  const response = NextResponse.redirect(`${origin}/tools/brief-archief/instellingen?connected=1`);
-  response.cookies.set("ms_oauth_state", "", { maxAge: 0, path: "/" });
+  const response = NextResponse.redirect(`${origin}/tools/mijn-dossier/instellingen?dropbox_connected=1`);
+  response.cookies.set("dropbox_oauth_state", "", { maxAge: 0, path: "/" });
 
   return response;
 }
