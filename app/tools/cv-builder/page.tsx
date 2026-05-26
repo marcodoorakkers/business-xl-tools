@@ -376,6 +376,7 @@ export default function CVBuilderPage() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+      if (data._lang) setLang(data._lang);
       setCv(data);
       setStep("result");
     } catch (err: unknown) {
