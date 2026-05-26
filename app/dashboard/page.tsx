@@ -3,101 +3,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 
-const categories = [
-  {
-    label: "✉️ Communicatie & Vergaderen",
-    tools: [
-      {
-        name: "Voice Mail Draft",
-        description: "Spreek in wat je wilt mailen — de app maakt er een concept mail van.",
-        href: "/tools/voice-mail",
-        credits: 2,
-        icon: "🎙️",
-        color: "from-purple-500 to-indigo-500",
-        bg: "bg-purple-50",
-      },
-      {
-        name: "Meeting Memo",
-        description: "Neem je vergadering op of upload notulen en ontvang automatisch gestructureerde notulen.",
-        href: "/tools/meeting-memo",
-        credits: 2,
-        icon: "📝",
-        color: "from-blue-500 to-cyan-500",
-        bg: "bg-blue-50",
-      },
-    ],
-  },
-  {
-    label: "📄 Documenten & Presentaties",
-    tools: [
-      {
-        name: "Document Opmaken",
-        description: "Upload een Word-document en ontvang een professioneel opgemaakt versie met inhoudsopgave, koppen en paginanummers.",
-        href: "/tools/word-formatter",
-        credits: 2,
-        icon: "✨",
-        color: "from-teal-500 to-cyan-500",
-        bg: "bg-teal-50",
-      },
-      {
-        name: "Presentatie Outline",
-        description: "Geef je onderwerp en duur op en ontvang direct een complete slideopbouw met spreektips.",
-        href: "/tools/presentation-outline",
-        credits: 1,
-        icon: "🎯",
-        color: "from-violet-500 to-purple-500",
-        bg: "bg-violet-50",
-      },
-    ],
-  },
-  {
-    label: "💼 Loopbaan",
-    tools: [
-      {
-        name: "Vacaturezoeker",
-        description: "Plak je CV of profiel en vind actuele freelance & contract vacatures in NL, remote en internationaal.",
-        href: "/tools/vacancy-finder",
-        credits: 1,
-        icon: "🔍",
-        color: "from-green-500 to-teal-500",
-        bg: "bg-green-50",
-      },
-      {
-        name: "CV Builder",
-        description: "Upload je CV als PDF en kies uit 6 templates — compact, uitgebreid of gericht op een vacature.",
-        href: "/tools/cv-builder",
-        credits: 2,
-        icon: "📋",
-        color: "from-rose-500 to-pink-500",
-        bg: "bg-rose-50",
-      },
-    ],
-  },
-  {
-    label: "🏠 Privé",
-    tools: [
-      {
-        name: "Weekmenu Planner",
-        description: "Geef je voorkeuren op en ontvang een weekmenu voor 7 avondmaaltijden met boodschappenlijst.",
-        href: "/tools/dinner-planner",
-        credits: 1,
-        icon: "🍽️",
-        color: "from-orange-400 to-pink-500",
-        bg: "bg-orange-50",
-      },
-      ...(process.env.MIJN_DOSSIER_ENABLED === "true" ? [{
-        name: "MijnDossier",
-        description: "Upload een scan of foto van een brief. AI analyseert het document en plaatst het automatisch in de juiste map op jouw computer.",
-        href: "/tools/mijn-dossier",
-        credits: 1,
-        icon: "📬",
-        color: "from-sky-500 to-blue-600",
-        bg: "bg-sky-50",
-      }] : []),
-    ],
-  },
-];
-
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -112,6 +17,101 @@ export default async function DashboardPage() {
 
   const credits = profile?.credits ?? 0;
   const isAdmin = user.email === process.env.ADMIN_EMAIL;
+
+  const categories = [
+    {
+      label: "✉️ Communicatie & Vergaderen",
+      tools: [
+        {
+          name: "Voice Mail Draft",
+          description: "Spreek in wat je wilt mailen — de app maakt er een concept mail van.",
+          href: "/tools/voice-mail",
+          credits: 2,
+          icon: "🎙️",
+          color: "from-purple-500 to-indigo-500",
+          bg: "bg-purple-50",
+        },
+        {
+          name: "Meeting Memo",
+          description: "Neem je vergadering op of upload notulen en ontvang automatisch gestructureerde notulen.",
+          href: "/tools/meeting-memo",
+          credits: 2,
+          icon: "📝",
+          color: "from-blue-500 to-cyan-500",
+          bg: "bg-blue-50",
+        },
+      ],
+    },
+    {
+      label: "📄 Documenten & Presentaties",
+      tools: [
+        {
+          name: "Document Opmaken",
+          description: "Upload een Word-document en ontvang een professioneel opgemaakt versie met inhoudsopgave, koppen en paginanummers.",
+          href: "/tools/word-formatter",
+          credits: 2,
+          icon: "✨",
+          color: "from-teal-500 to-cyan-500",
+          bg: "bg-teal-50",
+        },
+        {
+          name: "Presentatie Outline",
+          description: "Geef je onderwerp en duur op en ontvang direct een complete slideopbouw met spreektips.",
+          href: "/tools/presentation-outline",
+          credits: 1,
+          icon: "🎯",
+          color: "from-violet-500 to-purple-500",
+          bg: "bg-violet-50",
+        },
+      ],
+    },
+    {
+      label: "💼 Loopbaan",
+      tools: [
+        {
+          name: "Vacaturezoeker",
+          description: "Plak je CV of profiel en vind actuele freelance & contract vacatures in NL, remote en internationaal.",
+          href: "/tools/vacancy-finder",
+          credits: 1,
+          icon: "🔍",
+          color: "from-green-500 to-teal-500",
+          bg: "bg-green-50",
+        },
+        {
+          name: "CV Builder",
+          description: "Upload je CV als PDF en kies uit 6 templates — compact, uitgebreid of gericht op een vacature.",
+          href: "/tools/cv-builder",
+          credits: 2,
+          icon: "📋",
+          color: "from-rose-500 to-pink-500",
+          bg: "bg-rose-50",
+        },
+      ],
+    },
+    {
+      label: "🏠 Privé",
+      tools: [
+        {
+          name: "Weekmenu Planner",
+          description: "Geef je voorkeuren op en ontvang een weekmenu voor 7 avondmaaltijden met boodschappenlijst.",
+          href: "/tools/dinner-planner",
+          credits: 1,
+          icon: "🍽️",
+          color: "from-orange-400 to-pink-500",
+          bg: "bg-orange-50",
+        },
+        ...(process.env.MIJN_DOSSIER_ENABLED === "true" ? [{
+          name: "MijnDossier",
+          description: "Upload een scan of foto van een brief. AI analyseert het document en plaatst het automatisch in de juiste map op jouw computer.",
+          href: "/tools/mijn-dossier",
+          credits: 1,
+          icon: "📬",
+          color: "from-sky-500 to-blue-600",
+          bg: "bg-sky-50",
+        }] : []),
+      ],
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
