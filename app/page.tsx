@@ -280,6 +280,7 @@ export default async function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center gap-3">
               <p>Resultaten worden gegenereerd door AI · Verantwoordelijkheid voor gebruik ligt bij de gebruiker</p>
               <Link href="/disclaimer" className="hover:text-gray-600 underline underline-offset-2 whitespace-nowrap">Meer info</Link>
+            <Link href="/privacy" className="hover:text-gray-600 underline underline-offset-2 whitespace-nowrap">Privacyverklaring</Link>
             </div>
             <p>© {new Date().getFullYear()} TimeSaverTools · Alle rechten voorbehouden</p>
           </div>
