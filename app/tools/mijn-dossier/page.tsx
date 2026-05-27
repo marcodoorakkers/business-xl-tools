@@ -244,6 +244,34 @@ export default function BriefArchiefPage() {
     });
   }
 
+  async function imagesToPdf(imageFiles: File[], name: string): Promise<File> {
+    const { jsPDF } = await import("jspdf");
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const PW = 210, PH = 297;
+    for (let i = 0; i < imageFiles.length; i++) {
+      if (i > 0) pdf.addPage();
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target!.result as string);
+        reader.readAsDataURL(imageFiles[i]);
+      });
+      const dims = await new Promise<{ w: number; h: number }>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+        img.onerror = reject;
+        img.src = dataUrl;
+      });
+      const iR = dims.w / dims.h;
+      const pR = PW / PH;
+      let drawW = PW, drawH = PH;
+      if (iR > pR) drawH = PW / iR;
+      else drawW = PH * iR;
+      pdf.addImage(dataUrl, "JPEG", (PW - drawW) / 2, (PH - drawH) / 2, drawW, drawH);
+    }
+    const blob = pdf.output("blob");
+    return new File([blob], `${name}.pdf`, { type: "application/pdf" });
+  }
+
   const addFile = useCallback((f: File) => {
     const isPdf = f.type === "application/pdf";
     if (f.type.startsWith("image/")) {
@@ -327,29 +355,22 @@ export default function BriefArchiefPage() {
       : "/api/tools/mijn-dossier/onedrive/upload";
 
     try {
-      const filesToUpload = files.map((f, i) => ({
-        file: f,
-        name: files.length === 1 ? bestandsnaam : `${bestandsnaam}_p${i + 1}`,
-      }));
+      const compressed = await Promise.all(files.map(compressImage));
+      const fileToUpload = files.length > 1
+        ? await imagesToPdf(compressed, bestandsnaam)
+        : compressed[0];
 
-      let lastPath = "";
-      let lastUrl: string | null = null;
+      const fd = new FormData();
+      fd.append("file", fileToUpload);
+      fd.append("familyMember", gezinslid);
+      fd.append("mappad", mappad);
+      fd.append("bestandsnaam", bestandsnaam);
+      const res = await fetch(endpoint, { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload mislukt");
 
-      for (const { file, name } of filesToUpload) {
-        const fd = new FormData();
-        fd.append("file", file);
-        fd.append("familyMember", gezinslid);
-        fd.append("mappad", mappad);
-        fd.append("bestandsnaam", name);
-        const res = await fetch(endpoint, { method: "POST", body: fd });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "Upload mislukt");
-        lastPath = data.path;
-        lastUrl = data.webUrl || null;
-      }
-
-      setSavedPath(files.length > 1 ? `${mappad} (${files.length} pagina's opgeslagen)` : lastPath);
-      setSavedUrl(lastUrl);
+      setSavedPath(data.path);
+      setSavedUrl(data.webUrl || null);
       setStep("done");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Upload mislukt");
@@ -361,17 +382,19 @@ export default function BriefArchiefPage() {
     if (!files.length || !analysis) return;
     setStep("saving");
 
-    if (!fsApiSupported) {
-      const filesToSave = files.map((f, i) => {
-        const ext = f.name.includes(".") ? "." + f.name.split(".").pop() : "";
-        const name = files.length === 1 ? `${bestandsnaam}${ext}` : `${bestandsnaam}_p${i + 1}${ext}`;
-        return new File([f], name, { type: f.type });
-      });
+    const compressed = await Promise.all(files.map(compressImage));
+    const fileToSave = files.length > 1
+      ? await imagesToPdf(compressed, bestandsnaam)
+      : compressed[0];
+    const ext = files.length > 1 ? ".pdf" : (fileToSave.type === "image/jpeg" ? ".jpg" : "." + (files[0].name.split(".").pop() ?? "jpg"));
+    const fullName = `${bestandsnaam}${ext}`;
+    const namedFile = new File([fileToSave], fullName, { type: fileToSave.type });
 
-      if (shareApiSupported && navigator.canShare?.({ files: filesToSave })) {
+    if (!fsApiSupported) {
+      if (shareApiSupported && navigator.canShare?.({ files: [namedFile] })) {
         try {
-          await navigator.share({ files: filesToSave, title: filesToSave[0].name });
-          setSavedPath(`${mappad}/${filesToSave[0].name}`);
+          await navigator.share({ files: [namedFile], title: fullName });
+          setSavedPath(`${mappad}/${fullName}`);
           setSavedUrl(null);
           setStep("done");
         } catch (err: unknown) {
@@ -383,15 +406,13 @@ export default function BriefArchiefPage() {
           }
         }
       } else {
-        for (const f of filesToSave) {
-          const url = URL.createObjectURL(f);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = f.name;
-          a.click();
-          URL.revokeObjectURL(url);
-        }
-        setSavedPath(`${mappad} (${filesToSave.length > 1 ? filesToSave.length + " bestanden gedownload" : filesToSave[0].name + " gedownload"})`);
+        const url = URL.createObjectURL(namedFile);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fullName;
+        a.click();
+        URL.revokeObjectURL(url);
+        setSavedPath(`${mappad}/${fullName} (gedownload)`);
         setSavedUrl(null);
         setStep("done");
       }
@@ -411,14 +432,8 @@ export default function BriefArchiefPage() {
     }
 
     try {
-      let lastPath = "";
-      for (let i = 0; i < files.length; i++) {
-        const f = files[i];
-        const ext = f.name.includes(".") ? "." + f.name.split(".").pop() : "";
-        const name = files.length === 1 ? bestandsnaam : `${bestandsnaam}_p${i + 1}`;
-        lastPath = await saveToArchive(handle, mappad, name, f, ext);
-      }
-      setSavedPath(files.length > 1 ? `${mappad} (${files.length} pagina's opgeslagen)` : lastPath);
+      const savedPath = await saveToArchive(handle, mappad, bestandsnaam, fileToSave, ext);
+      setSavedPath(savedPath);
       setSavedUrl(null);
       setStep("done");
     } catch (err: unknown) {
@@ -445,7 +460,7 @@ export default function BriefArchiefPage() {
   }
 
   const docIcon = analysis ? (DOC_ICONS[analysis.type?.toLowerCase()] ?? "📄") : "📄";
-  const ext = files[0]?.name.includes(".") ? "." + files[0].name.split(".").pop() : "";
+  const ext = files.length > 1 ? ".pdf" : (files[0]?.name.includes(".") ? "." + files[0].name.split(".").pop() : "");
   const cloudPath = cloudConnected
     ? [effectiveArchiveRoot, gezinslid, mappad, bestandsnaam ? `${bestandsnaam}${ext}` : ""]
         .filter(Boolean)
@@ -745,7 +760,9 @@ export default function BriefArchiefPage() {
                   placeholder="bijv. 2024-03-15_factuur_belastingdienst"
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Extensie ({files[0]?.name.split(".").pop()}) wordt automatisch toegevoegd.
+                  {files.length > 1
+                    ? "Meerdere pagina's worden samengevoegd als één PDF."
+                    : `Extensie (.${files[0]?.name.split(".").pop() ?? "jpg"}) wordt automatisch toegevoegd.`}
                 </p>
               </div>
 
