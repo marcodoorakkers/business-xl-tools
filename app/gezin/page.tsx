@@ -107,9 +107,14 @@ export default function GezinLandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-amber-100 py-6 text-center text-xs text-gray-400">
-        © {new Date().getFullYear()} NooitMeerPostKwijt &nbsp;·&nbsp;
-        <span>Een product van Business XL</span>
+      <footer className="border-t border-amber-100 py-6 text-center text-xs text-gray-400 space-x-3">
+        <span>© {new Date().getFullYear()} NooitMeerPostKwijt · Business XL · KvK 50418041</span>
+        <span>·</span>
+        <Link href="/privacy" className="hover:text-gray-600 underline">Privacyverklaring</Link>
+        <span>·</span>
+        <Link href="/disclaimer" className="hover:text-gray-600 underline">Disclaimer</Link>
+        <span>·</span>
+        <a href="mailto:info@nooitmeerpostkwijt.nl" className="hover:text-gray-600 underline">Contact</a>
       </footer>
     </div>
   );
