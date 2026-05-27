@@ -710,7 +710,7 @@ export default function BriefArchiefPage() {
                   placeholder="bijv. 2024-03-15_factuur_belastingdienst"
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Extensie ({file?.name.split(".").pop()}) wordt automatisch toegevoegd.
+                  Extensie ({files[0]?.name.split(".").pop()}) wordt automatisch toegevoegd.
                 </p>
               </div>
 
