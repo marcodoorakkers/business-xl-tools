@@ -511,7 +511,7 @@ export default function BriefArchiefPage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
               className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) addFile(f); }}
             />
@@ -565,7 +565,7 @@ export default function BriefArchiefPage() {
             <input
               ref={pageInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/heic"
+              accept="image/jpeg,image/png,image/webp"
               className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) addFile(f); if (pageInputRef.current) pageInputRef.current.value = ""; }}
             />

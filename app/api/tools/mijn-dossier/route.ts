@@ -41,13 +41,26 @@ export async function POST(req: NextRequest) {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   type ImageMediaType = "image/jpeg" | "image/png" | "image/gif" | "image/webp";
 
+  // Blokkeer HEIC/HEIF — Claude ondersteunt dit formaat niet
+  const unsupported = uploadedFiles.find(f => f.type === "image/heic" || f.type === "image/heif");
+  if (unsupported) {
+    return NextResponse.json(
+      { error: "HEIC/HEIF-foto's worden niet ondersteund. Ga op je iPhone naar Instellingen → Camera → Formaten en kies 'Meest Compatible', dan opnieuw proberen." },
+      { status: 415 }
+    );
+  }
+
   const contentBlocks = await Promise.all(uploadedFiles.map(async (file) => {
     const buffer = Buffer.from(await file.arrayBuffer());
     const base64 = buffer.toString("base64");
     const isPdf = file.type === "application/pdf";
+    const supportedImageTypes: ImageMediaType[] = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    const mediaType: ImageMediaType = supportedImageTypes.includes(file.type as ImageMediaType)
+      ? (file.type as ImageMediaType)
+      : "image/jpeg";
     return isPdf
       ? { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data: base64 } }
-      : { type: "image" as const, source: { type: "base64" as const, media_type: (file.type || "image/jpeg") as ImageMediaType, data: base64 } };
+      : { type: "image" as const, source: { type: "base64" as const, media_type: mediaType, data: base64 } };
   }));
 
   const familyInstruction =
@@ -57,17 +70,19 @@ export async function POST(req: NextRequest) {
 
   const pageNote = uploadedFiles.length > 1 ? `\n\nDit document bestaat uit ${uploadedFiles.length} pagina's (hierboven afgebeeld). Analyseer het als één geheel document.` : "";
 
-  const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 1024,
-    messages: [
-      {
-        role: "user",
-        content: [
-          ...contentBlocks,
-          {
-            type: "text",
-            text: `Analyseer dit document en geef ALLEEN een geldig JSON object terug, zonder uitleg of markdown.${pageNote}
+  let message;
+  try {
+    message = await anthropic.messages.create({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1024,
+      messages: [
+        {
+          role: "user",
+          content: [
+            ...contentBlocks,
+            {
+              type: "text",
+              text: `Analyseer dit document en geef ALLEEN een geldig JSON object terug, zonder uitleg of markdown.${pageNote}
 
 Formaat:
 {
@@ -79,11 +94,15 @@ Formaat:
   "bestandsnaam": "bestandsnaam zonder extensie, formaat: YYYY-MM-DD_onderwerp_afzender (alles lowercase, spaties als koppelteken)",
   "samenvatting": "één zin die het document beschrijft"
 }${familyInstruction}`,
-          },
-        ],
-      },
-    ],
-  });
+            },
+          ],
+        },
+      ],
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Onbekende fout";
+    return NextResponse.json({ error: `AI-analyse mislukt: ${msg}` }, { status: 500 });
+  }
 
   const raw = message.content[0].type === "text" ? message.content[0].text : "";
 
