@@ -19,6 +19,9 @@ interface Analysis {
   bestandsnaam: string;
   samenvatting: string;
   gezinslid?: string | null;
+  actie?: string | null;
+  actie_deadline?: string | null;
+  actie_type?: string | null;
 }
 
 const DOC_ICONS: Record<string, string> = {
@@ -123,6 +126,7 @@ export default function BriefArchiefPage() {
   const [storagePreference, setStoragePreference] = useState<StorageOption>("local");
   const [selectedStorage, setSelectedStorage] = useState<StorageOption>("local");
   const [familyMembers, setFamilyMembers] = useState<string[]>([]);
+  const [includeActie, setIncludeActie] = useState(true);
   const [folderStatus, setFolderStatus] = useState<FolderStatus>("idle");
   const [folderCheckPath, setFolderCheckPath] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -346,6 +350,24 @@ export default function BriefArchiefPage() {
     }
   }
 
+  async function saveActie() {
+    if (!analysis?.actie || !includeActie) return;
+    try {
+      await fetch("/api/tools/mijn-dossier/acties", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          actie: analysis.actie,
+          deadline: analysis.actie_deadline ?? null,
+          actie_type: analysis.actie_type ?? null,
+          document_naam: bestandsnaam,
+          afzender: analysis.afzender,
+          mappad,
+        }),
+      });
+    } catch { /* Silently fail — blokkeer het opslaan niet */ }
+  }
+
   async function handleUploadCloud() {
     if (!files.length || !analysis) return;
     setStep("saving");
@@ -371,6 +393,7 @@ export default function BriefArchiefPage() {
 
       setSavedPath(data.path);
       setSavedUrl(data.webUrl || null);
+      await saveActie();
       setStep("done");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Upload mislukt");
@@ -396,6 +419,7 @@ export default function BriefArchiefPage() {
           await navigator.share({ files: [namedFile], title: fullName });
           setSavedPath(`${mappad}/${fullName}`);
           setSavedUrl(null);
+          await saveActie();
           setStep("done");
         } catch (err: unknown) {
           if (err instanceof Error && err.name !== "AbortError") {
@@ -414,6 +438,7 @@ export default function BriefArchiefPage() {
         URL.revokeObjectURL(url);
         setSavedPath(`${mappad}/${fullName} (gedownload)`);
         setSavedUrl(null);
+        await saveActie();
         setStep("done");
       }
       return;
@@ -435,6 +460,7 @@ export default function BriefArchiefPage() {
       const savedPath = await saveToArchive(handle, mappad, bestandsnaam, fileToSave, ext);
       setSavedPath(savedPath);
       setSavedUrl(null);
+      await saveActie();
       setStep("done");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Opslaan mislukt");
@@ -453,6 +479,7 @@ export default function BriefArchiefPage() {
     setSavedPath("");
     setSavedUrl(null);
     setErrorMsg("");
+    setIncludeActie(true);
     setFolderStatus("idle");
     setFolderCheckPath("");
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -497,11 +524,20 @@ export default function BriefArchiefPage() {
               Upload een scan of foto van een brief. AI analyseert het document en plaatst het in de juiste map.
             </p>
           </div>
-          <Link
-            href="/tools/mijn-dossier/instellingen"
-            className="shrink-0 ml-4 text-gray-400 hover:text-gray-700 transition-colors"
-            title="Instellingen"
-          >
+          <div className="flex items-center gap-3 shrink-0 ml-4">
+            <Link
+              href="/tools/mijn-dossier/acties"
+              className="text-gray-400 hover:text-gray-700 transition-colors text-sm font-medium flex items-center gap-1"
+              title="Acties"
+            >
+              <span>📋</span>
+              <span className="hidden sm:inline">Acties</span>
+            </Link>
+            <Link
+              href="/tools/mijn-dossier/instellingen"
+              className="text-gray-400 hover:text-gray-700 transition-colors"
+              title="Instellingen"
+            >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fillRule="evenodd"
@@ -510,6 +546,7 @@ export default function BriefArchiefPage() {
               />
             </svg>
           </Link>
+          </div>
         </div>
 
         {fsApiSupported && !oneDriveConnected && !dropboxConnected && (
@@ -692,6 +729,33 @@ export default function BriefArchiefPage() {
                 </div>
               </div>
             </div>
+
+            {analysis.actie && (
+              <div className={`border rounded-3xl p-5 flex items-start gap-4 ${includeActie ? "bg-amber-50 border-amber-200" : "bg-gray-50 border-gray-200 opacity-60"}`}>
+                <span className="text-2xl shrink-0 mt-0.5">
+                  {analysis.actie_type === "betaling" ? "💶" : analysis.actie_type === "reageren" ? "✏️" : analysis.actie_type === "aanvragen" ? "📋" : analysis.actie_type === "registreren" ? "📝" : "📌"}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-0.5">Actie gevonden</p>
+                  <p className="text-sm font-medium text-gray-900">{analysis.actie}</p>
+                  {analysis.actie_deadline && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Vóór {new Date(analysis.actie_deadline).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => setIncludeActie(v => !v)}
+                  className={`shrink-0 text-xs font-medium px-3 py-1.5 rounded-xl border transition-colors ${
+                    includeActie
+                      ? "bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200"
+                      : "bg-white border-gray-200 text-gray-500 hover:bg-gray-100"
+                  }`}
+                >
+                  {includeActie ? "Bijhouden ✓" : "Niet bijhouden"}
+                </button>
+              </div>
+            )}
 
             <div className="bg-white border border-gray-200 rounded-3xl p-6 space-y-4">
               <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Opslaan als</h2>
