@@ -211,6 +211,39 @@ export default function BriefArchiefPage() {
     };
   }, [mappad, gezinslid, step, selectedStorage, cloudConnected]);
 
+  async function compressImage(file: File): Promise<File> {
+    // PDFs niet aanraken
+    if (file.type === "application/pdf") return file;
+    // Converteer naar JPEG via canvas — lost HEIC op en verkleint de bestandsgrootte
+    return new Promise((resolve) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const maxSize = 1920;
+        let { width, height } = img;
+        if (width > maxSize || height > maxSize) {
+          if (width >= height) { height = Math.round(height * maxSize / width); width = maxSize; }
+          else { width = Math.round(width * maxSize / height); height = maxSize; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d")!.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const name = file.name.replace(/\.[^.]+$/, ".jpg");
+            resolve(new File([blob], name, { type: "image/jpeg" }));
+          } else {
+            resolve(file);
+          }
+        }, "image/jpeg", 0.85);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
+  }
+
   const addFile = useCallback((f: File) => {
     const isPdf = f.type === "application/pdf";
     if (f.type.startsWith("image/")) {
@@ -244,9 +277,11 @@ export default function BriefArchiefPage() {
   async function analyzeFiles(fs: File[]) {
     setStep("analyzing");
     setErrorMsg("");
+    // Comprimeer afbeeldingen naar JPEG (max 1920px, 85% kwaliteit) — lost HEIC en te-grote-bestanden op
+    const compressed = await Promise.all(fs.map(compressImage));
     const formData = new FormData();
-    fs.forEach((f, i) => formData.append(`file_${i}`, f));
-    formData.append("file_count", String(fs.length));
+    compressed.forEach((f, i) => formData.append(`file_${i}`, f));
+    formData.append("file_count", String(compressed.length));
     if (familyMembers.length > 0) {
       formData.append("family_members", JSON.stringify(familyMembers));
     }
