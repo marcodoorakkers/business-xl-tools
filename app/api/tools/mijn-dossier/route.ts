@@ -14,49 +14,48 @@ export async function POST(req: NextRequest) {
   if (!profile || profile.credits < 1) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
 
   const formData = await req.formData();
-  const file = formData.get("file") as File | null;
-  if (!file) return NextResponse.json({ error: "Geen bestand meegegeven" }, { status: 400 });
 
   const familyMembersRaw = formData.get("family_members") as string | null;
   let familyMemberNames: string[] = [];
   if (familyMembersRaw) {
-    try {
-      familyMemberNames = JSON.parse(familyMembersRaw);
-    } catch {
-      familyMemberNames = [];
-    }
+    try { familyMemberNames = JSON.parse(familyMembersRaw); } catch { familyMemberNames = []; }
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const base64 = buffer.toString("base64");
+  // Ondersteuning voor meerdere bestanden (file_0, file_1, ...) én enkel bestand (file)
+  const fileCountRaw = formData.get("file_count");
+  const fileCount = fileCountRaw ? parseInt(String(fileCountRaw)) : 1;
+
+  const uploadedFiles: File[] = [];
+  if (fileCount > 1 || formData.get("file_0")) {
+    for (let i = 0; i < fileCount; i++) {
+      const f = formData.get(`file_${i}`) as File | null;
+      if (f) uploadedFiles.push(f);
+    }
+  } else {
+    const f = formData.get("file") as File | null;
+    if (f) uploadedFiles.push(f);
+  }
+
+  if (!uploadedFiles.length) return NextResponse.json({ error: "Geen bestand meegegeven" }, { status: 400 });
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
   type ImageMediaType = "image/jpeg" | "image/png" | "image/gif" | "image/webp";
-  const isPdf = file.type === "application/pdf";
 
-  const contentBlock = isPdf
-    ? {
-        type: "document" as const,
-        source: {
-          type: "base64" as const,
-          media_type: "application/pdf" as const,
-          data: base64,
-        },
-      }
-    : {
-        type: "image" as const,
-        source: {
-          type: "base64" as const,
-          media_type: (file.type || "image/jpeg") as ImageMediaType,
-          data: base64,
-        },
-      };
+  const contentBlocks = await Promise.all(uploadedFiles.map(async (file) => {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const base64 = buffer.toString("base64");
+    const isPdf = file.type === "application/pdf";
+    return isPdf
+      ? { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data: base64 } }
+      : { type: "image" as const, source: { type: "base64" as const, media_type: (file.type || "image/jpeg") as ImageMediaType, data: base64 } };
+  }));
 
   const familyInstruction =
     familyMemberNames.length > 0
       ? `\n\nDe gezinsleden zijn: ${familyMemberNames.join(", ")}. Voeg een veld 'gezinslid' toe met de meest waarschijnlijke ontvanger op basis van de naam/adres op het document (of null als onduidelijk).`
       : "";
+
+  const pageNote = uploadedFiles.length > 1 ? `\n\nDit document bestaat uit ${uploadedFiles.length} pagina's (hierboven afgebeeld). Analyseer het als één geheel document.` : "";
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
@@ -65,10 +64,10 @@ export async function POST(req: NextRequest) {
       {
         role: "user",
         content: [
-          contentBlock,
+          ...contentBlocks,
           {
             type: "text",
-            text: `Analyseer dit document en geef ALLEEN een geldig JSON object terug, zonder uitleg of markdown.
+            text: `Analyseer dit document en geef ALLEEN een geldig JSON object terug, zonder uitleg of markdown.${pageNote}
 
 Formaat:
 {

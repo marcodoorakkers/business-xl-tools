@@ -6,7 +6,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import ToolNav from "@/components/ToolNav";
 
-type Step = "idle" | "analyzing" | "suggestion" | "saving" | "done" | "error";
+type Step = "idle" | "staging" | "analyzing" | "suggestion" | "saving" | "done" | "error";
 type FolderStatus = "idle" | "loading" | "exists" | "new";
 type StorageOption = "local" | "onedrive" | "dropbox";
 
@@ -103,8 +103,8 @@ async function saveToArchive(
 export default function BriefArchiefPage() {
   const [step, setStep] = useState<Step>("idle");
   const [dragOver, setDragOver] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [mappad, setMappad] = useState("");
   const [bestandsnaam, setBestandsnaam] = useState("");
@@ -126,6 +126,7 @@ export default function BriefArchiefPage() {
   const [folderStatus, setFolderStatus] = useState<FolderStatus>("idle");
   const [folderCheckPath, setFolderCheckPath] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pageInputRef = useRef<HTMLInputElement>(null);
   const folderCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -210,23 +211,42 @@ export default function BriefArchiefPage() {
     };
   }, [mappad, gezinslid, step, selectedStorage, cloudConnected]);
 
-  const handleFile = useCallback((f: File) => {
-    setFile(f);
+  const addFile = useCallback((f: File) => {
+    const isPdf = f.type === "application/pdf";
     if (f.type.startsWith("image/")) {
       const reader = new FileReader();
-      reader.onload = (e) => setPreview(e.target?.result as string);
+      reader.onload = (e) => {
+        setPreviews(prev => [...prev, e.target?.result as string]);
+      };
       reader.readAsDataURL(f);
     } else {
-      setPreview(null);
+      setPreviews(prev => [...prev, ""]);
     }
-    analyze(f);
+    setFiles(prev => {
+      const next = [...prev, f];
+      if (isPdf) {
+        // PDFs zijn al meerdere pagina's — direct analyseren
+        setTimeout(() => analyzeFiles(next), 0);
+      } else {
+        setStep("staging");
+      }
+      return next;
+    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function analyze(f: File) {
+  function removeFile(index: number) {
+    const next = files.filter((_, i) => i !== index);
+    setPreviews(prev => prev.filter((_, i) => i !== index));
+    setFiles(next);
+    if (next.length === 0) setStep("idle");
+  }
+
+  async function analyzeFiles(fs: File[]) {
     setStep("analyzing");
     setErrorMsg("");
     const formData = new FormData();
-    formData.append("file", f);
+    fs.forEach((f, i) => formData.append(`file_${i}`, f));
+    formData.append("file_count", String(fs.length));
     if (familyMembers.length > 0) {
       formData.append("family_members", JSON.stringify(familyMembers));
     }
@@ -264,25 +284,37 @@ export default function BriefArchiefPage() {
   }
 
   async function handleUploadCloud() {
-    if (!file || !analysis) return;
+    if (!files.length || !analysis) return;
     setStep("saving");
-
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("familyMember", gezinslid);
-    fd.append("mappad", mappad);
-    fd.append("bestandsnaam", bestandsnaam);
 
     const endpoint = selectedStorage === "dropbox"
       ? "/api/tools/mijn-dossier/dropbox/upload"
       : "/api/tools/mijn-dossier/onedrive/upload";
 
     try {
-      const res = await fetch(endpoint, { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Upload mislukt");
-      setSavedPath(data.path);
-      setSavedUrl(data.webUrl || null);
+      const filesToUpload = files.map((f, i) => ({
+        file: f,
+        name: files.length === 1 ? bestandsnaam : `${bestandsnaam}_p${i + 1}`,
+      }));
+
+      let lastPath = "";
+      let lastUrl: string | null = null;
+
+      for (const { file, name } of filesToUpload) {
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("familyMember", gezinslid);
+        fd.append("mappad", mappad);
+        fd.append("bestandsnaam", name);
+        const res = await fetch(endpoint, { method: "POST", body: fd });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Upload mislukt");
+        lastPath = data.path;
+        lastUrl = data.webUrl || null;
+      }
+
+      setSavedPath(files.length > 1 ? `${mappad} (${files.length} pagina's opgeslagen)` : lastPath);
+      setSavedUrl(lastUrl);
       setStep("done");
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : "Upload mislukt");
@@ -291,18 +323,20 @@ export default function BriefArchiefPage() {
   }
 
   async function handleSaveLocal() {
-    if (!file || !analysis) return;
+    if (!files.length || !analysis) return;
     setStep("saving");
 
     if (!fsApiSupported) {
-      const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
-      const fullName = `${bestandsnaam}${ext}`;
-      const shareFile = new File([file], fullName, { type: file.type });
+      const filesToSave = files.map((f, i) => {
+        const ext = f.name.includes(".") ? "." + f.name.split(".").pop() : "";
+        const name = files.length === 1 ? `${bestandsnaam}${ext}` : `${bestandsnaam}_p${i + 1}${ext}`;
+        return new File([f], name, { type: f.type });
+      });
 
-      if (shareApiSupported && navigator.canShare?.({ files: [shareFile] })) {
+      if (shareApiSupported && navigator.canShare?.({ files: filesToSave })) {
         try {
-          await navigator.share({ files: [shareFile], title: fullName });
-          setSavedPath(`${mappad}/${fullName}`);
+          await navigator.share({ files: filesToSave, title: filesToSave[0].name });
+          setSavedPath(`${mappad}/${filesToSave[0].name}`);
           setSavedUrl(null);
           setStep("done");
         } catch (err: unknown) {
@@ -314,13 +348,15 @@ export default function BriefArchiefPage() {
           }
         }
       } else {
-        const url = URL.createObjectURL(file);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = fullName;
-        a.click();
-        URL.revokeObjectURL(url);
-        setSavedPath(`${mappad}/${fullName} (gedownload)`);
+        for (const f of filesToSave) {
+          const url = URL.createObjectURL(f);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = f.name;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+        setSavedPath(`${mappad} (${filesToSave.length > 1 ? filesToSave.length + " bestanden gedownload" : filesToSave[0].name + " gedownload"})`);
         setSavedUrl(null);
         setStep("done");
       }
@@ -330,25 +366,24 @@ export default function BriefArchiefPage() {
     let handle = archiveHandle;
     if (!handle) {
       handle = await pickArchiveFolder();
-      if (!handle) {
-        setStep("suggestion");
-        return;
-      }
+      if (!handle) { setStep("suggestion"); return; }
     }
 
     const permitted = await verifyPermission(handle);
     if (!permitted) {
       handle = await pickArchiveFolder();
-      if (!handle) {
-        setStep("suggestion");
-        return;
-      }
+      if (!handle) { setStep("suggestion"); return; }
     }
 
     try {
-      const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
-      const path = await saveToArchive(handle, mappad, bestandsnaam, file, ext);
-      setSavedPath(path);
+      let lastPath = "";
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        const ext = f.name.includes(".") ? "." + f.name.split(".").pop() : "";
+        const name = files.length === 1 ? bestandsnaam : `${bestandsnaam}_p${i + 1}`;
+        lastPath = await saveToArchive(handle, mappad, name, f, ext);
+      }
+      setSavedPath(files.length > 1 ? `${mappad} (${files.length} pagina's opgeslagen)` : lastPath);
       setSavedUrl(null);
       setStep("done");
     } catch (err: unknown) {
@@ -359,8 +394,8 @@ export default function BriefArchiefPage() {
 
   function reset() {
     setStep("idle");
-    setFile(null);
-    setPreview(null);
+    setFiles([]);
+    setPreviews([]);
     setAnalysis(null);
     setMappad("");
     setBestandsnaam("");
@@ -371,10 +406,11 @@ export default function BriefArchiefPage() {
     setFolderStatus("idle");
     setFolderCheckPath("");
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (pageInputRef.current) pageInputRef.current.value = "";
   }
 
   const docIcon = analysis ? (DOC_ICONS[analysis.type?.toLowerCase()] ?? "📄") : "📄";
-  const ext = file?.name.includes(".") ? "." + file.name.split(".").pop() : "";
+  const ext = files[0]?.name.includes(".") ? "." + files[0].name.split(".").pop() : "";
   const cloudPath = cloudConnected
     ? [effectiveArchiveRoot, gezinslid, mappad, bestandsnaam ? `${bestandsnaam}${ext}` : ""]
         .filter(Boolean)
@@ -458,7 +494,7 @@ export default function BriefArchiefPage() {
               e.preventDefault();
               setDragOver(false);
               const f = e.dataTransfer.files[0];
-              if (f) handleFile(f);
+              if (f) addFile(f);
             }}
           >
             <div className="text-5xl mb-4">📬</div>
@@ -477,17 +513,96 @@ export default function BriefArchiefPage() {
               type="file"
               accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
               className="hidden"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) addFile(f); }}
             />
+          </div>
+        )}
+
+        {step === "staging" && (
+          <div className="bg-white border border-gray-200 rounded-3xl p-6 space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-bold text-gray-900">
+                {files.length === 1 ? "1 pagina" : `${files.length} pagina's`}
+              </h2>
+              <span className="text-xs text-gray-400">Voeg meer pagina's toe of analyseer direct</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              {files.map((f, i) => (
+                <div key={i} className="relative group">
+                  {previews[i] ? (
+                    <img
+                      src={previews[i]}
+                      alt={`Pagina ${i + 1}`}
+                      className="w-full aspect-[3/4] object-cover rounded-xl border border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-full aspect-[3/4] bg-gray-100 rounded-xl border border-gray-200 flex items-center justify-center text-3xl">
+                      📄
+                    </div>
+                  )}
+                  <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs rounded px-1.5 py-0.5">
+                    p{i + 1}
+                  </div>
+                  <button
+                    onClick={() => removeFile(i)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+
+              <button
+                onClick={() => pageInputRef.current?.click()}
+                className="w-full aspect-[3/4] border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-blue-400 hover:text-blue-500 transition-colors"
+              >
+                <span className="text-2xl mb-1">+</span>
+                <span className="text-xs">Pagina</span>
+              </button>
+            </div>
+
+            <input
+              ref={pageInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/heic"
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) addFile(f); if (pageInputRef.current) pageInputRef.current.value = ""; }}
+            />
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => analyzeFiles(files)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-2xl transition-colors"
+              >
+                Analyseren →
+              </button>
+              <button
+                onClick={reset}
+                className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium transition-colors"
+              >
+                Annuleren
+              </button>
+            </div>
           </div>
         )}
 
         {step === "analyzing" && (
           <div className="bg-white border border-gray-200 rounded-3xl p-10 text-center">
-            {preview && (
-              <img src={preview} alt="preview" className="max-h-40 mx-auto rounded-xl mb-6 object-contain shadow" />
-            )}
-            {!preview && (
+            {previews[0] ? (
+              <div className="flex gap-2 justify-center mb-6">
+                {previews.slice(0, 3).map((p, i) => p ? (
+                  <img key={i} src={p} alt={`p${i+1}`} className="h-24 rounded-lg object-cover shadow" />
+                ) : (
+                  <div key={i} className="h-24 w-16 bg-gray-100 rounded-lg flex items-center justify-center text-2xl shadow">📄</div>
+                ))}
+                {previews.length > 3 && (
+                  <div className="h-24 w-16 bg-gray-100 rounded-lg flex items-center justify-center text-sm text-gray-500 shadow">
+                    +{previews.length - 3}
+                  </div>
+                )}
+              </div>
+            ) : (
               <div className="w-16 h-16 mx-auto mb-6 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl">📄</div>
             )}
             <div className="inline-flex items-center gap-2 text-blue-600 font-medium">
@@ -495,7 +610,7 @@ export default function BriefArchiefPage() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
               </svg>
-              Document wordt geanalyseerd…
+              {files.length > 1 ? `${files.length} pagina's worden geanalyseerd…` : "Document wordt geanalyseerd…"}
             </div>
           </div>
         )}
@@ -504,8 +619,8 @@ export default function BriefArchiefPage() {
           <div className="space-y-4">
             <div className="bg-white border border-gray-200 rounded-3xl p-6">
               <div className="flex items-start gap-4">
-                {preview ? (
-                  <img src={preview} alt="preview" className="w-16 h-20 object-cover rounded-xl shadow shrink-0" />
+                {previews[0] ? (
+                  <img src={previews[0]} alt="preview" className="w-16 h-20 object-cover rounded-xl shadow shrink-0" />
                 ) : (
                   <div className="w-16 h-20 bg-gray-100 rounded-xl flex items-center justify-center text-3xl shrink-0">{docIcon}</div>
                 )}
