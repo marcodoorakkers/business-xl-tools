@@ -27,15 +27,51 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
-  const isProtected = request.nextUrl.pathname.startsWith("/dashboard") ||
-    request.nextUrl.pathname.startsWith("/tools") ||
-    request.nextUrl.pathname.startsWith("/account") ||
-    request.nextUrl.pathname.startsWith("/admin");
+  const hostname = request.nextUrl.hostname;
+  const isFamilySite =
+    hostname === "nooitmeerpostkwijt.nl" ||
+    hostname === "www.nooitmeerpostkwijt.nl";
+
+  const originalPath = request.nextUrl.pathname;
+  const isApiOrCallback =
+    originalPath.startsWith("/api") ||
+    originalPath.startsWith("/_next") ||
+    originalPath.startsWith("/auth/callback");
+
+  // Bereken het effectieve pad (met /gezin prefix voor familiedomein)
+  const needsRewrite = isFamilySite && !isApiOrCallback && !originalPath.startsWith("/gezin");
+  const effectivePath = needsRewrite
+    ? originalPath === "/" ? "/gezin" : `/gezin${originalPath}`
+    : originalPath;
+
+  // Familie auth-checks
+  const isGezinProtected =
+    effectivePath.startsWith("/gezin/dossier") ||
+    effectivePath.startsWith("/gezin/acties");
+  const isGezinAuthPage =
+    effectivePath.startsWith("/gezin/inloggen") ||
+    effectivePath.startsWith("/gezin/aanmelden");
+
+  if (isGezinProtected && !user) {
+    const redirectTo = isFamilySite ? "/inloggen" : "/gezin/inloggen";
+    return NextResponse.redirect(new URL(redirectTo, request.url));
+  }
+  if (isGezinAuthPage && user) {
+    const redirectTo = isFamilySite ? "/dossier" : "/gezin/dossier";
+    return NextResponse.redirect(new URL(redirectTo, request.url));
+  }
+
+  // Standaard timesavertools.nl auth-checks
+  const isAuthPage = originalPath.startsWith("/auth");
+  const isProtected =
+    originalPath.startsWith("/dashboard") ||
+    originalPath.startsWith("/tools") ||
+    originalPath.startsWith("/account") ||
+    originalPath.startsWith("/admin");
 
   const isMijnDossier =
-    request.nextUrl.pathname.startsWith("/tools/mijn-dossier") ||
-    request.nextUrl.pathname.startsWith("/api/tools/mijn-dossier");
+    originalPath.startsWith("/tools/mijn-dossier") ||
+    originalPath.startsWith("/api/tools/mijn-dossier");
 
   if (isMijnDossier && process.env.MIJN_DOSSIER_ENABLED !== "true") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -45,8 +81,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
-  if (user && isAuthPage && !request.nextUrl.pathname.startsWith("/auth/callback")) {
+  if (user && isAuthPage && !originalPath.startsWith("/auth/callback")) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  // Rewrite familiedomein transparant naar /gezin/*
+  if (needsRewrite) {
+    const url = request.nextUrl.clone();
+    url.pathname = effectivePath;
+    const rewriteRes = NextResponse.rewrite(url);
+    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
+      rewriteRes.cookies.set(name, value);
+    });
+    return rewriteRes;
   }
 
   return supabaseResponse;
