@@ -175,66 +175,98 @@ export default function ActiesPage() {
               return (
                 <div
                   key={action.id}
-                  className={`bg-white border rounded-2xl p-5 transition-opacity ${isUpdating ? "opacity-50" : ""}`}
+                  className={`bg-white border border-gray-200 rounded-2xl overflow-hidden transition-opacity ${isUpdating ? "opacity-50" : ""}`}
                 >
-                  <div className="flex items-start gap-4">
-                    <span className="text-2xl shrink-0 mt-0.5">{icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 text-sm leading-snug mb-1">{action.actie}</p>
-                      {action.afzender && (
-                        <p className="text-xs text-gray-500 mb-1">Van: {action.afzender}</p>
+                  {/* Gekleurde urgentie-balk bovenaan */}
+                  {filter === "open" && (
+                    <div className={`h-1.5 w-full ${
+                      dl.urgency === "overdue" || dl.urgency === "today" ? "bg-red-400" :
+                      dl.urgency === "soon" ? "bg-orange-400" : "bg-green-400"
+                    }`} />
+                  )}
+
+                  <div className="p-5">
+                    <div className="flex items-start gap-4">
+                      {/* Klikbare checkbox */}
+                      {filter === "open" ? (
+                        <button
+                          onClick={() => updateStatus(action.id, "gedaan")}
+                          disabled={isUpdating}
+                          title="Markeer als gedaan"
+                          className="mt-0.5 w-6 h-6 rounded-full border-2 border-gray-300 hover:border-green-500 hover:bg-green-50 shrink-0 transition-colors"
+                        />
+                      ) : (
+                        <span className="text-xl shrink-0 mt-0.5">{icon}</span>
                       )}
-                      <div className="flex items-center gap-2 flex-wrap mt-2">
-                        {action.deadline && (
-                          <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${URGENCY_STYLES[dl.urgency]}`}>
-                            {dl.urgency === "overdue" ? "⚠️ " : dl.urgency === "today" ? "🔴 " : dl.urgency === "soon" ? "🟡 " : "🟢 "}
-                            {dl.label}
+
+                      <div className="flex-1 min-w-0">
+                        {/* Status badge */}
+                        {filter === "open" && (
+                          <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full mb-1.5 ${
+                            dl.urgency === "overdue" ? "bg-red-100 text-red-700" :
+                            dl.urgency === "today" ? "bg-red-100 text-red-700" :
+                            dl.urgency === "soon" ? "bg-orange-100 text-orange-700" :
+                            "bg-amber-100 text-amber-700"
+                          }`}>
+                            {dl.urgency === "overdue" ? "⚠️ Te laat" : "⏳ Te doen"}
                           </span>
                         )}
-                        {action.mappad && (
-                          <span className="text-xs text-gray-400 font-mono">{action.mappad}</span>
+
+                        <p className="font-semibold text-gray-900 text-sm leading-snug mb-1">{action.actie}</p>
+                        {action.afzender && (
+                          <p className="text-xs text-gray-500">Van: {action.afzender}</p>
                         )}
+                        <div className="flex items-center gap-2 flex-wrap mt-2">
+                          {action.deadline && (
+                            <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${URGENCY_STYLES[dl.urgency]}`}>
+                              {dl.label}
+                            </span>
+                          )}
+                          {action.mappad && (
+                            <span className="text-xs text-gray-400 font-mono">{action.mappad}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Acties knoppen */}
-                  {filter === "open" && (
-                    <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
-                      <button
-                        onClick={() => updateStatus(action.id, "gedaan")}
-                        disabled={isUpdating}
-                        className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold py-2 rounded-xl transition-colors"
-                      >
-                        Gedaan ✓
-                      </button>
-                      <button
-                        onClick={() => updateStatus(action.id, "overgeslagen")}
-                        disabled={isUpdating}
-                        className="flex-1 bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 text-xs font-medium py-2 rounded-xl transition-colors"
-                      >
-                        Overslaan
-                      </button>
-                    </div>
-                  )}
-                  {filter !== "open" && (
-                    <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
-                      <button
-                        onClick={() => updateStatus(action.id, "open")}
-                        disabled={isUpdating}
-                        className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
-                      >
-                        Heropen
-                      </button>
-                      <button
-                        onClick={() => deleteAction(action.id)}
-                        disabled={isUpdating}
-                        className="text-xs text-red-400 hover:text-red-600 font-medium transition-colors ml-auto"
-                      >
-                        Verwijderen
-                      </button>
-                    </div>
-                  )}
+                    {/* Acties */}
+                    {filter === "open" && (
+                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
+                        <button
+                          onClick={() => updateStatus(action.id, "gedaan")}
+                          disabled={isUpdating}
+                          className="flex items-center gap-2 bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-colors"
+                        >
+                          <span className="text-base">✓</span> Markeer als gedaan
+                        </button>
+                        <button
+                          onClick={() => updateStatus(action.id, "overgeslagen")}
+                          disabled={isUpdating}
+                          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          Overslaan
+                        </button>
+                      </div>
+                    )}
+                    {filter !== "open" && (
+                      <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
+                        <button
+                          onClick={() => updateStatus(action.id, "open")}
+                          disabled={isUpdating}
+                          className="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                        >
+                          Heropen
+                        </button>
+                        <button
+                          onClick={() => deleteAction(action.id)}
+                          disabled={isUpdating}
+                          className="text-xs text-red-400 hover:text-red-600 font-medium transition-colors ml-auto"
+                        >
+                          Verwijderen
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
