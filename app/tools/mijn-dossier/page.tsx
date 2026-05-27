@@ -353,7 +353,7 @@ export default function BriefArchiefPage() {
   async function saveActie() {
     if (!analysis?.actie || !includeActie) return;
     try {
-      await fetch("/api/tools/mijn-dossier/acties", {
+      const res = await fetch("/api/tools/mijn-dossier/acties", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -365,7 +365,13 @@ export default function BriefArchiefPage() {
           mappad,
         }),
       });
-    } catch { /* Silently fail — blokkeer het opslaan niet */ }
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        console.error("Actie opslaan mislukt:", d.error ?? res.status);
+      }
+    } catch (err) {
+      console.error("Actie opslaan mislukt:", err);
+    }
   }
 
   async function handleUploadCloud() {

@@ -45,16 +45,24 @@ const URGENCY_STYLES = {
 export default function ActiesPage() {
   const [actions, setActions] = useState<DocumentAction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"open" | "gedaan" | "overgeslagen">("open");
   const [updating, setUpdating] = useState<string | null>(null);
 
   const loadActions = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await fetch("/api/tools/mijn-dossier/acties");
       const data = await res.json();
-      setActions(Array.isArray(data) ? data : []);
-    } catch {
+      if (!res.ok) {
+        setLoadError(data.error ?? `Fout ${res.status}`);
+        setActions([]);
+      } else {
+        setActions(Array.isArray(data) ? data : []);
+      }
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : "Onbekende fout");
       setActions([]);
     } finally {
       setLoading(false);
@@ -129,6 +137,13 @@ export default function ActiesPage() {
             </button>
           ))}
         </div>
+
+        {/* Foutmelding */}
+        {loadError && (
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-2xl px-4 py-3 text-sm text-red-700">
+            Fout bij laden: {loadError}
+          </div>
+        )}
 
         {/* Acties lijst */}
         {loading ? (
