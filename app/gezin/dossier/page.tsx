@@ -208,6 +208,30 @@ export default function GezinDossierPage() {
     }
   }
 
+  async function saveDocumentMetadata(fileUrl?: string, storage?: string) {
+    if (!analysis) return;
+    try {
+      await fetch("/api/tools/mijn-dossier/documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bestandsnaam,
+          type: analysis.type ?? null,
+          afzender: analysis.afzender ?? null,
+          datum: analysis.datum ?? null,
+          onderwerp: analysis.onderwerp ?? null,
+          mappad: mappad ?? null,
+          gezinslid: gezinslid || null,
+          samenvatting: analysis.samenvatting ?? null,
+          file_url: fileUrl ?? null,
+          storage: storage ?? "local",
+        }),
+      });
+    } catch {
+      // Stil falen — metadata opslaan is niet kritiek
+    }
+  }
+
   async function handleSaveCloud() {
     if (!analysis) return;
     setStep("saving");
@@ -235,6 +259,7 @@ export default function GezinDossierPage() {
     if (data.error) { setErrorMsg(data.error); setStep("error"); return; }
 
     if (includeActie && analysis.actie) await saveActie(analysis);
+    await saveDocumentMetadata(data.webUrl, storagePreference);
     setSavedInfo({ pad: data.path ?? mappad, url: data.webUrl });
     setStep("done");
   }
@@ -261,6 +286,7 @@ export default function GezinDossierPage() {
     }
 
     if (includeActie && analysis.actie) await saveActie(analysis);
+    await saveDocumentMetadata(undefined, "local");
     setSavedInfo({ pad: mappad });
     setStep("done");
   }
@@ -283,6 +309,9 @@ export default function GezinDossierPage() {
           <div className="flex items-center gap-4">
             <Link href="/acties" className="text-sm text-amber-700 font-medium hover:text-amber-500 transition-colors">
               📋 Acties
+            </Link>
+            <Link href="/dossier/archief" className="text-sm text-amber-700 font-medium hover:text-amber-500 transition-colors">
+              🗂 Archief
             </Link>
             <Link href="/dossier/instellingen" className="text-gray-400 hover:text-gray-600 transition-colors">
               ⚙️

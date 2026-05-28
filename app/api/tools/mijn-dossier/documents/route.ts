@@ -1,0 +1,93 @@
+import { createClient } from "@/lib/supabase/server";
+import { NextRequest, NextResponse } from "next/server";
+
+// GET /api/tools/mijn-dossier/documents?q=...&gezinslid=...&type=...
+export async function GET(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  const q = searchParams.get("q")?.trim() ?? "";
+  const gezinslid = searchParams.get("gezinslid")?.trim() ?? "";
+  const type = searchParams.get("type")?.trim() ?? "";
+
+  let query = supabase
+    .from("documents")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (q) {
+    query = query.or(
+      `afzender.ilike.%${q}%,samenvatting.ilike.%${q}%,onderwerp.ilike.%${q}%,mappad.ilike.%${q}%,bestandsnaam.ilike.%${q}%`
+    );
+  }
+  if (gezinslid) {
+    query = query.eq("gezinslid", gezinslid);
+  }
+  if (type) {
+    query = query.eq("type", type);
+  }
+
+  const { data, error } = await query;
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ documents: data ?? [] });
+}
+
+// POST /api/tools/mijn-dossier/documents
+export async function POST(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+
+  const body = await req.json();
+  const { bestandsnaam, type, afzender, datum, onderwerp, mappad, gezinslid, samenvatting, file_url, storage } = body;
+
+  if (!bestandsnaam) return NextResponse.json({ error: "Bestandsnaam vereist" }, { status: 400 });
+
+  const { data, error } = await supabase
+    .from("documents")
+    .insert({
+      user_id: user.id,
+      bestandsnaam,
+      type: type ?? null,
+      afzender: afzender ?? null,
+      datum: datum ?? null,
+      onderwerp: onderwerp ?? null,
+      mappad: mappad ?? null,
+      gezinslid: gezinslid ?? null,
+      samenvatting: samenvatting ?? null,
+      file_url: file_url ?? null,
+      storage: storage ?? "local",
+    })
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ document: data });
+}
+
+// DELETE /api/tools/mijn-dossier/documents?id=...
+export async function DELETE(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "ID vereist" }, { status: 400 });
+
+  const { error } = await supabase
+    .from("documents")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ ok: true });
+}
