@@ -6,6 +6,7 @@ import DeleteAccountButton from "./DeleteAccountButton";
 import BuyCreditsButton from "./BuyCreditsButton";
 import SubscribeButton from "./SubscribeButton";
 import CancelSubscriptionButton from "./CancelSubscriptionButton";
+import ManageSubscriptionButton from "./ManageSubscriptionButton";
 
 const PACKAGES = [
   { name: "Starter", credits: 50, price: "€9,99", priceId: "price_1TZSta1ifGSUEPSdHvDnulnr", perCredit: "€0,20/credit" },
@@ -97,7 +98,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             {formattedPeriodEnd && (
               <p className="text-green-600 text-sm mt-1">Volgende verlenging: {formattedPeriodEnd}</p>
             )}
-            <CancelSubscriptionButton periodEnd={subscriptionPeriodEnd} />
+            <ManageSubscriptionButton />
           </div>
         )}
 

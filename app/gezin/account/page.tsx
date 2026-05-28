@@ -4,6 +4,7 @@ import Link from "next/link";
 import BuyCreditsButton from "@/app/account/BuyCreditsButton";
 import SubscribeButton from "@/app/account/SubscribeButton";
 import CancelSubscriptionButton from "@/app/account/CancelSubscriptionButton";
+import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
 
@@ -94,15 +95,15 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
 
         {subscriptionStatus === "active" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-green-600 font-bold">✓</span>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-green-600 font-bold text-lg">✓</span>
               <h2 className="font-bold text-green-800 text-lg">Maandelijks abonnement actief</h2>
             </div>
             <p className="text-green-700 text-sm">Je ontvangt elke maand 50 nieuwe scans.</p>
             {formattedPeriodEnd && (
               <p className="text-green-600 text-sm mt-1">Volgende verlenging: {formattedPeriodEnd}</p>
             )}
-            <CancelSubscriptionButton periodEnd={subscriptionPeriodEnd} />
+            <ManageSubscriptionButton />
           </div>
         )}
 
