@@ -10,6 +10,7 @@ const CREDIT_PACKAGES: Record<string, number> = {
 };
 
 export async function POST(req: NextRequest) {
+  try {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -84,4 +85,10 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ url: session.url });
+
+  } catch (err) {
+    console.error("Checkout session error:", err);
+    const msg = err instanceof Error ? err.message : "Onbekende fout";
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
