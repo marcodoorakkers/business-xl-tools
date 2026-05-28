@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "NooitMeerPostKwijt — Nooit meer een brief mislopen",
-  description: "Maak een foto van jullie post. AI analyseert het document, slaat het op en houdt acties bij. Voor het hele gezin.",
+  description: "Maak een foto van jullie post. NooitMeerPostKwijt analyseert het document en houdt acties bij. Voor het hele gezin.",
 };
 
 export default function GezinLandingPage() {
@@ -32,7 +32,7 @@ export default function GezinLandingPage() {
             Nooit meer een brief kwijt
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed">
-            Maak een foto van jullie post. AI leest het document, herkent wat er moet gebeuren en houdt de acties bij. Voor het hele gezin.
+            Maak een foto van jullie post. NooitMeerPostKwijt leest het document, herkent wat er moet gebeuren en houdt de acties bij. Voor het hele gezin.
           </p>
           <Link
             href="/aanmelden"
@@ -55,8 +55,8 @@ export default function GezinLandingPage() {
             {
               step: "2",
               icon: "🤖",
-              title: "AI analyseert",
-              desc: "AI herkent voor wie de brief is, wat het inhoudt en of er iets gedaan moet worden.",
+              title: "Slim analyseren",
+              desc: "NooitMeerPostKwijt herkent voor wie de brief is, wat het inhoudt en of er iets gedaan moet worden.",
             },
             {
               step: "3",
@@ -89,7 +89,7 @@ export default function GezinLandingPage() {
               </div>
             </div>
             {/* Arrow */}
-            <p className="text-center text-gray-400 text-sm my-3">↓ AI analyseert…</p>
+            <p className="text-center text-gray-400 text-sm my-3">↓ NooitMeerPostKwijt analyseert…</p>
             {/* Output */}
             <div className="bg-white border border-gray-200 rounded-xl p-4">
               <div className="flex flex-wrap gap-2 mb-3">
@@ -141,7 +141,7 @@ export default function GezinLandingPage() {
               <p className="text-xs text-gray-400 mb-5">10 gratis scans bij aanmelding</p>
               <ul className="space-y-1.5 text-sm text-gray-600 mb-6">
                 <li>✅ 10 scans</li>
-                <li>✅ AI-analyse</li>
+                <li>✅ Slimme analyse</li>
                 <li>✅ Acties bijhouden</li>
                 <li>✅ Opslaan in je eigen cloud</li>
               </ul>
@@ -200,7 +200,7 @@ export default function GezinLandingPage() {
           </p>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>✅ Jouw documenten worden <strong>niet op onze servers opgeslagen</strong> — jij bewaart ze in je eigen OneDrive of Dropbox</li>
-            <li>✅ De foto wordt alleen <strong>tijdelijk verwerkt</strong> door AI om te analyseren, daarna direct verwijderd</li>
+            <li>✅ De foto wordt alleen <strong>tijdelijk verwerkt</strong> voor analyse, daarna direct verwijderd</li>
             <li>✅ Alleen de analyse (categorie, acties, deadline) wordt opgeslagen — <strong>niet het document zelf</strong></li>
             <li>✅ Je kunt al je data op elk moment <strong>volledig verwijderen</strong></li>
           </ul>
