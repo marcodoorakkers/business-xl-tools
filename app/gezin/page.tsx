@@ -126,6 +126,72 @@ export default function GezinLandingPage() {
           </div>
         </div>
 
+        {/* Pricing */}
+        <div className="max-w-3xl mx-auto mb-12 text-center">
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Eenvoudige prijzen</h2>
+          <p className="text-gray-500 text-sm mb-8">Start gratis. Koop extra scans wanneer je ze nodig hebt. Geen abonnement, geen verrassingen.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+            {/* Gratis */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-7 text-left">
+              <p className="text-2xl mb-1">🆓</p>
+              <h3 className="font-bold text-gray-900 text-lg mb-0.5">Gratis</h3>
+              <p className="text-xs text-gray-400 mb-4">Probeer het uit</p>
+              <p className="text-4xl font-extrabold text-gray-900 mb-0.5">€0</p>
+              <p className="text-xs text-gray-400 mb-5">10 gratis scans bij aanmelding</p>
+              <ul className="space-y-1.5 text-sm text-gray-600 mb-6">
+                <li>✅ 10 scans</li>
+                <li>✅ AI-analyse</li>
+                <li>✅ Acties bijhouden</li>
+                <li>✅ Opslaan in cloud</li>
+              </ul>
+              <Link href="/aanmelden" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
+                Gratis beginnen
+              </Link>
+            </div>
+
+            {/* Gezin — featured */}
+            <div className="bg-white border-2 border-amber-400 rounded-2xl p-7 text-left relative shadow-md">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Meest gekozen</span>
+              <p className="text-2xl mb-1">👨‍👩‍👧‍👦</p>
+              <h3 className="font-bold text-gray-900 text-lg mb-0.5">Gezin</h3>
+              <p className="text-xs text-gray-400 mb-4">Voor een jaar post</p>
+              <p className="text-4xl font-extrabold text-gray-900 mb-0.5">€9,99</p>
+              <p className="text-xs text-gray-400 mb-5">50 scans · €0,20 per scan</p>
+              <ul className="space-y-1.5 text-sm text-gray-600 mb-6">
+                <li>✅ 50 scans</li>
+                <li>✅ Gezinsleden koppelen</li>
+                <li>✅ Acties bijhouden</li>
+                <li>✅ OneDrive &amp; Dropbox</li>
+              </ul>
+              <Link href="/aanmelden" className="block text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">
+                Kies Gezin
+              </Link>
+            </div>
+
+            {/* Veelgebruiker */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-7 text-left relative">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Beste prijs</span>
+              <p className="text-2xl mb-1">📦</p>
+              <h3 className="font-bold text-gray-900 text-lg mb-0.5">Veelgebruiker</h3>
+              <p className="text-xs text-gray-400 mb-4">Groot gezin of veel post</p>
+              <p className="text-4xl font-extrabold text-gray-900 mb-0.5">€29,99</p>
+              <p className="text-xs text-gray-400 mb-5">200 scans · €0,15 per scan</p>
+              <ul className="space-y-1.5 text-sm text-gray-600 mb-6">
+                <li>✅ 200 scans</li>
+                <li>✅ Gezinsleden koppelen</li>
+                <li>✅ Acties bijhouden</li>
+                <li>✅ OneDrive &amp; Dropbox</li>
+              </ul>
+              <Link href="/aanmelden" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
+                Kies Veelgebruiker
+              </Link>
+            </div>
+
+          </div>
+          <p className="text-xs text-gray-400 mt-5">Scans verlopen niet. Betaal via iDEAL, creditcard of Bancontact.</p>
+        </div>
+
         {/* Privacy */}
         <div className="max-w-2xl mx-auto mb-12 bg-blue-50 border border-blue-200 rounded-3xl p-8">
           <h2 className="text-xl font-extrabold text-gray-900 mb-3">🔒 Jouw post, alleen voor jou</h2>
