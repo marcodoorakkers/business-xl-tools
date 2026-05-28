@@ -284,7 +284,7 @@ export default function GezinDossierPage() {
             <Link href="/acties" className="text-sm text-amber-700 font-medium hover:text-amber-500 transition-colors">
               📋 Acties
             </Link>
-            <Link href="/tools/mijn-dossier/settings" className="text-gray-400 hover:text-gray-600 transition-colors">
+            <Link href="/dossier/instellingen" className="text-gray-400 hover:text-gray-600 transition-colors">
               ⚙️
             </Link>
             {credits !== null && (
@@ -339,7 +339,7 @@ export default function GezinDossierPage() {
             {familyMembers.length === 0 && (
               <div className="mt-4 bg-amber-100 rounded-2xl px-4 py-3 text-sm text-amber-800">
                 💡 <strong>Tip:</strong> Voeg gezinsleden toe in de{" "}
-                <Link href="/tools/mijn-dossier/settings" className="underline font-medium">instellingen</Link>{" "}
+                <Link href="/dossier/instellingen" className="underline font-medium">instellingen</Link>{" "}
                 zodat AI brieven automatisch aan het juiste gezinslid koppelt.
               </div>
             )}
@@ -505,7 +505,7 @@ export default function GezinDossierPage() {
               {!cloudConnected && (
                 <p className="text-center text-xs text-gray-400">
                   Verbind OneDrive of Dropbox in de{" "}
-                  <Link href="/tools/mijn-dossier/settings" className="underline text-amber-600">instellingen</Link>
+                  <Link href="/dossier/instellingen" className="underline text-amber-600">instellingen</Link>
                   {" "}voor automatisch opslaan.
                 </p>
               )}
