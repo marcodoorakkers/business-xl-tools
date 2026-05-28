@@ -164,7 +164,7 @@ export default function GezinLandingPage() {
                 <li>✅ Acties bijhouden</li>
                 <li>✅ OneDrive &amp; Dropbox</li>
               </ul>
-              <Link href="/aanmelden" className="block text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">
+              <Link href="/account" className="block text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">
                 Kies Gezin
               </Link>
             </div>
@@ -183,7 +183,7 @@ export default function GezinLandingPage() {
                 <li>✅ Acties bijhouden</li>
                 <li>✅ OneDrive &amp; Dropbox</li>
               </ul>
-              <Link href="/aanmelden" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
+              <Link href="/account" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
                 Kies Veelgebruiker
               </Link>
             </div>

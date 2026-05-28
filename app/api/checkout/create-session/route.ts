@@ -20,7 +20,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ongeldig pakket" }, { status: 400 });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://timesavertools.nl";
+  // Gebruik het domein van de aanvrager zodat na betaling teruggestuurd wordt naar de juiste site
+  const origin = req.headers.get("origin");
+  const baseUrl = origin ?? process.env.NEXT_PUBLIC_BASE_URL ?? "https://timesavertools.nl";
 
   // Handle Pro subscription
   if (priceId === process.env.STRIPE_PRO_PRICE_ID) {

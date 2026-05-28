@@ -47,7 +47,8 @@ export async function middleware(request: NextRequest) {
   // Familie auth-checks
   const isGezinProtected =
     effectivePath.startsWith("/gezin/dossier") ||
-    effectivePath.startsWith("/gezin/acties");
+    effectivePath.startsWith("/gezin/acties") ||
+    effectivePath.startsWith("/gezin/account");
   const isGezinAuthPage =
     effectivePath.startsWith("/gezin/inloggen") ||
     effectivePath.startsWith("/gezin/aanmelden");

@@ -1,0 +1,158 @@
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import BuyCreditsButton from "@/app/account/BuyCreditsButton";
+import SubscribeButton from "@/app/account/SubscribeButton";
+import CancelSubscriptionButton from "@/app/account/CancelSubscriptionButton";
+import ChangePasswordForm from "@/app/account/ChangePasswordForm";
+import DeleteAccountButton from "@/app/account/DeleteAccountButton";
+
+const PACKAGES = [
+  { name: "Gezin", credits: 50, price: "€9,99", priceId: "price_1TZSta1ifGSUEPSdHvDnulnr", perScan: "€0,20/scan" },
+  { name: "Veelgebruiker", credits: 200, price: "€29,99", priceId: "price_1TZSte1ifGSUEPSd9N8emyuz", perScan: "€0,15/scan" },
+];
+
+export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string; credits?: string }> }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/gezin/inloggen");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("credits, subscription_status, subscription_period_end")
+    .eq("id", user.id)
+    .single();
+
+  const credits = profile?.credits ?? 0;
+  const subscriptionStatus = profile?.subscription_status ?? null;
+  const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
+  const params = await searchParams;
+  const paymentStatus = params.payment;
+  const addedCredits = params.credits;
+  const proPriceId = process.env.STRIPE_PRO_PRICE_ID!;
+
+  const formattedPeriodEnd = subscriptionPeriodEnd
+    ? new Date(subscriptionPeriodEnd).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })
+    : null;
+
+  return (
+    <div className="min-h-screen bg-amber-50">
+      {/* Header */}
+      <header className="bg-white border-b border-amber-100 px-6 py-4">
+        <div className="max-w-lg mx-auto flex items-center justify-between">
+          <Link href="/" className="font-extrabold text-amber-700 text-lg">📬 NooitMeerPostKwijt</Link>
+          <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
+            ← Terug
+          </Link>
+        </div>
+      </header>
+
+      <main className="max-w-lg mx-auto px-6 py-8 flex flex-col gap-5">
+        <h1 className="text-2xl font-extrabold text-gray-900">Account</h1>
+
+        {/* Betaalfeedback */}
+        {paymentStatus === "success" && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
+            🎉 Betaling geslaagd! {addedCredits} scans zijn toegevoegd aan je account.
+          </div>
+        )}
+        {paymentStatus === "subscribed" && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
+            🎉 Abonnement gestart! 50 scans zijn toegevoegd.
+          </div>
+        )}
+        {paymentStatus === "cancelled" && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-yellow-700 text-sm font-medium">
+            Betaling geannuleerd. Je scans zijn niet gewijzigd.
+          </div>
+        )}
+
+        {/* Scans saldo */}
+        <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-white">
+          <p className="text-amber-100 text-sm mb-1">Jouw scans</p>
+          <p className="text-5xl font-extrabold">{credits}</p>
+          <p className="text-amber-100 text-sm mt-1">scans beschikbaar · verlopen nooit</p>
+        </div>
+
+        {/* Maandelijks abonnement */}
+        {!subscriptionStatus && (
+          <div className="bg-white border-2 border-amber-300 rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <span>⭐</span>
+              <h2 className="font-bold text-gray-900 text-lg">Maandelijks abonnement</h2>
+            </div>
+            <p className="text-gray-500 text-sm mb-4">50 scans per maand · automatisch verlengd · opzegbaar wanneer je wil</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-3xl font-extrabold text-gray-900">€4,99</span>
+                <span className="text-gray-400 text-sm ml-1">/maand</span>
+              </div>
+              <SubscribeButton priceId={proPriceId} />
+            </div>
+          </div>
+        )}
+
+        {subscriptionStatus === "active" && (
+          <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-green-600 font-bold">✓</span>
+              <h2 className="font-bold text-green-800 text-lg">Maandelijks abonnement actief</h2>
+            </div>
+            <p className="text-green-700 text-sm">Je ontvangt elke maand 50 nieuwe scans.</p>
+            {formattedPeriodEnd && (
+              <p className="text-green-600 text-sm mt-1">Volgende verlenging: {formattedPeriodEnd}</p>
+            )}
+            <CancelSubscriptionButton periodEnd={subscriptionPeriodEnd} />
+          </div>
+        )}
+
+        {subscriptionStatus === "cancelling" && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+            <h2 className="font-bold text-amber-800 text-lg mb-1">
+              Abonnement loopt af{formattedPeriodEnd ? ` op ${formattedPeriodEnd}` : ""}
+            </h2>
+            <p className="text-amber-700 text-sm">Je scans blijven gewoon staan.</p>
+          </div>
+        )}
+
+        {/* Scans kopen */}
+        <div className="bg-white rounded-2xl border border-amber-100 p-6">
+          <h2 className="font-semibold text-gray-900 mb-1">Scans kopen</h2>
+          <p className="text-sm text-gray-500 mb-5">Kies een pakket — scans verlopen nooit.</p>
+          <div className="flex flex-col gap-3">
+            {PACKAGES.map((pkg) => (
+              <div key={pkg.priceId} className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50 hover:bg-amber-50 transition-colors">
+                <div>
+                  <p className="font-semibold text-gray-900">{pkg.name}</p>
+                  <p className="text-sm text-gray-500">{pkg.credits} scans · {pkg.perScan}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="font-bold text-gray-900">{pkg.price}</span>
+                  <BuyCreditsButton priceId={pkg.priceId} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-gray-400 mt-4">Betalen via iDEAL, creditcard of Bancontact</p>
+        </div>
+
+        {/* Account info */}
+        <div className="bg-white rounded-2xl border border-amber-100 p-6">
+          <h2 className="font-semibold text-gray-900 mb-1">E-mailadres</h2>
+          <p className="text-sm text-gray-600">{user.email}</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-amber-100 p-6">
+          <h2 className="font-semibold text-gray-900 mb-4">Wachtwoord wijzigen</h2>
+          <ChangePasswordForm />
+        </div>
+
+        <div className="bg-white rounded-2xl border border-red-100 p-6">
+          <h2 className="font-semibold text-red-600 mb-2">Account verwijderen</h2>
+          <p className="text-sm text-gray-500 mb-4">Dit verwijdert je account en alle bijbehorende data permanent.</p>
+          <DeleteAccountButton />
+        </div>
+      </main>
+    </div>
+  );
+}
