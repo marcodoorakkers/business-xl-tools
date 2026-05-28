@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       metadata: { user_id: user.id },
       success_url: `${baseUrl}/account?payment=subscribed`,
       cancel_url: `${baseUrl}/account?payment=cancelled`,
-      payment_method_types: ["card"],
+      payment_method_types: ["card", "ideal", "sepa_debit"],
       locale: "nl",
     });
 
