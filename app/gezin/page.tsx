@@ -32,7 +32,7 @@ export default function GezinLandingPage() {
             Nooit meer een brief kwijt
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed">
-            Maak een foto van jullie post. AI leest het document, slaat het op in de juiste map en houdt bij welke acties er nodig zijn.
+            Maak een foto van jullie post. AI leest het document, herkent wat er moet gebeuren en houdt de acties bij. Voor het hele gezin.
           </p>
           <Link
             href="/aanmelden"
@@ -56,13 +56,13 @@ export default function GezinLandingPage() {
               step: "2",
               icon: "🤖",
               title: "AI analyseert",
-              desc: "AI herkent wie de brief is, wat het inhoudt en of er iets gedaan moet worden.",
+              desc: "AI herkent voor wie de brief is, wat het inhoudt en of er iets gedaan moet worden.",
             },
             {
               step: "3",
               icon: "✅",
               title: "Bijhouden",
-              desc: "Document wordt opgeslagen in de juiste map. Acties verschijnen in jullie to-do lijst.",
+              desc: "Je slaat het document op in je eigen cloud. Acties verschijnen automatisch in de actielijst.",
             },
           ].map((item) => (
             <div key={item.step} className="bg-white rounded-3xl p-7 text-center shadow-sm">
@@ -94,7 +94,7 @@ export default function GezinLandingPage() {
             <div className="bg-white border border-gray-200 rounded-xl p-4">
               <div className="flex flex-wrap gap-2 mb-3">
                 <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">📁 Belastingen</span>
-                <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">👤 Papa</span>
+                <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">👤 M. de Vries</span>
                 <span className="bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">⚠️ Actie vereist</span>
               </div>
               <ul className="space-y-1.5 text-sm text-gray-700">
@@ -111,7 +111,7 @@ export default function GezinLandingPage() {
           <h2 className="text-xl font-extrabold text-gray-900 mb-6 text-center">Alles wat een gezin nodig heeft</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { icon: "👨‍👩‍👧‍👦", text: "Koppel brieven aan een gezinslid — voor mama, papa of de kinderen" },
+              { icon: "👥", text: "Koppel brieven aan een gezinslid — overzichtelijk voor het hele gezin" },
               { icon: "📁", text: "Documenten worden automatisch in de juiste map gezet" },
               { icon: "⏰", text: "Deadlines en acties worden bijgehouden, zodat je niets mist" },
               { icon: "☁️", text: "Opslaan in OneDrive of Dropbox — altijd bij de hand" },
@@ -143,7 +143,7 @@ export default function GezinLandingPage() {
                 <li>✅ 10 scans</li>
                 <li>✅ AI-analyse</li>
                 <li>✅ Acties bijhouden</li>
-                <li>✅ Opslaan in cloud</li>
+                <li>✅ Opslaan in je eigen cloud</li>
               </ul>
               <Link href="/aanmelden" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
                 Gratis beginnen
@@ -155,7 +155,7 @@ export default function GezinLandingPage() {
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Meest gekozen</span>
               <p className="text-2xl mb-1">👨‍👩‍👧‍👦</p>
               <h3 className="font-bold text-gray-900 text-lg mb-0.5">Gezin</h3>
-              <p className="text-xs text-gray-400 mb-4">Voor een jaar post</p>
+              <p className="text-xs text-gray-400 mb-4">Genoeg voor een heel jaar</p>
               <p className="text-4xl font-extrabold text-gray-900 mb-0.5">€9,99</p>
               <p className="text-xs text-gray-400 mb-5">50 scans · €0,20 per scan</p>
               <ul className="space-y-1.5 text-sm text-gray-600 mb-6">
@@ -199,9 +199,9 @@ export default function GezinLandingPage() {
             We begrijpen dat brieven van de Belastingdienst, je zorgverzekeraar of je bank privé zijn. Daarom:
           </p>
           <ul className="space-y-2 text-sm text-gray-700">
-            <li>✅ Jouw documenten worden <strong>nooit gebruikt om AI te trainen</strong></li>
-            <li>✅ Opslag gebeurt op <strong>Europese servers</strong> (EU-wetgeving van toepassing)</li>
-            <li>✅ Alleen jij — en wie jij uitnodigt — heeft toegang tot jouw documenten</li>
+            <li>✅ Jouw documenten worden <strong>niet op onze servers opgeslagen</strong> — jij bewaart ze in je eigen OneDrive of Dropbox</li>
+            <li>✅ De foto wordt alleen <strong>tijdelijk verwerkt</strong> door AI om te analyseren, daarna direct verwijderd</li>
+            <li>✅ Alleen de analyse (categorie, acties, deadline) wordt opgeslagen — <strong>niet het document zelf</strong></li>
             <li>✅ Je kunt al je data op elk moment <strong>volledig verwijderen</strong></li>
           </ul>
         </div>
