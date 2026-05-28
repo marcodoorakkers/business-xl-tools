@@ -254,14 +254,19 @@ export default function GezinDossierPage() {
     fd.append("mappad", `${archiveRoot}/${gezinslid ? `${gezinslid}/` : ""}${mappad}`);
     fd.append("bestandsnaam", bestandsnaam);
 
-    const res = await fetch(endpoint, { method: "POST", body: fd });
-    const data = await res.json();
-    if (data.error) { setErrorMsg(data.error); setStep("error"); return; }
+    try {
+      const res = await fetch(endpoint, { method: "POST", body: fd });
+      const data = await res.json();
+      if (data.error) { setErrorMsg(data.error); setStep("error"); return; }
 
-    if (includeActie && analysis.actie) await saveActie(analysis);
-    await saveDocumentMetadata(data.webUrl, storagePreference);
-    setSavedInfo({ pad: data.path ?? mappad, url: data.webUrl });
-    setStep("done");
+      if (includeActie && analysis.actie) await saveActie(analysis);
+      await saveDocumentMetadata(data.webUrl, storagePreference);
+      setSavedInfo({ pad: data.path ?? mappad, url: data.webUrl });
+      setStep("done");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Upload mislukt — probeer opnieuw");
+      setStep("error");
+    }
   }
 
   async function handleSaveLocal() {
