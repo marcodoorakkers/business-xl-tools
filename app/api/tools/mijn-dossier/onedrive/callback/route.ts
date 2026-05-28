@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   const origin = request.nextUrl.origin;
-  const failUrl = `${origin}/tools/mijn-dossier/instellingen?error=auth_failed`;
+  const hostname = request.nextUrl.hostname;
+  const isGezinSite = hostname === "nooitmeerpostkwijt.nl" || hostname === "www.nooitmeerpostkwijt.nl";
+  const instellingenPath = isGezinSite ? "/dossier/instellingen" : "/tools/mijn-dossier/instellingen";
+  const failUrl = `${origin}${instellingenPath}?error=auth_failed`;
 
   if (!user) return NextResponse.redirect(failUrl);
 
@@ -56,7 +59,7 @@ export async function GET(request: NextRequest) {
     updated_at: new Date().toISOString(),
   }, { onConflict: "user_id" });
 
-  const response = NextResponse.redirect(`${origin}/tools/mijn-dossier/instellingen?connected=1`);
+  const response = NextResponse.redirect(`${origin}${instellingenPath}?connected=1`);
   response.cookies.set("ms_oauth_state", "", { maxAge: 0, path: "/" });
 
   return response;
