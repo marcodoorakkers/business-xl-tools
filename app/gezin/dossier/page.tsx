@@ -341,7 +341,7 @@ export default function GezinDossierPage() {
           <div>
             <div className="mb-6">
               <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Post scannen</h1>
-              <p className="text-gray-500 text-sm">Maak een foto of upload een PDF — AI regelt de rest.</p>
+              <p className="text-gray-500 text-sm">Maak een foto of upload een PDF — wij regelen de rest.</p>
             </div>
 
             <div
@@ -374,7 +374,7 @@ export default function GezinDossierPage() {
               <div className="mt-4 bg-amber-100 rounded-2xl px-4 py-3 text-sm text-amber-800">
                 💡 <strong>Tip:</strong> Voeg gezinsleden toe in de{" "}
                 <Link href="/dossier/instellingen" className="underline font-medium">instellingen</Link>{" "}
-                zodat AI brieven automatisch aan het juiste gezinslid koppelt.
+                zodat brieven automatisch aan het juiste gezinslid gekoppeld worden.
               </div>
             )}
           </div>
@@ -439,7 +439,7 @@ export default function GezinDossierPage() {
         {step === "analyzing" && (
           <div className="text-center py-20">
             <div className="text-5xl mb-4 animate-bounce">🤖</div>
-            <p className="font-semibold text-gray-700 text-lg mb-1">AI analyseert jullie post…</p>
+            <p className="font-semibold text-gray-700 text-lg mb-1">Jullie post wordt geanalyseerd…</p>
             <p className="text-gray-400 text-sm">Even geduld — dit duurt maar een paar seconden.</p>
           </div>
         )}
