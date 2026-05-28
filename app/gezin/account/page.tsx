@@ -136,6 +136,21 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           <p className="text-xs text-gray-400 mt-4">Betalen via iDEAL, creditcard of Bancontact</p>
         </div>
 
+        {/* Cross-promo TimeSaverTools */}
+        <a
+          href="https://timesavertools.nl"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-4 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4 hover:border-blue-400 hover:shadow-sm transition-all group"
+        >
+          <span className="text-2xl">⚡</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-900">Ook ZZP-er of ondernemer?</p>
+            <p className="text-xs text-gray-500">Ontdek onze zakelijke tools op TimeSaverTools.nl — je scans werken er ook.</p>
+          </div>
+          <span className="text-blue-400 group-hover:text-blue-600 transition-colors text-sm">→</span>
+        </a>
+
         {/* Account info */}
         <div className="bg-white rounded-2xl border border-amber-100 p-6">
           <h2 className="font-semibold text-gray-900 mb-1">E-mailadres</h2>

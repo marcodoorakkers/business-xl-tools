@@ -63,6 +63,15 @@ export default async function DashboardPage() {
           color: "from-violet-500 to-purple-500",
           bg: "bg-violet-50",
         },
+        ...(process.env.MIJN_DOSSIER_ENABLED === "true" ? [{
+          name: "MijnDossier",
+          description: "Maak een foto van een brief of document. NooitMeerPostKwijt analyseert het en houdt bij welke acties er nodig zijn.",
+          href: "/tools/mijn-dossier",
+          credits: 1,
+          icon: "📬",
+          color: "from-sky-500 to-blue-600",
+          bg: "bg-sky-50",
+        }] : []),
       ],
     },
     {
@@ -86,29 +95,6 @@ export default async function DashboardPage() {
           color: "from-rose-500 to-pink-500",
           bg: "bg-rose-50",
         },
-      ],
-    },
-    {
-      label: "🏠 Privé",
-      tools: [
-        {
-          name: "Weekmenu Planner",
-          description: "Geef je voorkeuren op en ontvang een weekmenu voor 7 avondmaaltijden met boodschappenlijst.",
-          href: "/tools/dinner-planner",
-          credits: 1,
-          icon: "🍽️",
-          color: "from-orange-400 to-pink-500",
-          bg: "bg-orange-50",
-        },
-        ...(process.env.MIJN_DOSSIER_ENABLED === "true" ? [{
-          name: "MijnDossier",
-          description: "Upload een scan of foto van een brief. AI analyseert het document en plaatst het automatisch in de juiste map op jouw computer.",
-          href: "/tools/mijn-dossier",
-          credits: 1,
-          icon: "📬",
-          color: "from-sky-500 to-blue-600",
-          bg: "bg-sky-50",
-        }] : []),
       ],
     },
   ];

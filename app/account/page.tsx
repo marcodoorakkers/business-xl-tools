@@ -133,6 +133,21 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <p className="text-xs text-gray-400 mt-4">Betalen via iDEAL, creditcard of Bancontact · Excl. BTW</p>
         </div>
 
+        {/* Cross-promo NooitMeerPostKwijt */}
+        <a
+          href="https://nooitmeerpostkwijt.nl"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-4 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 hover:border-amber-400 hover:shadow-sm transition-all group"
+        >
+          <span className="text-2xl">📬</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-900">Thuis ook je post bijhouden?</p>
+            <p className="text-xs text-gray-500">Probeer NooitMeerPostKwijt.nl — je credits werken er ook.</p>
+          </div>
+          <span className="text-amber-400 group-hover:text-amber-600 transition-colors text-sm">→</span>
+        </a>
+
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
           <h2 className="font-semibold text-gray-900 mb-1">E-mailadres</h2>
           <p className="text-sm text-gray-600">{user.email}</p>
