@@ -129,7 +129,36 @@ export default function GezinLandingPage() {
         {/* Pricing */}
         <div className="max-w-3xl mx-auto mb-12 text-center">
           <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Eenvoudige prijzen</h2>
-          <p className="text-gray-500 text-sm mb-8">Start gratis. Koop extra scans wanneer je ze nodig hebt. Geen abonnement, geen verrassingen.</p>
+          <p className="text-gray-500 text-sm mb-8">Start gratis. Kies een abonnement of koop scans wanneer je ze nodig hebt.</p>
+
+          {/* Maandelijks abonnement */}
+          <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-left text-white mb-5 relative shadow-md">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Meest flexibel</span>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xl">⭐</span>
+                  <h3 className="font-bold text-lg">Maandelijks abonnement</h3>
+                </div>
+                <p className="text-amber-100 text-sm mb-3">50 scans per maand · automatisch verlengd · opzegbaar wanneer je wil</p>
+                <ul className="space-y-1 text-sm text-amber-50">
+                  <li>✅ 50 scans elke maand</li>
+                  <li>✅ Gezinsleden koppelen</li>
+                  <li>✅ OneDrive &amp; Dropbox</li>
+                </ul>
+              </div>
+              <div className="text-right flex-shrink-0">
+                <p className="text-4xl font-extrabold">€4,99</p>
+                <p className="text-amber-100 text-sm">/maand</p>
+                <Link href="/account" className="mt-3 inline-block bg-white text-amber-600 hover:bg-amber-50 font-bold py-2.5 px-6 rounded-xl text-sm transition-colors">
+                  Abonnement starten
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400 mb-5">Of koop scans eenmalig — verlopen nooit</p>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
 
             {/* Gratis */}
@@ -150,10 +179,9 @@ export default function GezinLandingPage() {
               </Link>
             </div>
 
-            {/* Gezin — featured */}
-            <div className="bg-white border-2 border-amber-400 rounded-2xl p-7 text-left relative shadow-md">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Meest gekozen</span>
-              <p className="text-2xl mb-1">👨‍👩‍👧‍👦</p>
+            {/* Gezin */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-7 text-left relative">
+              <p className="text-2xl mb-1">👥</p>
               <h3 className="font-bold text-gray-900 text-lg mb-0.5">Gezin</h3>
               <p className="text-xs text-gray-400 mb-4">Genoeg voor een heel jaar</p>
               <p className="text-4xl font-extrabold text-gray-900 mb-0.5">€9,99</p>
@@ -164,7 +192,7 @@ export default function GezinLandingPage() {
                 <li>✅ Acties bijhouden</li>
                 <li>✅ OneDrive &amp; Dropbox</li>
               </ul>
-              <Link href="/account" className="block text-center bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 rounded-xl text-sm transition-colors">
+              <Link href="/account" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
                 Kies Gezin
               </Link>
             </div>
@@ -189,7 +217,7 @@ export default function GezinLandingPage() {
             </div>
 
           </div>
-          <p className="text-xs text-gray-400 mt-5">Scans verlopen niet. Betaal via iDEAL, creditcard of Bancontact.</p>
+          <p className="text-xs text-gray-400 mt-5">Betaal via iDEAL, creditcard of Bancontact.</p>
         </div>
 
         {/* Privacy */}
