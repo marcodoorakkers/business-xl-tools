@@ -57,7 +57,8 @@ function formatDate(dateStr: string | null): string {
 
 export default function ArchiefPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [query, setQuery] = useState("");
   const [filterGezinslid, setFilterGezinslid] = useState("");
   const [filterType, setFilterType] = useState("");
@@ -65,7 +66,9 @@ export default function ArchiefPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchDocuments = useCallback(async () => {
+    if (!query && !filterGezinslid && !filterType) return;
     setLoading(true);
+    setHasSearched(true);
     try {
       const params = new URLSearchParams();
       if (query) params.set("q", query);
@@ -167,7 +170,7 @@ export default function ArchiefPage() {
             )}
             {(query || filterGezinslid || filterType) && (
               <button
-                onClick={() => { setQuery(""); setFilterGezinslid(""); setFilterType(""); }}
+                onClick={() => { setQuery(""); setFilterGezinslid(""); setFilterType(""); setHasSearched(false); setDocuments([]); }}
                 className="text-xs text-amber-600 hover:text-amber-800 font-medium px-3 py-2 rounded-xl border border-amber-200 transition-colors"
               >
                 Wis filters
@@ -180,26 +183,19 @@ export default function ArchiefPage() {
         {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-400 text-sm gap-2">
             <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-            Laden…
+            Zoeken…
+          </div>
+        ) : !hasSearched ? (
+          <div className="text-center py-16">
+            <p className="text-4xl mb-3">🔍</p>
+            <p className="text-gray-500 font-medium mb-1">Zoek op afzender, onderwerp of trefwoord</p>
+            <p className="text-sm text-gray-400">Of filter op gezinslid of type document.</p>
           </div>
         ) : documents.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-4xl mb-3">🗂</p>
-            {query || filterGezinslid || filterType ? (
-              <>
-                <p className="text-gray-600 font-medium mb-1">Geen documenten gevonden</p>
-                <p className="text-sm text-gray-400">Probeer een andere zoekterm of verwijder de filters.</p>
-              </>
-            ) : (
-              <>
-                <p className="text-gray-600 font-medium mb-1">Nog geen documenten in het archief</p>
-                <p className="text-sm text-gray-400 mb-4">Scan een brief om te beginnen.</p>
-                <Link href="/dossier"
-                  className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors">
-                  Eerste scan maken →
-                </Link>
-              </>
-            )}
+            <p className="text-gray-600 font-medium mb-1">Geen documenten gevonden</p>
+            <p className="text-sm text-gray-400">Probeer een andere zoekterm of verwijder de filters.</p>
           </div>
         ) : (
           <>
