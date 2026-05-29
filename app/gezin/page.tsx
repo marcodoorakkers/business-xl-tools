@@ -211,7 +211,7 @@ export default function GezinLandingPage() {
 
             <div className="bg-white border border-gray-200 rounded-2xl p-6 text-left">
               <h3 className="font-bold text-gray-900 text-lg mb-1">50 scans</h3>
-              <p className="text-xs text-gray-400 mb-4">Voor het gemiddelde gezin</p>
+              <p className="text-xs text-gray-400 mb-4">Als je regelmatig post ontvangt</p>
               <p className="text-3xl font-extrabold text-gray-900 mb-0.5">€7,49</p>
               <p className="text-xs text-gray-400 mb-4">€0,15 per scan</p>
               <div className="text-sm text-gray-500 space-y-1 mb-6">
