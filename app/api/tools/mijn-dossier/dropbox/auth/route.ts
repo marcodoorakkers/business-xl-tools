@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     response_type: "code",
     redirect_uri: redirectUri,
     token_access_type: "offline",
+    scope: "account_info.read files.content.write files.content.read sharing.write",
     state,
   });
 

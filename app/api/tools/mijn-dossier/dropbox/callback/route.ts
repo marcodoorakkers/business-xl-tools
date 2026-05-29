@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
   const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
 
   const admin = createAdminClient();
-  await admin.from("dropbox_tokens").upsert({
+  const { error: upsertError } = await admin.from("dropbox_tokens").upsert({
     user_id: user.id,
     access_token: tokens.access_token,
     refresh_token: tokens.refresh_token,
@@ -59,6 +59,8 @@ export async function GET(request: NextRequest) {
     archive_root: "Archief",
     updated_at: new Date().toISOString(),
   }, { onConflict: "user_id" });
+
+  if (upsertError) return NextResponse.redirect(failUrl);
 
   const response = NextResponse.redirect(`${origin}${instellingenPath}?dropbox_connected=1`);
   response.cookies.set("dropbox_oauth_state", "", { maxAge: 0, path: "/" });
