@@ -3,6 +3,12 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "NooitMeerPostKwijt — Nooit meer een brief kwijt",
   description: "Scan je post, laat het slim analyseren en sla alles veilig op in je eigen OneDrive of Dropbox.",
+  applicationName: "NooitMeerPostKwijt",
+  appleWebApp: {
+    title: "NooitMeerPostKwijt",
+    statusBarStyle: "default",
+    capable: true,
+  },
   icons: {
     icon: [
       { url: "/gezin-icon.svg", type: "image/svg+xml" },
