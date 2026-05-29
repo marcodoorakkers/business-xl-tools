@@ -17,13 +17,6 @@ const tools = [
     bg: "bg-blue-50",
   },
   {
-    icon: "🍽️",
-    name: "Weekmenu Planner",
-    description: "Geef je voorkeuren op en ontvang een weekmenu met recepten en boodschappenlijst.",
-    color: "from-orange-400 to-pink-500",
-    bg: "bg-orange-50",
-  },
-  {
     icon: "🔍",
     name: "Vacaturezoeker",
     description: "Plak je CV of profiel en vind direct actuele freelance & contract vacatures wereldwijd.",
