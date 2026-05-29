@@ -375,7 +375,6 @@ export default function GezinDossierPage() {
                 type="file"
                 accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
                 multiple
-                capture="environment"
                 className="hidden"
                 onChange={(e) => Array.from(e.target.files ?? []).forEach(addFile)}
               />
@@ -427,7 +426,6 @@ export default function GezinDossierPage() {
               type="file"
               accept="image/jpeg,image/png,image/gif,image/webp"
               multiple
-              capture="environment"
               className="hidden"
               onChange={(e) => Array.from(e.target.files ?? []).forEach(addFile)}
             />
