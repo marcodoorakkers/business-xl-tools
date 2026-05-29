@@ -372,9 +372,9 @@ export default function GezinDossierPage() {
 
             {familyMembers.length === 0 && (
               <div className="mt-4 bg-amber-100 rounded-2xl px-4 py-3 text-sm text-amber-800">
-                💡 <strong>Tip:</strong> Voeg gezinsleden toe in de{" "}
+                💡 <strong>Tip:</strong> Voeg personen toe in de{" "}
                 <Link href="/dossier/instellingen" className="underline font-medium">instellingen</Link>{" "}
-                zodat brieven automatisch aan het juiste gezinslid gekoppeld worden.
+                zodat brieven automatisch aan de juiste persoon gekoppeld worden.
               </div>
             )}
           </div>
@@ -439,7 +439,7 @@ export default function GezinDossierPage() {
         {step === "analyzing" && (
           <div className="text-center py-20">
             <div className="text-5xl mb-4 animate-bounce">🤖</div>
-            <p className="font-semibold text-gray-700 text-lg mb-1">Jullie post wordt geanalyseerd…</p>
+            <p className="font-semibold text-gray-700 text-lg mb-1">Je post wordt geanalyseerd…</p>
             <p className="text-gray-400 text-sm">Even geduld — dit duurt maar een paar seconden.</p>
           </div>
         )}

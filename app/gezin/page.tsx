@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "NooitMeerPostKwijt — Nooit meer een brief mislopen",
-  description: "Maak een foto van jullie post. NooitMeerPostKwijt analyseert het document en houdt acties bij. Voor het hele gezin.",
+  title: "NooitMeerPostKwijt — Nooit meer een brief kwijt",
+  description: "Scan je post. NooitMeerPostKwijt analyseert het document, herkent wat er moet gebeuren en houdt je acties bij.",
 };
 
 export default function GezinLandingPage() {
@@ -32,7 +32,7 @@ export default function GezinLandingPage() {
             Nooit meer een brief kwijt
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto mb-8 leading-relaxed">
-            Maak een foto van jullie post. NooitMeerPostKwijt leest het document, herkent wat er moet gebeuren en houdt de acties bij. Voor het hele gezin.
+            Maak een foto van je post. NooitMeerPostKwijt leest het document, herkent wat er moet gebeuren en houdt de acties voor je bij.
           </p>
           <Link
             href="/aanmelden"
@@ -108,14 +108,14 @@ export default function GezinLandingPage() {
 
         {/* Features */}
         <div className="bg-white rounded-3xl p-8 mb-12 shadow-sm">
-          <h2 className="text-xl font-extrabold text-gray-900 mb-6 text-center">Alles wat een gezin nodig heeft</h2>
+          <h2 className="text-xl font-extrabold text-gray-900 mb-6 text-center">Altijd grip op je post</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { icon: "👥", text: "Koppel brieven aan een gezinslid — overzichtelijk voor het hele gezin" },
               { icon: "📁", text: "Documenten worden automatisch in de juiste map gezet" },
               { icon: "⏰", text: "Deadlines en acties worden bijgehouden, zodat je niets mist" },
-              { icon: "☁️", text: "Opslaan in OneDrive of Dropbox — altijd bij de hand" },
-              { icon: "📱", text: "Werkt perfect op je telefoon — ideaal na de brievenbus" },
+              { icon: "☁️", text: "Opslaan in je eigen OneDrive of Dropbox — altijd bij de hand" },
+              { icon: "👥", text: "Meerdere personen koppelen aan een document — handig voor thuis of werk" },
+              { icon: "📱", text: "Werkt perfect op je telefoon — scan direct bij de brievenbus" },
               { icon: "🔒", text: "Jouw documenten zijn alleen voor jou zichtbaar" },
             ].map((f) => (
               <div key={f.text} className="flex items-start gap-3">
@@ -183,7 +183,7 @@ export default function GezinLandingPage() {
             <div className="bg-white border border-gray-200 rounded-2xl p-7 text-left relative">
               <p className="text-2xl mb-1">👥</p>
               <h3 className="font-bold text-gray-900 text-lg mb-0.5">Gezin</h3>
-              <p className="text-xs text-gray-400 mb-4">Genoeg voor een heel jaar</p>
+              <p className="text-xs text-gray-400 mb-4">Genoeg voor een vol jaar</p>
               <p className="text-4xl font-extrabold text-gray-900 mb-0.5">€9,99</p>
               <p className="text-xs text-gray-400 mb-5">50 scans · €0,20 per scan</p>
               <ul className="space-y-1.5 text-sm text-gray-600 mb-6">
@@ -202,7 +202,7 @@ export default function GezinLandingPage() {
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">Beste prijs</span>
               <p className="text-2xl mb-1">📦</p>
               <h3 className="font-bold text-gray-900 text-lg mb-0.5">Veelgebruiker</h3>
-              <p className="text-xs text-gray-400 mb-4">Groot gezin of veel post</p>
+              <p className="text-xs text-gray-400 mb-4">Voor wie veel post ontvangt</p>
               <p className="text-4xl font-extrabold text-gray-900 mb-0.5">€29,99</p>
               <p className="text-xs text-gray-400 mb-5">200 scans · €0,15 per scan</p>
               <ul className="space-y-1.5 text-sm text-gray-600 mb-6">
@@ -237,7 +237,7 @@ export default function GezinLandingPage() {
         {/* CTA */}
         <div className="text-center pb-16">
           <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Klaar om te beginnen?</h2>
-          <p className="text-gray-500 text-sm mb-6">Maak een gratis account aan en scan jullie eerste brief.</p>
+          <p className="text-gray-500 text-sm mb-6">Maak een gratis account aan en scan je eerste brief.</p>
           <Link
             href="/aanmelden"
             className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold text-lg px-8 py-4 rounded-2xl transition-colors shadow-md"
