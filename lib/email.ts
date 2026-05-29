@@ -38,7 +38,7 @@ export async function sendWelcomeEmailNMMPK(to: string) {
         </a>
         <hr style="border: none; border-top: 1px solid #F3F4F6; margin: 40px 0 24px;" />
         <p style="font-size: 12px; color: #9CA3AF; line-height: 1.6; margin: 0;">
-          Vragen? Mail naar <a href="mailto:info@nooitmeerpostkwijt.nl" style="color: #9CA3AF;">info@nooitmeerpostkwijt.nl</a><br />
+          Vragen? Mail naar <a href="mailto:nooitmeerpostkwijt@business-xl.nl" style="color: #9CA3AF;">nooitmeerpostkwijt@business-xl.nl</a><br />
           NooitMeerPostKwijt · Business XL · Bosscheweg 44, 5056 KC Berkel-Enschot
         </p>
       </div>

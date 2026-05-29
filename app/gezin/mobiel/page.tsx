@@ -99,8 +99,8 @@ export default function GezinMobielPage() {
 
         <p className="text-center text-xs text-gray-400 mt-10">
           Vragen? Mail naar{" "}
-          <a href="mailto:info@nooitmeerpostkwijt.nl" className="underline hover:text-gray-600">
-            info@nooitmeerpostkwijt.nl
+          <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="underline hover:text-gray-600">
+            nooitmeerpostkwijt@business-xl.nl
           </a>
         </p>
       </main>

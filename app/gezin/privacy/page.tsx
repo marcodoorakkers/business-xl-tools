@@ -28,7 +28,7 @@ export default function GezinPrivacyPage() {
               <p><span className="font-medium">Eigenaar:</span> Marco Doorakkers</p>
               <p><span className="font-medium">Adres:</span> Bosscheweg 44, 5056 KC Berkel-Enschot, Nederland</p>
               <p><span className="font-medium">KvK-nummer:</span> 50418041</p>
-              <p><span className="font-medium">E-mail:</span> <a href="mailto:info@nooitmeerpostkwijt.nl" className="text-amber-600 hover:underline">info@nooitmeerpostkwijt.nl</a></p>
+              <p><span className="font-medium">E-mail:</span> <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a></p>
               <p><span className="font-medium">Website:</span> <a href="https://www.nooitmeerpostkwijt.nl" className="text-amber-600 hover:underline">www.nooitmeerpostkwijt.nl</a></p>
             </div>
           </section>
@@ -173,7 +173,7 @@ export default function GezinPrivacyPage() {
                 <li key={right}><span className="font-medium text-gray-800">{right}:</span> {desc}</li>
               ))}
             </ul>
-            <p className="mt-3 text-sm">Stuur een verzoek naar <a href="mailto:info@nooitmeerpostkwijt.nl" className="text-amber-600 hover:underline">info@nooitmeerpostkwijt.nl</a>. Wij reageren binnen 30 dagen.</p>
+            <p className="mt-3 text-sm">Stuur een verzoek naar <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a>. Wij reageren binnen 30 dagen.</p>
           </section>
 
           <section>
@@ -189,7 +189,7 @@ export default function GezinPrivacyPage() {
 
           <section>
             <h2 className="text-lg font-bold text-gray-900 mb-3">10. Klacht indienen</h2>
-            <p className="mb-2">Ben je niet tevreden? Neem dan eerst contact met ons op via <a href="mailto:info@nooitmeerpostkwijt.nl" className="text-amber-600 hover:underline">info@nooitmeerpostkwijt.nl</a>.</p>
+            <p className="mb-2">Ben je niet tevreden? Neem dan eerst contact met ons op via <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a>.</p>
             <p className="text-sm text-gray-600">Je hebt ook het recht om een klacht in te dienen bij de Autoriteit Persoonsgegevens:<br />
               Website: <a href="https://www.autoriteitpersoonsgegevens.nl" className="text-amber-600 hover:underline" target="_blank" rel="noopener noreferrer">www.autoriteitpersoonsgegevens.nl</a><br />
               Telefoon: 088 - 1805 250
@@ -204,7 +204,7 @@ export default function GezinPrivacyPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-10">
-          © {new Date().getFullYear()} NooitMeerPostKwijt · Business XL (Marco Doorakkers) · KvK 50418041 · <a href="mailto:info@nooitmeerpostkwijt.nl" className="underline hover:text-gray-600">info@nooitmeerpostkwijt.nl</a>
+          © {new Date().getFullYear()} NooitMeerPostKwijt · Business XL (Marco Doorakkers) · KvK 50418041 · <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="underline hover:text-gray-600">nooitmeerpostkwijt@business-xl.nl</a>
         </p>
       </main>
     </div>

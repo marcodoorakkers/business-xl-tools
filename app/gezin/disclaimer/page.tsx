@@ -59,8 +59,8 @@ export default function GezinDisclaimerPage() {
             <h2 className="text-lg font-bold text-gray-900 mb-2">Contact</h2>
             <p>
               Heb je vragen of opmerkingen? Stuur een e-mail naar{" "}
-              <a href="mailto:info@nooitmeerpostkwijt.nl" className="text-amber-600 hover:underline">
-                info@nooitmeerpostkwijt.nl
+              <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">
+                nooitmeerpostkwijt@business-xl.nl
               </a>. Wij reageren zo snel mogelijk.
             </p>
           </section>

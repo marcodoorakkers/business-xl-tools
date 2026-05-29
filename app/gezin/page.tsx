@@ -278,7 +278,7 @@ export default function GezinLandingPage() {
         <span>·</span>
         <Link href="/disclaimer" className="hover:text-gray-600 underline">Disclaimer</Link>
         <span>·</span>
-        <a href="mailto:info@nooitmeerpostkwijt.nl" className="hover:text-gray-600 underline">Contact</a>
+        <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="hover:text-gray-600 underline">Contact</a>
       </footer>
     </div>
   );
