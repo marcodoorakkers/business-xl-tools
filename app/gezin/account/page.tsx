@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import NMMPKLogo from "@/components/NMMPKLogo";
 import BuyCreditsButton from "@/app/account/BuyCreditsButton";
 import SubscribeButton from "@/app/account/SubscribeButton";
 import CancelSubscriptionButton from "@/app/account/CancelSubscriptionButton";
@@ -43,7 +44,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
       {/* Header */}
       <header className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <Link href="/" className="font-extrabold text-amber-700 text-lg">📬 NooitMeerPostKwijt</Link>
+          <NMMPKLogo />
           <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
             ← Terug
           </Link>

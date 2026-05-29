@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import NMMPKLogo from "@/components/NMMPKLogo";
 
 export default function GezinRegisterPage() {
   const [email, setEmail] = useState("");
@@ -48,7 +49,7 @@ export default function GezinRegisterPage() {
       <main className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <Link href="/" className="text-2xl font-extrabold text-amber-700">📬 NooitMeerPostKwijt</Link>
+            <NMMPKLogo size="lg" />
           </div>
           <div className="bg-white rounded-3xl shadow-sm p-8 text-center">
             <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">

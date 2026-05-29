@@ -6,6 +6,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import NMMPKLogo from "@/components/NMMPKLogo";
 
 export default function GezinLoginPage() {
   const [email, setEmail] = useState("");
@@ -34,7 +35,7 @@ export default function GezinLoginPage() {
     <main className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-extrabold text-amber-700">📬 NooitMeerPostKwijt</Link>
+          <NMMPKLogo size="lg" />
         </div>
         <div className="bg-white rounded-3xl shadow-sm p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Inloggen</h1>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NMMPKLogo from "@/components/NMMPKLogo";
 
 export const metadata = {
   title: "NooitMeerPostKwijt — Nooit meer een brief kwijt",
@@ -10,7 +11,7 @@ export default function GezinLandingPage() {
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto">
-        <span className="font-extrabold text-xl text-amber-700">📬 NooitMeerPostKwijt</span>
+        <NMMPKLogo href="/" size="lg" />
         <div className="flex gap-3 items-center">
           <Link href="/inloggen" className="text-sm text-gray-600 font-medium hover:text-gray-900 transition-colors">
             Inloggen

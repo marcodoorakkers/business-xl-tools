@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
+import NMMPKLogo from "@/components/NMMPKLogo";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
@@ -311,7 +312,7 @@ export default function GezinDossierPage() {
       {/* Header */}
       <header className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <Link href="/" className="font-extrabold text-amber-700 text-lg">📬 NooitMeerPostKwijt</Link>
+          <NMMPKLogo />
           <div className="flex items-center gap-4">
             <Link href="/acties" className="text-sm text-amber-700 font-medium hover:text-amber-500 transition-colors">
               📋 Acties

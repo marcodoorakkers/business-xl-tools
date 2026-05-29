@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NMMPKLogo from "@/components/NMMPKLogo";
 
 export const metadata = { title: "Gebruik op je telefoon — NooitMeerPostKwijt" };
 
@@ -23,7 +24,7 @@ export default function GezinMobielPage() {
     <div className="min-h-screen bg-white">
       <nav className="bg-white border-b border-gray-100 px-6 py-4 max-w-3xl mx-auto flex items-center justify-between">
         <Link href="/" className="font-extrabold text-amber-700 text-lg">
-          📬 NooitMeerPostKwijt
+          <NMMPKLogo />
         </Link>
         <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
           ← Terug
@@ -82,8 +83,11 @@ export default function GezinMobielPage() {
 
           {/* Result */}
           <div className="bg-gray-900 rounded-2xl p-8 text-white text-center">
-            <div className="w-14 h-14 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-              📬
+            <div className="w-14 h-14 bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M2 5l10 8 10-8" />
+              </svg>
             </div>
             <h3 className="text-xl font-bold mb-2">Klaar!</h3>
             <p className="text-gray-400 text-sm">
