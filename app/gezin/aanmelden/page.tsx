@@ -33,7 +33,7 @@ export default function GezinRegisterPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${location.origin}/auth/callback?next=/dossier` },
+      options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/auth/callback?next=/dossier` },
     });
 
     if (error) {
@@ -68,7 +68,7 @@ export default function GezinRegisterPage() {
     <main className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-extrabold text-amber-700">📬 NooitMeerPostKwijt</Link>
+          <NMMPKLogo href="/" size="lg" />
         </div>
         <div className="bg-white rounded-3xl shadow-sm p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Account aanmaken</h1>
