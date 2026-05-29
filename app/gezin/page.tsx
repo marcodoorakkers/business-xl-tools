@@ -137,7 +137,7 @@ export default function GezinLandingPage() {
               { title: "Automatisch archiveren", desc: "Documenten gaan direct naar de juiste map in je OneDrive of Dropbox." },
               { title: "Acties bijhouden", desc: "Deadlines en to-do's worden automatisch herkend en bijgehouden." },
               { title: "Meerdere personen", desc: "Koppel documenten aan een persoon — handig voor thuis of een klein bedrijf." },
-              { title: "Werkt op je telefoon", desc: "Scan direct bij de brievenbus. De camera van je telefoon is alles wat je nodig hebt." },
+              { title: "Werkt op je telefoon", desc: "Geen app te installeren — voeg de site toe aan je beginscherm en scan direct vanuit je broekzak.", link: "/mobiel" },
               { title: "Jouw cloud, jouw data", desc: "Documenten staan in je eigen OneDrive of Dropbox — niet op onze servers." },
               { title: "Zoeken en terugvinden", desc: "Vind elk document terug via het archief — zoek op afzender, onderwerp of datum." },
             ].map((f) => (
@@ -146,6 +146,11 @@ export default function GezinLandingPage() {
                 <div>
                   <p className="font-semibold text-gray-900 text-sm mb-0.5">{f.title}</p>
                   <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+                  {"link" in f && f.link && (
+                    <Link href={f.link} className="text-xs text-amber-600 hover:text-amber-800 font-medium transition-colors">
+                      Zo werkt dat →
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}
