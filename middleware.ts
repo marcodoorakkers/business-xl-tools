@@ -83,8 +83,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
-  if (user && isAuthPage && !originalPath.startsWith("/auth/callback")) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  if (user && isAuthPage && !originalPath.startsWith("/auth/callback") && !originalPath.startsWith("/auth/confirm")) {
+    const redirectPath = isFamilySite ? "/dossier" : "/dashboard";
+    return NextResponse.redirect(new URL(redirectPath, request.url));
   }
 
   // Rewrite familiedomein transparant naar /gezin/*
