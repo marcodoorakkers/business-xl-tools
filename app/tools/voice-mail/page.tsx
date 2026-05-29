@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import ToolNav from "@/components/ToolNav";
 
-type Step = "idle" | "recording" | "processing" | "preview" | "saving" | "saved" | "error";
+type Step = "idle" | "recording" | "processing" | "preview" | "translating" | "saving" | "saved" | "error";
 
 const LANGUAGES = [
   { code: "nl", label: "🇳🇱 Nederlands" },
@@ -84,6 +84,27 @@ export default function VoiceMailPage() {
     }
   }
 
+  async function retranslate(newLanguage: string) {
+    if (newLanguage === language) return;
+    setLanguage(newLanguage);
+    setStep("translating");
+    try {
+      const res = await fetch("/api/tools/generate-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript, language: newLanguage }),
+      });
+      const { subject: s, body: b, error: generateError } = await res.json();
+      if (generateError) throw new Error(generateError);
+      setSubject(s);
+      setBody(b);
+      setStep("preview");
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : "Vertalen mislukt");
+      setStep("error");
+    }
+  }
+
   async function saveDraft() {
     setStep("saving");
     try {
@@ -124,14 +145,19 @@ export default function VoiceMailPage() {
           <p className="text-gray-500 text-sm mb-6">Spreek in wat je wilt mailen — het concept wordt opgeslagen in je account. Kost 2 credits.</p>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Uitvoertaal van de mail</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Uitvoertaal van de mail
+              {step === "preview" && (
+                <span className="ml-2 text-xs font-normal text-blue-500">— kies een andere taal om opnieuw te genereren</span>
+              )}
+            </label>
             <div className="flex flex-wrap gap-2">
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
                   type="button"
-                  onClick={() => setLanguage(lang.code)}
-                  disabled={step === "recording" || step === "processing"}
+                  onClick={() => step === "preview" ? retranslate(lang.code) : setLanguage(lang.code)}
+                  disabled={step === "recording" || step === "processing" || step === "translating" || step === "saving"}
                   className={`px-3 py-1.5 rounded-xl text-sm font-medium border transition-colors disabled:opacity-50 ${
                     language === lang.code
                       ? "bg-blue-600 text-white border-blue-600"
@@ -198,6 +224,13 @@ export default function VoiceMailPage() {
                   Opnieuw
                 </button>
               </div>
+            </div>
+          )}
+
+          {step === "translating" && (
+            <div className="flex flex-col items-center gap-3 py-6">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm text-gray-500">Mail vertalen...</p>
             </div>
           )}
 
