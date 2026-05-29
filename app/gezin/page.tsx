@@ -227,7 +227,7 @@ export default function GezinLandingPage() {
             <div className="bg-white border border-gray-200 rounded-2xl p-6 text-left relative">
               <span className="absolute -top-3 left-4 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">Beste prijs</span>
               <h3 className="font-bold text-gray-900 text-lg mb-1">200 scans</h3>
-              <p className="text-xs text-gray-400 mb-4">Voor wie veel post ontvangt</p>
+              <p className="text-xs text-gray-400 mb-4">Als je veel post ontvangt</p>
               <p className="text-3xl font-extrabold text-gray-900 mb-0.5">€19,99</p>
               <p className="text-xs text-gray-400 mb-4">€0,10 per scan</p>
               <div className="text-sm text-gray-500 space-y-1 mb-6">
