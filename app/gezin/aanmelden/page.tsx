@@ -33,7 +33,7 @@ export default function GezinRegisterPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/auth/callback?next=/dossier` },
+      options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/dossier` },
     });
 
     if (error) {
