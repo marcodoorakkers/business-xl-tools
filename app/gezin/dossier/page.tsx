@@ -316,7 +316,7 @@ export default function GezinDossierPage() {
       {/* Header */}
       <header className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <NMMPKLogo />
+          <NMMPKLogo iconOnly />
           <div className="flex items-center gap-4">
             <Link href="/acties" className="text-sm text-amber-700 font-medium hover:text-amber-500 transition-colors">
               Acties
