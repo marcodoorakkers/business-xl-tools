@@ -47,6 +47,44 @@ export async function getValidDropboxToken(userId: string): Promise<string | nul
   return tokens.access_token;
 }
 
+export async function forceRefreshDropboxToken(userId: string): Promise<string | null> {
+  const admin = createAdminClient();
+  const { data: row } = await admin
+    .from("dropbox_tokens")
+    .select("refresh_token")
+    .eq("user_id", userId)
+    .single();
+
+  if (!row) return null;
+
+  const params = new URLSearchParams({
+    client_id: process.env.DROPBOX_CLIENT_ID!,
+    client_secret: process.env.DROPBOX_CLIENT_SECRET!,
+    grant_type: "refresh_token",
+    refresh_token: row.refresh_token,
+  });
+
+  const res = await fetch(TOKEN_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: params.toString(),
+  });
+
+  if (!res.ok) return null;
+
+  const tokens = await res.json();
+  const newExpiresAt = new Date(Date.now() + (tokens.expires_in ?? 14400) * 1000).toISOString();
+
+  await admin.from("dropbox_tokens").update({
+    access_token: tokens.access_token,
+    refresh_token: tokens.refresh_token ?? row.refresh_token,
+    expires_at: newExpiresAt,
+    updated_at: new Date().toISOString(),
+  }).eq("user_id", userId);
+
+  return tokens.access_token;
+}
+
 export async function checkDropboxFolderExists(accessToken: string, fullPath: string): Promise<boolean> {
   const res = await fetch("https://api.dropboxapi.com/2/files/get_metadata", {
     method: "POST",
@@ -78,7 +116,9 @@ export async function uploadFileToDropbox(
 
   if (!res.ok) {
     const body = await res.text().catch(() => "");
-    throw new Error(`Dropbox upload failed: ${res.status} ${body.slice(0, 200)}`);
+    const err = new Error(`Dropbox upload failed: ${res.status} ${body.slice(0, 200)}`);
+    (err as Error & { status?: number }).status = res.status;
+    throw err;
   }
 
   const uploadData = await res.json();

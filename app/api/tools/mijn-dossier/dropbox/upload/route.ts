@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, logUsage } from "@/lib/supabase/admin";
-import { getValidDropboxToken, uploadFileToDropbox } from "@/lib/dropbox";
+import { getValidDropboxToken, forceRefreshDropboxToken, uploadFileToDropbox } from "@/lib/dropbox";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -40,12 +40,25 @@ export async function POST(req: NextRequest) {
   const buffer = Buffer.from(await file.arrayBuffer());
 
   try {
-    const { webUrl } = await uploadFileToDropbox(accessToken, fullPath, buffer, file.type || "application/octet-stream");
+    let token = accessToken;
+    let result: { webUrl: string };
+    try {
+      result = await uploadFileToDropbox(token, fullPath, buffer, file.type || "application/octet-stream");
+    } catch (err) {
+      if ((err as Error & { status?: number }).status === 401) {
+        const refreshed = await forceRefreshDropboxToken(user.id);
+        if (!refreshed) return NextResponse.json({ error: "Dropbox koppeling verlopen — koppel Dropbox opnieuw via instellingen" }, { status: 401 });
+        token = refreshed;
+        result = await uploadFileToDropbox(token, fullPath, buffer, file.type || "application/octet-stream");
+      } else {
+        throw err;
+      }
+    }
 
     await supabase.from("profiles").update({ credits: profile.credits - 1 }).eq("id", user.id);
     await logUsage(user.id, "mijn-dossier", 1);
 
-    return NextResponse.json({ webUrl, path: fullPath });
+    return NextResponse.json({ webUrl: result.webUrl, path: fullPath });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Upload mislukt";
     return NextResponse.json({ error: msg }, { status: 500 });
