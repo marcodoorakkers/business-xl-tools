@@ -19,12 +19,17 @@ interface NMMPKLogoProps {
   className?: string;
   size?: "sm" | "md" | "lg";
   textClassName?: string;
+  iconOnly?: boolean;
 }
 
-export default function NMMPKLogo({ href = "/", className = "", size = "md", textClassName }: NMMPKLogoProps) {
+export default function NMMPKLogo({ href = "/", className = "", size = "md", textClassName, iconOnly = false }: NMMPKLogoProps) {
   const textSize = textClassName ?? (size === "lg" ? "text-base sm:text-xl" : "text-sm sm:text-lg");
 
-  const inner = (
+  const inner = iconOnly ? (
+    <span className={`inline-flex items-center ${className}`}>
+      <LogoMark size={size} />
+    </span>
+  ) : (
     <span className={`inline-flex items-center gap-2 font-extrabold text-amber-700 ${textSize} ${className}`}>
       <LogoMark size={size} />
       NooitMeerPostKwijt

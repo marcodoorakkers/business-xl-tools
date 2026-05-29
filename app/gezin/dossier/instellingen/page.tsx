@@ -162,7 +162,7 @@ function InstellingenContent() {
 
       <header className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
-          <NMMPKLogo />
+          <NMMPKLogo iconOnly />
           <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
             ← Terug
           </Link>
