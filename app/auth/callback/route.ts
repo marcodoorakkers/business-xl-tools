@@ -3,9 +3,17 @@ import { sendAdminNotification, sendWelcomeEmailNMMPK } from "@/lib/email";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const host = request.headers.get("host") ?? "";
+
+  // Use x-forwarded-host or host header to get the real domain,
+  // not request.url which can be the internal Vercel URL
+  const host = request.headers.get("x-forwarded-host")
+    ?? request.headers.get("host")
+    ?? new URL(request.url).hostname;
+  const proto = request.headers.get("x-forwarded-proto") ?? "https";
+  const origin = `${proto}://${host}`;
+
   const isNMMPKDomain = host.includes("nooitmeerpostkwijt");
   const defaultNext = isNMMPKDomain ? "/dossier" : "/dashboard";
   const next = searchParams.get("next") ?? defaultNext;
@@ -57,5 +65,6 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=auth_callback_error`);
+  const loginPath = isNMMPKDomain ? "/inloggen" : "/auth/login";
+  return NextResponse.redirect(`${origin}${loginPath}?error=auth_callback_error`);
 }
