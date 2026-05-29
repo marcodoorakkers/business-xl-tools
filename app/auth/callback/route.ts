@@ -5,7 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const host = request.headers.get("host") ?? "";
+  const isNMMPKDomain = host.includes("nooitmeerpostkwijt");
+  const defaultNext = isNMMPKDomain ? "/dossier" : "/dashboard";
+  const next = searchParams.get("next") ?? defaultNext;
 
   if (code) {
     const supabase = await createClient();
@@ -19,7 +22,7 @@ export async function GET(request: NextRequest) {
       if (isNewUser) {
         const email = data.user.email ?? "onbekend";
         const time = new Date().toLocaleString("nl-NL", { timeZone: "Europe/Amsterdam" });
-        const isNMMPK = next.startsWith("/dossier");
+        const isNMMPK = isNMMPKDomain || next.startsWith("/dossier");
 
         // Welcome email to the user (NooitMeerPostKwijt only)
         if (isNMMPK && data.user.email) {
