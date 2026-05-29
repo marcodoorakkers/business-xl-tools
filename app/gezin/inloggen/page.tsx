@@ -31,7 +31,7 @@ export default function GezinLoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-amber-50 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="text-2xl font-extrabold text-amber-700">📬 NooitMeerPostKwijt</Link>

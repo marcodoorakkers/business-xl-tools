@@ -112,9 +112,9 @@ export default function ArchiefPage() {
   const uniqueTypes = Array.from(new Set(documents.map((d) => d.type).filter(Boolean))) as string[];
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-amber-100 px-6 py-4">
+      <header className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link href="/" className="font-extrabold text-amber-700 text-lg">📬 NooitMeerPostKwijt</Link>
           <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
@@ -130,7 +130,7 @@ export default function ArchiefPage() {
         </div>
 
         {/* Zoekbalk */}
-        <div className="bg-white rounded-2xl border border-amber-100 p-4 mb-4 flex flex-col gap-3">
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4 flex flex-col gap-3">
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
             <input
@@ -187,13 +187,11 @@ export default function ArchiefPage() {
           </div>
         ) : !hasSearched ? (
           <div className="text-center py-16">
-            <p className="text-4xl mb-3">🔍</p>
             <p className="text-gray-500 font-medium mb-1">Zoek op afzender, onderwerp of trefwoord</p>
-            <p className="text-sm text-gray-400">Of filter op gezinslid of type document.</p>
+            <p className="text-sm text-gray-400">Of filter op persoon of type document.</p>
           </div>
         ) : documents.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-4xl mb-3">🗂</p>
             <p className="text-gray-600 font-medium mb-1">Geen documenten gevonden</p>
             <p className="text-sm text-gray-400">Probeer een andere zoekterm of verwijder de filters.</p>
           </div>
@@ -202,9 +200,9 @@ export default function ArchiefPage() {
             <p className="text-xs text-gray-400 mb-3">{documents.length} document{documents.length !== 1 ? "en" : ""} gevonden</p>
             <div className="flex flex-col gap-3">
               {documents.map((doc) => (
-                <div key={doc.id} className="bg-white border border-amber-100 rounded-2xl p-4 flex items-start gap-3 group">
+                <div key={doc.id} className="bg-white border border-gray-100 rounded-2xl p-4 flex items-start gap-3 group">
                   {/* Type icon */}
-                  <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-xl flex-shrink-0 mt-0.5">
+                  <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-xl flex-shrink-0 mt-0.5">
                     {TYPE_ICONS[doc.type ?? ""] ?? "📄"}
                   </div>
 

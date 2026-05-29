@@ -4,8 +4,8 @@ export const metadata = { title: "Privacyverklaring — NooitMeerPostKwijt" };
 
 export default function GezinPrivacyPage() {
   return (
-    <div className="min-h-screen bg-amber-50">
-      <nav className="bg-white border-b border-amber-100 px-6 py-4 max-w-3xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-white">
+      <nav className="bg-white border-b border-gray-100 px-6 py-4 max-w-3xl mx-auto flex items-center justify-between">
         <Link href="/" className="font-extrabold text-amber-700 text-lg">📬 NooitMeerPostKwijt</Link>
         <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">← Terug</Link>
       </nav>

@@ -90,9 +90,9 @@ export default function GezinActiesPage() {
   const openCount = actions.filter(a => a.status === "open").length;
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-amber-100 px-6 py-4">
+      <header className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <Link href="/" className="font-extrabold text-amber-700 text-lg">📬 NooitMeerPostKwijt</Link>
           <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
@@ -121,7 +121,7 @@ export default function GezinActiesPage() {
               className={`px-4 py-1.5 rounded-xl text-sm font-medium transition-colors ${
                 filter === f
                   ? "bg-amber-500 text-white"
-                  : "bg-white border border-amber-100 text-gray-600 hover:bg-amber-50"
+                  : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
             >
               {f === "open" ? `Open${openCount > 0 ? ` (${openCount})` : ""}` : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -138,11 +138,10 @@ export default function GezinActiesPage() {
         {loading ? (
           <div className="text-center py-16 text-gray-400 text-sm">Laden…</div>
         ) : filtered.length === 0 ? (
-          <div className="bg-white border border-amber-100 rounded-3xl p-12 text-center">
-            <div className="text-4xl mb-3">{filter === "open" ? "✅" : "📭"}</div>
+          <div className="bg-white border border-gray-100 rounded-3xl p-12 text-center">
             <p className="text-gray-500 text-sm">
               {filter === "open"
-                ? "Geen openstaande acties. Scan een brief om acties te ontdekken."
+                ? "Geen openstaande acties — scan een brief om acties te ontdekken."
                 : `Geen ${filter} acties.`}
             </p>
             {filter === "open" && (
@@ -160,7 +159,7 @@ export default function GezinActiesPage() {
               return (
                 <div
                   key={action.id}
-                  className={`bg-white border border-amber-100 rounded-2xl overflow-hidden transition-opacity ${isUpdating ? "opacity-50" : ""}`}
+                  className={`bg-white border border-gray-100 rounded-2xl overflow-hidden transition-opacity ${isUpdating ? "opacity-50" : ""}`}
                 >
                   {filter === "open" && (
                     <div className={`h-1.5 w-full ${
@@ -179,7 +178,11 @@ export default function GezinActiesPage() {
                           className="mt-0.5 w-6 h-6 rounded-full border-2 border-gray-300 hover:border-amber-500 hover:bg-amber-50 shrink-0 transition-colors"
                         />
                       ) : (
-                        <span className="text-xl shrink-0 mt-0.5">📌</span>
+                        <span className="w-6 h-6 rounded-full bg-gray-100 shrink-0 mt-0.5 flex items-center justify-center">
+                          <svg className="w-3.5 h-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </span>
                       )}
 
                       <div className="flex-1 min-w-0">
@@ -207,7 +210,7 @@ export default function GezinActiesPage() {
                     </div>
 
                     {filter === "open" && (
-                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-amber-50">
+                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
                         <button
                           onClick={() => updateStatus(action.id, "gedaan")}
                           disabled={isUpdating}
@@ -225,7 +228,7 @@ export default function GezinActiesPage() {
                       </div>
                     )}
                     {filter !== "open" && (
-                      <div className="flex gap-2 mt-4 pt-3 border-t border-amber-50">
+                      <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
                         <button
                           onClick={() => updateStatus(action.id, "open")}
                           disabled={isUpdating}

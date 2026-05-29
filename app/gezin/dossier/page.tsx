@@ -306,9 +306,9 @@ export default function GezinDossierPage() {
   const cloudLabel = storagePreference === "dropbox" ? "Dropbox" : "OneDrive";
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-amber-100 px-6 py-4">
+      <header className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <Link href="/" className="font-extrabold text-amber-700 text-lg">📬 NooitMeerPostKwijt</Link>
           <div className="flex items-center gap-4">
@@ -371,9 +371,9 @@ export default function GezinDossierPage() {
             </div>
 
             {familyMembers.length === 0 && (
-              <div className="mt-4 bg-amber-100 rounded-2xl px-4 py-3 text-sm text-amber-800">
-                💡 <strong>Tip:</strong> Voeg personen toe in de{" "}
-                <Link href="/dossier/instellingen" className="underline font-medium">instellingen</Link>{" "}
+              <div className="mt-4 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-600">
+                Voeg personen toe in de{" "}
+                <Link href="/dossier/instellingen" className="underline font-medium text-amber-600">instellingen</Link>{" "}
                 zodat brieven automatisch aan de juiste persoon gekoppeld worden.
               </div>
             )}
@@ -438,7 +438,9 @@ export default function GezinDossierPage() {
         {/* ANALYZING */}
         {step === "analyzing" && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4 animate-bounce">🤖</div>
+            <div className="flex justify-center mb-5">
+              <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+            </div>
             <p className="font-semibold text-gray-700 text-lg mb-1">Je post wordt geanalyseerd…</p>
             <p className="text-gray-400 text-sm">Even geduld — dit duurt maar een paar seconden.</p>
           </div>
@@ -550,7 +552,9 @@ export default function GezinDossierPage() {
         {/* SAVING */}
         {step === "saving" && (
           <div className="text-center py-20">
-            <div className="text-5xl mb-4">💾</div>
+            <div className="flex justify-center mb-5">
+              <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin" />
+            </div>
             <p className="font-semibold text-gray-700 text-lg">Opslaan…</p>
           </div>
         )}
@@ -558,7 +562,11 @@ export default function GezinDossierPage() {
         {/* DONE */}
         {step === "done" && savedInfo && (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">🎉</div>
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
             <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Opgeslagen!</h2>
             <p className="text-sm text-gray-500 font-mono mb-6">{savedInfo.pad}</p>
             {savedInfo.url && (
@@ -592,8 +600,12 @@ export default function GezinDossierPage() {
         {/* ERROR */}
         {step === "error" && (
           <div className="text-center py-12">
-            <div className="text-5xl mb-4">😕</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Oeps, er ging iets mis</h2>
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Er ging iets mis</h2>
             <p className="text-sm text-red-500 mb-6">{errorMsg}</p>
             <button
               onClick={reset}

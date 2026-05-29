@@ -26,7 +26,7 @@ export default function BuyCreditsButton({ priceId }: { priceId: string }) {
     <button
       onClick={handleBuy}
       disabled={loading}
-      className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
+      className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
     >
       {loading ? "Laden..." : "Kopen →"}
     </button>

@@ -150,7 +150,7 @@ function InstellingenContent() {
   ];
 
   return (
-    <div className="min-h-screen bg-amber-50">
+    <div className="min-h-screen bg-white">
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-2xl shadow-lg text-sm font-medium transition-all ${
           toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
@@ -159,7 +159,7 @@ function InstellingenContent() {
         </div>
       )}
 
-      <header className="bg-white border-b border-amber-100 px-6 py-4">
+      <header className="bg-white border-b border-gray-100 px-6 py-4">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <Link href="/" className="font-extrabold text-amber-700 text-lg">📬 NooitMeerPostKwijt</Link>
           <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
@@ -175,7 +175,7 @@ function InstellingenContent() {
         </div>
 
         {/* Opslagvoorkeur */}
-        <div className="bg-white border border-amber-100 rounded-2xl p-6 space-y-4">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
           <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Opslagvoorkeur</h2>
           <div className="flex gap-2">
             {storageOptions.map((opt) => (
@@ -196,13 +196,15 @@ function InstellingenContent() {
         </div>
 
         {/* OneDrive */}
-        <div className="bg-white border border-amber-100 rounded-2xl p-6 space-y-5">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
           <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">OneDrive koppeling</h2>
           {status === null ? (
             <div className="text-sm text-gray-400">Laden…</div>
           ) : status.connected ? (
             <div className="flex items-center gap-3">
-              <span className="text-green-500 text-xl">✓</span>
+              <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </span>
               <span className="text-sm font-medium text-gray-900">OneDrive is gekoppeld</span>
               <a href="/api/tools/mijn-dossier/onedrive/auth"
                 className="ml-auto text-xs text-amber-600 hover:text-amber-800 font-medium border border-amber-200 rounded-xl px-3 py-1.5 transition-colors">
@@ -211,7 +213,7 @@ function InstellingenContent() {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <span className="text-gray-400 text-xl">○</span>
+              <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block flex-shrink-0" />
               <span className="text-sm text-gray-600">OneDrive is nog niet gekoppeld</span>
               <a href="/api/tools/mijn-dossier/onedrive/auth"
                 className="ml-auto bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
@@ -235,13 +237,15 @@ function InstellingenContent() {
         </div>
 
         {/* Dropbox */}
-        <div className="bg-white border border-amber-100 rounded-2xl p-6 space-y-5">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
           <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Dropbox koppeling</h2>
           {status === null ? (
             <div className="text-sm text-gray-400">Laden…</div>
           ) : status.dropboxConnected ? (
             <div className="flex items-center gap-3">
-              <span className="text-green-500 text-xl">✓</span>
+              <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </span>
               <span className="text-sm font-medium text-gray-900">Dropbox is gekoppeld</span>
               <a href="/api/tools/mijn-dossier/dropbox/auth"
                 className="ml-auto text-xs text-amber-600 hover:text-amber-800 font-medium border border-amber-200 rounded-xl px-3 py-1.5 transition-colors">
@@ -250,7 +254,7 @@ function InstellingenContent() {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <span className="text-gray-400 text-xl">○</span>
+              <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block flex-shrink-0" />
               <span className="text-sm text-gray-600">Dropbox is nog niet gekoppeld</span>
               <a href="/api/tools/mijn-dossier/dropbox/auth"
                 className="ml-auto bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
@@ -274,14 +278,14 @@ function InstellingenContent() {
         </div>
 
         {/* Gezinsleden */}
-        <div className="bg-white border border-amber-100 rounded-2xl p-6 space-y-5">
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
           <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Gezinsleden</h2>
           <p className="text-xs text-gray-500">
             Voeg gezinsleden toe zodat documenten automatisch aan de juiste persoon worden gekoppeld.
           </p>
           <ul className="space-y-2">
             {familyMembers.map((m) => (
-              <li key={m.id} className="flex items-center justify-between bg-amber-50 rounded-xl px-4 py-2">
+              <li key={m.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2">
                 <span className="text-sm text-gray-800">{m.name}</span>
                 <button onClick={() => deleteMember(m.id)}
                   className="text-gray-400 hover:text-red-500 text-lg leading-none transition-colors"
