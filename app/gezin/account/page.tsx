@@ -23,11 +23,13 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("credits, subscription_status, subscription_period_end")
+    .select("credits, subscription_credits, subscription_status, subscription_period_end")
     .eq("id", user.id)
     .single();
 
-  const credits = profile?.credits ?? 0;
+  const purchasedCredits = profile?.credits ?? 0;
+  const subscriptionCredits = profile?.subscription_credits ?? 0;
+  const credits = purchasedCredits + subscriptionCredits;
   const subscriptionStatus = profile?.subscription_status ?? null;
   const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
   const params = await searchParams;
@@ -75,7 +77,11 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
         <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-white">
           <p className="text-amber-100 text-sm mb-1">Jouw scans</p>
           <p className="text-5xl font-extrabold">{credits}</p>
-          <p className="text-amber-100 text-sm mt-1">scans beschikbaar · verlopen nooit</p>
+          {subscriptionStatus === "active" && subscriptionCredits > 0 ? (
+            <p className="text-amber-100 text-sm mt-1">{subscriptionCredits} abonnement (deze maand) · {purchasedCredits} gekocht (verlopen nooit)</p>
+          ) : (
+            <p className="text-amber-100 text-sm mt-1">scans beschikbaar · verlopen nooit</p>
+          )}
         </div>
 
         {/* Maandelijks abonnement */}
@@ -85,7 +91,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <span>⭐</span>
               <h2 className="font-bold text-gray-900 text-lg">Maandelijks abonnement</h2>
             </div>
-            <p className="text-gray-500 text-sm mb-4">50 scans per maand · automatisch verlengd · opzegbaar wanneer je wil</p>
+            <p className="text-gray-500 text-sm mb-4">50 scans per maand · ongebruikte scans vervallen aan eind van de maand · opzegbaar wanneer je wil</p>
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-3xl font-extrabold text-gray-900">€3,99</span>
@@ -102,7 +108,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <span className="text-green-600 font-bold text-lg">✓</span>
               <h2 className="font-bold text-green-800 text-lg">Maandelijks abonnement actief</h2>
             </div>
-            <p className="text-green-700 text-sm">Je ontvangt elke maand 50 nieuwe scans.</p>
+            <p className="text-green-700 text-sm">Je ontvangt elke maand 50 verse scans. Ongebruikte abonnementsscans vervallen aan het einde van de maand.</p>
             {formattedPeriodEnd && (
               <p className="text-green-600 text-sm mt-1">Volgende verlenging: {formattedPeriodEnd}</p>
             )}
@@ -115,7 +121,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
             <h2 className="font-bold text-amber-800 text-lg mb-1">
               Abonnement loopt af{formattedPeriodEnd ? ` op ${formattedPeriodEnd}` : ""}
             </h2>
-            <p className="text-amber-700 text-sm">Je scans blijven gewoon staan.</p>
+            <p className="text-amber-700 text-sm">Je abonnementsscans zijn nog geldig tot het einde van de betaalperiode. Daarna blijven je gekochte scans gewoon staan.</p>
           </div>
         )}
 

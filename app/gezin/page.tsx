@@ -173,7 +173,7 @@ export default function GezinLandingPage() {
             <div className="flex items-start justify-between gap-6 flex-wrap">
               <div className="flex-1">
                 <h3 className="font-bold text-xl mb-1">Maandelijks abonnement</h3>
-                <p className="text-amber-100 text-sm mb-4">50 scans per maand · automatisch verlengd · opzegbaar wanneer je wil</p>
+                <p className="text-amber-100 text-sm mb-4">50 scans per maand · ongebruikte scans vervallen elke maand · opzegbaar wanneer je wil</p>
                 <div className="text-sm text-amber-50 space-y-1">
                   <p>50 scans elke maand</p>
                   <p>OneDrive &amp; Dropbox</p>
