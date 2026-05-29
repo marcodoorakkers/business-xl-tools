@@ -81,5 +81,39 @@ export async function uploadFileToDropbox(
     throw new Error(`Dropbox upload failed: ${res.status} ${body.slice(0, 200)}`);
   }
 
+  const uploadData = await res.json();
+  const uploadedPath = uploadData.path_display ?? ("/" + fullPath);
+
+  const linkRes = await fetch("https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ path: uploadedPath }),
+  });
+
+  if (linkRes.ok) {
+    const linkData = await linkRes.json();
+    return { webUrl: linkData.url ?? "" };
+  }
+
+  // Link may already exist — fetch it
+  if (linkRes.status === 409) {
+    const listRes = await fetch("https://api.dropboxapi.com/2/sharing/list_shared_links", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ path: uploadedPath, direct_only: true }),
+    });
+    if (listRes.ok) {
+      const listData = await listRes.json();
+      const url = listData.links?.[0]?.url ?? "";
+      return { webUrl: url };
+    }
+  }
+
   return { webUrl: "" };
 }
