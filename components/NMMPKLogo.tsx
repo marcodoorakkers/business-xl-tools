@@ -22,7 +22,7 @@ interface NMMPKLogoProps {
 }
 
 export default function NMMPKLogo({ href = "/", className = "", size = "md", textClassName }: NMMPKLogoProps) {
-  const textSize = textClassName ?? (size === "lg" ? "text-xl" : "text-lg");
+  const textSize = textClassName ?? (size === "lg" ? "text-base sm:text-xl" : "text-sm sm:text-lg");
 
   const inner = (
     <span className={`inline-flex items-center gap-2 font-extrabold text-amber-700 ${textSize} ${className}`}>
