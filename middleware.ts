@@ -36,7 +36,8 @@ export async function middleware(request: NextRequest) {
   const isApiOrCallback =
     originalPath.startsWith("/api") ||
     originalPath.startsWith("/_next") ||
-    originalPath.startsWith("/auth/callback");
+    originalPath.startsWith("/auth/callback") ||
+    originalPath.startsWith("/auth/confirm");
 
   // Bereken het effectieve pad (met /gezin prefix voor familiedomein)
   const needsRewrite = isFamilySite && !isApiOrCallback && !originalPath.startsWith("/gezin");
