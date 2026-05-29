@@ -10,6 +10,7 @@ create table if not exists document_actions (
   document_naam text,
   afzender     text,
   mappad       text,
+  file_url     text,
   created_at   timestamptz default now() not null
 );
 

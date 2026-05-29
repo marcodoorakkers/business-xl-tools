@@ -12,6 +12,7 @@ interface DocumentAction {
   document_naam: string | null;
   afzender: string | null;
   mappad: string | null;
+  file_url: string | null;
   created_at: string;
 }
 
@@ -198,6 +199,16 @@ export default function GezinActiesPage() {
                         <p className="font-semibold text-gray-900 text-sm leading-snug mb-1">{action.actie}</p>
                         {action.afzender && (
                           <p className="text-xs text-gray-500">Van: {action.afzender}</p>
+                        )}
+                        {action.file_url && (
+                          <a
+                            href={action.file_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block text-xs text-amber-600 hover:text-amber-800 font-medium mt-0.5 transition-colors"
+                          >
+                            Document openen →
+                          </a>
                         )}
                         <div className="flex items-center gap-2 flex-wrap mt-2">
                           {action.deadline && (

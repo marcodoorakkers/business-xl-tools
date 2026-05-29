@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const body = await req.json();
-  const { actie, deadline, actie_type, document_naam, afzender, mappad } = body;
+  const { actie, deadline, actie_type, document_naam, afzender, mappad, file_url } = body;
   if (!actie) return NextResponse.json({ error: "Actie verplicht" }, { status: 400 });
 
   const { data, error } = await supabase
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
       document_naam: document_naam ?? null,
       afzender: afzender ?? null,
       mappad: mappad ?? null,
+      file_url: file_url ?? null,
       status: "open",
     })
     .select()

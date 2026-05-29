@@ -188,7 +188,7 @@ export default function GezinDossierPage() {
     }
   }
 
-  async function saveActie(a: Analysis) {
+  async function saveActie(a: Analysis, fileUrl?: string) {
     if (!a.actie) return;
     try {
       await fetch("/api/tools/mijn-dossier/acties", {
@@ -201,6 +201,7 @@ export default function GezinDossierPage() {
           document_naam: bestandsnaam,
           afzender: a.afzender,
           mappad,
+          file_url: fileUrl ?? null,
         }),
       });
     } catch (err) {
@@ -259,7 +260,7 @@ export default function GezinDossierPage() {
       const data = await res.json();
       if (data.error) { setErrorMsg(data.error); setStep("error"); return; }
 
-      if (includeActie && analysis.actie) await saveActie(analysis);
+      if (includeActie && analysis.actie) await saveActie(analysis, data.webUrl);
       await saveDocumentMetadata(data.webUrl, storagePreference);
       setSavedInfo({ pad: data.path ?? mappad, url: data.webUrl });
       setStep("done");
