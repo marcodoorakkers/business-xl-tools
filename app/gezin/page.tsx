@@ -29,12 +29,12 @@ export default function GezinLandingPage() {
         <div className="flex flex-col lg:flex-row items-center gap-12 pt-12 pb-16">
           {/* Tekst */}
           <div className="flex-1 max-w-xl">
-            <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Post beheren, eenvoudig gemaakt</p>
+            <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Ken je dit moment?</p>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-5 leading-tight">
               Nooit meer<br />een brief kwijt
             </h1>
             <p className="text-lg text-gray-500 mb-8 leading-relaxed">
-              Maak een foto van je post. NooitMeerPostKwijt leest het document, herkent wat er moet gebeuren en houdt de acties voor je bij.
+              De tenaamstellingscode van je auto. Het polisnummer van je zorgverzekeraar. De garantiebrief die je nú nodig hebt. Scan je post — NooitMeerPostKwijt herkent wat er in staat en bewaart alles automatisch op de juiste plek.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
@@ -173,7 +173,7 @@ export default function GezinLandingPage() {
               </div>
               <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
                 <div>
-                  <p className="text-4xl font-extrabold">€4,99</p>
+                  <p className="text-4xl font-extrabold">€3,99</p>
                   <p className="text-amber-200 text-sm">/maand</p>
                 </div>
                 <Link href="/aanmelden" className="bg-white text-amber-600 hover:bg-amber-50 font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
@@ -203,8 +203,8 @@ export default function GezinLandingPage() {
             <div className="bg-white border border-gray-200 rounded-2xl p-6 text-left">
               <h3 className="font-bold text-gray-900 text-lg mb-1">50 scans</h3>
               <p className="text-xs text-gray-400 mb-4">Genoeg voor een vol jaar</p>
-              <p className="text-3xl font-extrabold text-gray-900 mb-0.5">€9,99</p>
-              <p className="text-xs text-gray-400 mb-4">€0,20 per scan</p>
+              <p className="text-3xl font-extrabold text-gray-900 mb-0.5">€7,49</p>
+              <p className="text-xs text-gray-400 mb-4">€0,15 per scan</p>
               <div className="text-sm text-gray-500 space-y-1 mb-6">
                 <p>Verlopen nooit</p>
                 <p>Alle functies</p>
@@ -219,8 +219,8 @@ export default function GezinLandingPage() {
               <span className="absolute -top-3 left-4 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">Beste prijs</span>
               <h3 className="font-bold text-gray-900 text-lg mb-1">200 scans</h3>
               <p className="text-xs text-gray-400 mb-4">Voor wie veel post ontvangt</p>
-              <p className="text-3xl font-extrabold text-gray-900 mb-0.5">€29,99</p>
-              <p className="text-xs text-gray-400 mb-4">€0,15 per scan</p>
+              <p className="text-3xl font-extrabold text-gray-900 mb-0.5">€19,99</p>
+              <p className="text-xs text-gray-400 mb-4">€0,10 per scan</p>
               <div className="text-sm text-gray-500 space-y-1 mb-6">
                 <p>Verlopen nooit</p>
                 <p>Alle functies</p>
@@ -232,6 +232,15 @@ export default function GezinLandingPage() {
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-5">Betaal via iDEAL, creditcard of Bancontact.</p>
+        </div>
+
+        {/* Sociaal bewijs */}
+        <div className="max-w-2xl mx-auto py-14 border-t border-gray-100 text-center">
+          <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-8">Wat gebruikers zeggen</p>
+          <blockquote className="text-lg text-gray-700 font-medium leading-relaxed mb-4">
+            &ldquo;Eindelijk weet ik waar al mijn belangrijke brieven zijn. Die ene brief van het RDW die ik al maanden zocht? Gevonden in twee seconden.&rdquo;
+          </blockquote>
+          <p className="text-sm text-gray-400">— Early adopter, gezin met 2 kinderen</p>
         </div>
 
         {/* Privacy */}
