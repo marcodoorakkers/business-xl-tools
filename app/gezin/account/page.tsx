@@ -9,8 +9,10 @@ import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
 
 const PACKAGES = [
-  { name: "Gezin", credits: 50, price: "€9,99", priceId: "price_1TZSta1ifGSUEPSdHvDnulnr", perScan: "€0,20/scan" },
-  { name: "Veelgebruiker", credits: 200, price: "€29,99", priceId: "price_1TZSte1ifGSUEPSd9N8emyuz", perScan: "€0,15/scan" },
+  { name: "10 scans",  credits: 10,  price: "€1,99",  priceId: process.env.STRIPE_PRICE_10!,  perScan: "€0,20/scan" },
+  { name: "50 scans",  credits: 50,  price: "€7,49",  priceId: process.env.STRIPE_PRICE_50!,  perScan: "€0,15/scan" },
+  { name: "100 scans", credits: 100, price: "€11,99", priceId: process.env.STRIPE_PRICE_100!, perScan: "€0,12/scan" },
+  { name: "200 scans", credits: 200, price: "€19,99", priceId: process.env.STRIPE_PRICE_200!, perScan: "€0,10/scan" },
 ];
 
 export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string; credits?: string }> }) {
@@ -85,7 +87,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
             <p className="text-gray-500 text-sm mb-4">50 scans per maand · automatisch verlengd · opzegbaar wanneer je wil</p>
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-extrabold text-gray-900">€4,99</span>
+                <span className="text-3xl font-extrabold text-gray-900">€3,99</span>
                 <span className="text-gray-400 text-sm ml-1">/maand</span>
               </div>
               <SubscribeButton priceId={proPriceId} />

@@ -3,11 +3,19 @@ import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const CREDIT_PACKAGES: Record<string, number> = {
-  "price_1TZSta1ifGSUEPSdHvDnulnr": 50,   // Starter
-  "price_1TZSte1ifGSUEPSd9N8emyuz": 200,  // Populair
-  "price_1TZStd1ifGSUEPSdlWmrtbOS": 500,  // Beste Koop
-};
+function buildCreditPackages(): Record<string, number> {
+  const map: Record<string, number> = {};
+  // Legacy prices (TimeSaverTools)
+  if (process.env.STRIPE_PRICE_STARTER)  map[process.env.STRIPE_PRICE_STARTER]  = 50;
+  if (process.env.STRIPE_PRICE_POPULAIR) map[process.env.STRIPE_PRICE_POPULAIR] = 200;
+  if (process.env.STRIPE_PRICE_BESTEKOOP) map[process.env.STRIPE_PRICE_BESTEKOOP] = 500;
+  // New credit packs
+  if (process.env.STRIPE_PRICE_10)  map[process.env.STRIPE_PRICE_10]  = 10;
+  if (process.env.STRIPE_PRICE_50)  map[process.env.STRIPE_PRICE_50]  = 50;
+  if (process.env.STRIPE_PRICE_100) map[process.env.STRIPE_PRICE_100] = 100;
+  if (process.env.STRIPE_PRICE_200) map[process.env.STRIPE_PRICE_200] = 200;
+  return map;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -66,6 +74,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Handle one-time credit purchases
+  const CREDIT_PACKAGES = buildCreditPackages();
   if (!CREDIT_PACKAGES[priceId]) {
     return NextResponse.json({ error: "Ongeldig pakket" }, { status: 400 });
   }
