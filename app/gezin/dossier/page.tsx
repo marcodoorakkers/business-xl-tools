@@ -134,23 +134,27 @@ export default function GezinDossierPage() {
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const addFile = useCallback((f: File) => {
-    if (f.type.startsWith("image/")) {
-      const reader = new FileReader();
-      reader.onload = (e) => setPreviews(prev => [...prev, e.target?.result as string]);
-      reader.readAsDataURL(f);
-    } else {
-      setPreviews(prev => [...prev, ""]);
-    }
+  const addFiles = useCallback(async (newFiles: File[]) => {
+    if (newFiles.length === 0) return;
+    const newPreviews = await Promise.all(newFiles.map(f =>
+      new Promise<string>(resolve => {
+        if (!f.type.startsWith("image/")) { resolve(""); return; }
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target?.result as string ?? "");
+        reader.readAsDataURL(f);
+      })
+    ));
     setFiles(prev => {
-      const next = [...prev, f];
-      if (f.type === "application/pdf") {
+      const next = [...prev, ...newFiles];
+      const hasPdf = newFiles.some(f => f.type === "application/pdf");
+      if (hasPdf) {
         setTimeout(() => analyzeFiles(next), 0);
       } else {
         setStep("staging");
       }
       return next;
     });
+    setPreviews(prev => [...prev, ...newPreviews]);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function removeFile(index: number) {
@@ -364,7 +368,7 @@ export default function GezinDossierPage() {
               onDragLeave={() => setDragOver(false)}
               onDrop={(e) => {
                 e.preventDefault(); setDragOver(false);
-                Array.from(e.dataTransfer.files).forEach(addFile);
+                addFiles(Array.from(e.dataTransfer.files));
               }}
             >
               <div className="text-5xl mb-3">📸</div>
@@ -376,7 +380,7 @@ export default function GezinDossierPage() {
                 accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
                 multiple
                 className="hidden"
-                onChange={(e) => Array.from(e.target.files ?? []).forEach(addFile)}
+                onChange={(e) => addFiles(Array.from(e.target.files ?? []))}
               />
             </div>
 
@@ -427,7 +431,7 @@ export default function GezinDossierPage() {
               accept="image/jpeg,image/png,image/gif,image/webp"
               multiple
               className="hidden"
-              onChange={(e) => Array.from(e.target.files ?? []).forEach(addFile)}
+              onChange={(e) => addFiles(Array.from(e.target.files ?? []))}
             />
 
             <div className="flex gap-3">
