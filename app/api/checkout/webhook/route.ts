@@ -61,12 +61,12 @@ export async function POST(req: NextRequest) {
         })
         .eq("id", userId);
 
-      const { error: creditsError } = await supabase.rpc("add_credits", {
+      const { error: creditsError } = await supabase.rpc("set_subscription_credits", {
         user_id: userId,
         amount: 50,
       });
       if (creditsError) {
-        console.error("[webhook] Failed to add credits on subscription_start:", creditsError);
+        console.error("[webhook] Failed to set credits on subscription_start:", creditsError);
       }
 
       await supabase.from("usage_logs").insert({
@@ -122,12 +122,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true });
     }
 
-    const { error: creditsError } = await supabase.rpc("add_credits", {
+    const { error: creditsError } = await supabase.rpc("set_subscription_credits", {
       user_id: profile.id,
       amount: 50,
     });
     if (creditsError) {
-      console.error("[webhook] Failed to add renewal credits:", creditsError);
+      console.error("[webhook] Failed to reset renewal credits:", creditsError);
     }
 
     await supabase.from("usage_logs").insert({
@@ -149,6 +149,7 @@ export async function POST(req: NextRequest) {
         subscription_status: null,
         stripe_subscription_id: null,
         subscription_period_end: null,
+        subscription_credits: 0,
       })
       .eq("stripe_customer_id", customerId);
 
