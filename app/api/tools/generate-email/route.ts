@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { transcript, language = "nl" } = await req.json();
+  const { transcript, language = "nl", retranslate = false } = await req.json();
   if (!transcript) return NextResponse.json({ error: "Geen transcript" }, { status: 400 });
 
   const languageNames: Record<string, string> = {
@@ -50,11 +50,12 @@ ${transcript}`,
 
     const email = JSON.parse(jsonMatch[0]);
 
-    // Deduct 2 credits
-    await supabase.rpc("decrement_credits", { user_id: user.id });
-    await supabase.rpc("decrement_credits", { user_id: user.id });
-
-    await logUsage(user.id, "voice-mail", 2);
+    // Deduct 2 credits — skip for re-translation (same transcript, different language)
+    if (!retranslate) {
+      await supabase.rpc("decrement_credits", { user_id: user.id });
+      await supabase.rpc("decrement_credits", { user_id: user.id });
+      await logUsage(user.id, "voice-mail", 2);
+    }
 
     return NextResponse.json(email);
   } catch {

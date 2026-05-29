@@ -92,7 +92,7 @@ export default function VoiceMailPage() {
       const res = await fetch("/api/tools/generate-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, language: newLanguage }),
+        body: JSON.stringify({ transcript, language: newLanguage, retranslate: true }),
       });
       const { subject: s, body: b, error: generateError } = await res.json();
       if (generateError) throw new Error(generateError);
