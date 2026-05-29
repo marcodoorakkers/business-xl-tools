@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import ToolNav from "@/components/ToolNav";
 
-type Step = "idle" | "recording" | "processing" | "preview" | "sending" | "done" | "error";
+type Step = "idle" | "recording" | "processing" | "preview" | "saving" | "saved" | "error";
 
 const LANGUAGES = [
   { code: "nl", label: "🇳🇱 Nederlands" },
@@ -19,7 +19,6 @@ const LANGUAGES = [
 
 export default function VoiceMailPage() {
   const [step, setStep] = useState<Step>("idle");
-  const [email, setEmail] = useState("");
   const [language, setLanguage] = useState("nl");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -31,16 +30,8 @@ export default function VoiceMailPage() {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
 
-  // Pre-fill email from logged-in account
-  useState(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user?.email) setEmail(user.email);
-    });
-  });
-
   async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    // Pick the best supported format — Safari uses mp4, Chrome/Firefox use webm
     const mimeType = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"]
       .find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
     mediaRecorder.current = new MediaRecorder(stream, {
@@ -54,7 +45,6 @@ export default function VoiceMailPage() {
     mediaRecorder.current.onstop = async () => {
       stream.getTracks().forEach((t) => t.stop());
       const audioBlob = new Blob(audioChunks.current, { type: mimeType || "audio/webm" });
-      console.log("[VoiceMail] format:", mimeType, "size:", (audioBlob.size / 1024).toFixed(1), "KB");
       await processAudio(audioBlob);
     };
     mediaRecorder.current.start(1000);
@@ -94,19 +84,19 @@ export default function VoiceMailPage() {
     }
   }
 
-  async function sendDraft() {
-    setStep("sending");
+  async function saveDraft() {
+    setStep("saving");
     try {
-      const res = await fetch("/api/tools/send-email", {
+      const res = await fetch("/api/tools/voice-mail/drafts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ to: email, subject, body }),
+        body: JSON.stringify({ subject, body, transcript, language }),
       });
       const { error } = await res.json();
       if (error) throw new Error(error);
-      setStep("done");
+      setStep("saved");
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Versturen mislukt");
+      setErrorMsg(err instanceof Error ? err.message : "Opslaan mislukt");
       setStep("error");
     }
   }
@@ -117,7 +107,6 @@ export default function VoiceMailPage() {
     setBody("");
     setTranscript("");
     setErrorMsg("");
-    // email bewaard zodat je niet opnieuw hoeft in te vullen
   }
 
   return (
@@ -126,18 +115,13 @@ export default function VoiceMailPage() {
 
       <main className="max-w-xl mx-auto px-4 py-10">
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h1 className="text-xl font-bold text-gray-900 mb-1">Voice Mail Draft</h1>
-          <p className="text-gray-500 text-sm mb-6">Spreek in wat je wilt mailen — de app maakt er een concept mail van. Kost 2 credits.</p>
-
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stuur concept naar</label>
-            <input
-              type="email"
-              value={email}
-              readOnly
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50 text-gray-500 cursor-default"
-            />
+          <div className="flex items-start justify-between mb-1">
+            <h1 className="text-xl font-bold text-gray-900">Voice Mail Draft</h1>
+            <Link href="/tools/voice-mail/concepten" className="text-xs text-blue-600 hover:underline font-medium">
+              Mijn concepten →
+            </Link>
           </div>
+          <p className="text-gray-500 text-sm mb-6">Spreek in wat je wilt mailen — het concept wordt opgeslagen in je account. Kost 2 credits.</p>
 
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-1">Uitvoertaal van de mail</label>
@@ -205,9 +189,9 @@ export default function VoiceMailPage() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
               </div>
               <div className="flex gap-3">
-                <button onClick={sendDraft}
+                <button onClick={saveDraft}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2 text-sm font-medium transition-colors">
-                  Stuur concept naar mijn mailbox
+                  Opslaan als concept
                 </button>
                 <button onClick={reset}
                   className="px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg py-2 text-sm font-medium transition-colors">
@@ -217,28 +201,42 @@ export default function VoiceMailPage() {
             </div>
           )}
 
-          {step === "sending" && (
+          {step === "saving" && (
             <div className="flex flex-col items-center gap-3 py-6">
               <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm text-gray-500">Mail wordt verstuurd...</p>
+              <p className="text-sm text-gray-500">Concept opslaan...</p>
             </div>
           )}
 
-          {step === "done" && (
-            <div className="flex flex-col items-center gap-4 py-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-3xl">✓</div>
-              <p className="text-gray-700 font-medium">Concept mail verstuurd naar je mailbox!</p>
-              <p className="text-sm text-gray-500">Pas de mail aan en verstuur hem zelf.</p>
-              <button onClick={reset}
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-2 text-sm font-medium transition-colors">
-                Nieuw bericht inspreken
-              </button>
+          {step === "saved" && (
+            <div className="flex flex-col items-center gap-4 py-6 text-center">
+              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-gray-800 font-semibold">Concept opgeslagen</p>
+              <p className="text-sm text-gray-500">Kopieer hem straks vanuit je conceptenlijst naar je mailprogramma.</p>
+              <div className="flex gap-3 mt-2">
+                <button onClick={reset}
+                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-5 py-2 text-sm font-medium transition-colors">
+                  Nog een inspreken
+                </button>
+                <Link href="/tools/voice-mail/concepten"
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg px-5 py-2 text-sm font-medium transition-colors">
+                  Naar concepten →
+                </Link>
+              </div>
             </div>
           )}
 
           {step === "error" && (
             <div className="flex flex-col items-center gap-4 py-6">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-3xl">!</div>
+              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center">
+                <svg className="w-7 h-7 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
               <p className="text-red-600 font-medium">Er is iets misgegaan</p>
               <p className="text-sm text-gray-500">{errorMsg}</p>
               <button onClick={reset}
