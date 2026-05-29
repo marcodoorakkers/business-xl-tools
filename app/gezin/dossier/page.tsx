@@ -323,6 +323,9 @@ export default function GezinDossierPage() {
             <Link href="/dossier/instellingen" className="text-gray-400 hover:text-gray-600 transition-colors">
               ⚙️
             </Link>
+            <Link href="/account" className="text-gray-400 hover:text-gray-600 transition-colors">
+              👤
+            </Link>
             {credits !== null && (
               <span className="text-xs text-gray-400 font-medium">{credits} credits</span>
             )}
