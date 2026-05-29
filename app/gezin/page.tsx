@@ -242,15 +242,6 @@ export default function GezinLandingPage() {
           <p className="text-xs text-gray-400 mt-5">Betaal via iDEAL, creditcard of Bancontact.</p>
         </div>
 
-        {/* Sociaal bewijs */}
-        <div className="max-w-2xl mx-auto py-14 border-t border-gray-100 text-center">
-          <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-8">Wat gebruikers zeggen</p>
-          <blockquote className="text-lg text-gray-700 font-medium leading-relaxed mb-4">
-            &ldquo;Eindelijk weet ik waar al mijn belangrijke brieven zijn. Die ene brief van het RDW die ik al maanden zocht? Gevonden in twee seconden.&rdquo;
-          </blockquote>
-          <p className="text-sm text-gray-400">— Early adopter, gezin met 2 kinderen</p>
-        </div>
-
         {/* Privacy */}
         <div className="max-w-2xl mx-auto mb-16 py-10 border-t border-gray-100">
           <h2 className="text-xl font-extrabold text-gray-900 mb-3">Jouw post, alleen voor jou</h2>

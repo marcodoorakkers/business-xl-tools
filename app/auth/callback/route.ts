@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { sendAdminNotification } from "@/lib/email";
+import { sendAdminNotification, sendWelcomeEmailNMMPK } from "@/lib/email";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -19,6 +19,12 @@ export async function GET(request: NextRequest) {
       if (isNewUser) {
         const email = data.user.email ?? "onbekend";
         const time = new Date().toLocaleString("nl-NL", { timeZone: "Europe/Amsterdam" });
+        const isNMMPK = next.startsWith("/dossier");
+
+        // Welcome email to the user (NooitMeerPostKwijt only)
+        if (isNMMPK && data.user.email) {
+          await sendWelcomeEmailNMMPK(data.user.email);
+        }
 
         await sendAdminNotification(
           `🎉 Nieuwe gebruiker: ${email}`,
