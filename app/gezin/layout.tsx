@@ -6,8 +6,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/gezin-icon.svg", type: "image/svg+xml" },
+      { url: "/gezin-apple-touch-icon.png", type: "image/png", sizes: "180x180" },
     ],
-    apple: "/gezin-icon.svg",
+    apple: [
+      { url: "/gezin-apple-touch-icon.png", sizes: "180x180" },
+    ],
   },
 };
 
