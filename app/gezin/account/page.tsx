@@ -131,13 +131,13 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           <p className="text-sm text-gray-500 mb-5">Kies een pakket — scans verlopen nooit.</p>
           <div className="flex flex-col gap-3">
             {PACKAGES.map((pkg) => (
-              <div key={pkg.priceId} className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50 hover:bg-amber-50 transition-colors">
+              <div key={pkg.priceId} className="flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-amber-50 transition-colors">
                 <div>
                   <p className="font-semibold text-gray-900">{pkg.name}</p>
-                  <p className="text-sm text-gray-500">{pkg.credits} scans · {pkg.perScan}</p>
+                  <p className="text-xs text-gray-400">{pkg.perScan}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-bold text-gray-900">{pkg.price}</span>
+                  <span className="font-bold text-gray-900 text-sm">{pkg.price}</span>
                   <BuyCreditsButton priceId={pkg.priceId} />
                 </div>
               </div>
