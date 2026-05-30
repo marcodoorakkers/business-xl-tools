@@ -166,7 +166,7 @@ export default async function LandingPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Simpele prijzen</h2>
           <p className="text-gray-500">Begin gratis of kies het Maandelijks abonnement voor de beste waarde.</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Gratis */}
           <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
             <div>
@@ -190,47 +190,47 @@ export default async function LandingPage() {
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-wider mb-1 text-amber-100">Maandelijks</p>
-              <p className="text-4xl font-extrabold text-white">€4,99</p>
+              <p className="text-4xl font-extrabold text-white">€3,99</p>
               <p className="text-sm mt-1 text-amber-100">/maand</p>
             </div>
             <div className="text-3xl font-bold text-white">
               50 <span className="text-base font-normal text-amber-100">credits/maand</span>
             </div>
-            <p className="text-xs text-amber-100">Maandelijks opzegbaar</p>
+            <p className="text-xs text-amber-100">Ongebruikte credits vervallen elke maand · opzegbaar wanneer je wil</p>
             <Link href="/account"
               className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-white text-amber-600 hover:bg-amber-50">
               Start Maandelijks →
             </Link>
           </div>
 
-          {/* Starter */}
+          {/* 50 credits */}
           <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">Starter</p>
-              <p className="text-4xl font-extrabold text-gray-900">€9,99</p>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">50 credits</p>
+              <p className="text-4xl font-extrabold text-gray-900">€7,49</p>
               <p className="text-sm mt-1 text-gray-500">Voor af en toe gebruik</p>
             </div>
             <div className="text-3xl font-bold text-gray-900">
               50 <span className="text-base font-normal text-gray-500">credits</span>
             </div>
-            <p className="text-xs text-gray-400">€0,20 per credit</p>
+            <p className="text-xs text-gray-400">€0,15 per credit · vervallen nooit</p>
             <Link href="/auth/register"
               className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
               Koop credits →
             </Link>
           </div>
 
-          {/* Populair */}
+          {/* 200 credits */}
           <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">Populair</p>
-              <p className="text-4xl font-extrabold text-gray-900">€29,99</p>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">200 credits</p>
+              <p className="text-4xl font-extrabold text-gray-900">€19,99</p>
               <p className="text-sm mt-1 text-gray-500">Voor regelmatig gebruik</p>
             </div>
             <div className="text-3xl font-bold text-gray-900">
               200 <span className="text-base font-normal text-gray-500">credits</span>
             </div>
-            <p className="text-xs text-gray-400">€0,15 per credit</p>
+            <p className="text-xs text-gray-400">€0,10 per credit · vervallen nooit</p>
             <Link href="/auth/register"
               className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
               Koop credits →
@@ -238,7 +238,7 @@ export default async function LandingPage() {
           </div>
 
         </div>
-        <p className="text-center text-xs text-gray-400 mt-6">Alle prijzen zijn excl. BTW · Betalen via iDEAL, creditcard of Bancontact · Credits vervallen niet</p>
+        <p className="text-center text-xs text-gray-400 mt-6">Alle prijzen zijn excl. BTW · Betalen via iDEAL, creditcard of Bancontact · Abonnementscredits vervallen maandelijks · Gekochte credits vervallen nooit</p>
       </section>
 
       {/* CTA */}
