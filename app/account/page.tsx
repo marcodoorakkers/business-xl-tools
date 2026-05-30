@@ -9,8 +9,10 @@ import CancelSubscriptionButton from "./CancelSubscriptionButton";
 import ManageSubscriptionButton from "./ManageSubscriptionButton";
 
 const PACKAGES = [
-  { name: "Starter", credits: 50, price: "€9,99", priceId: "price_1TZSta1ifGSUEPSdHvDnulnr", perCredit: "€0,20/credit" },
-  { name: "Populair", credits: 200, price: "€29,99", priceId: "price_1TZSte1ifGSUEPSd9N8emyuz", perCredit: "€0,15/credit" },
+  { name: "10 credits",  credits: 10,  price: "€1,99",  priceId: process.env.STRIPE_PRICE_10!,  perCredit: "€0,20/credit" },
+  { name: "50 credits",  credits: 50,  price: "€7,49",  priceId: process.env.STRIPE_PRICE_50!,  perCredit: "€0,15/credit" },
+  { name: "100 credits", credits: 100, price: "€11,99", priceId: process.env.STRIPE_PRICE_100!, perCredit: "€0,12/credit" },
+  { name: "200 credits", credits: 200, price: "€19,99", priceId: process.env.STRIPE_PRICE_200!, perCredit: "€0,10/credit" },
 ];
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ payment?: string; credits?: string }> }) {
@@ -21,11 +23,13 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("credits, subscription_status, subscription_period_end")
+    .select("credits, subscription_credits, subscription_status, subscription_period_end")
     .eq("id", user.id)
     .single();
 
-  const credits = profile?.credits ?? 0;
+  const purchasedCredits = profile?.credits ?? 0;
+  const subscriptionCredits = profile?.subscription_credits ?? 0;
+  const credits = purchasedCredits + subscriptionCredits;
   const subscriptionStatus = profile?.subscription_status ?? null;
   const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
   const params = await searchParams;
@@ -65,7 +69,11 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
           <p className="text-blue-200 text-sm mb-1">Jouw credits</p>
           <p className="text-5xl font-extrabold">{credits}</p>
-          <p className="text-blue-200 text-sm mt-1">credits beschikbaar</p>
+          {subscriptionStatus === "active" && subscriptionCredits > 0 ? (
+            <p className="text-blue-200 text-sm mt-1">{subscriptionCredits} abonnement (deze maand) · {purchasedCredits} gekocht (vervallen nooit)</p>
+          ) : (
+            <p className="text-blue-200 text-sm mt-1">credits beschikbaar · vervallen nooit</p>
+          )}
         </div>
 
         {/* Maandelijks subscription section */}
@@ -76,11 +84,11 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               <h2 className="font-bold text-lg">Maandelijks abonnement</h2>
             </div>
             <p className="text-amber-100 text-sm mb-4">
-              50 credits per maand · automatisch verlengd · opzegbaar wanneer je wil
+              50 credits per maand · ongebruikte credits vervallen elke maand · opzegbaar wanneer je wil
             </p>
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-extrabold">€4,99</span>
+                <span className="text-3xl font-extrabold">€3,99</span>
                 <span className="text-amber-100 text-sm ml-1">/maand</span>
               </div>
               <SubscribeButton priceId={proPriceId} />
@@ -94,7 +102,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               <span className="text-green-600 font-bold text-lg">✓</span>
               <h2 className="font-bold text-green-800 text-lg">Maandelijks abonnement actief</h2>
             </div>
-            <p className="text-green-700 text-sm">Je ontvangt elke maand 50 nieuwe credits.</p>
+            <p className="text-green-700 text-sm">Je ontvangt elke maand 50 verse credits. Ongebruikte abonnementscredits vervallen aan het einde van de maand.</p>
             {formattedPeriodEnd && (
               <p className="text-green-600 text-sm mt-1">Volgende verlenging: {formattedPeriodEnd}</p>
             )}
@@ -107,14 +115,14 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             <h2 className="font-bold text-amber-800 text-lg mb-1">
               Abonnement loopt af{formattedPeriodEnd ? ` op ${formattedPeriodEnd}` : ""}
             </h2>
-            <p className="text-amber-700 text-sm">Je credits blijven gewoon staan.</p>
+            <p className="text-amber-700 text-sm">Je abonnementscredits zijn nog geldig tot het einde van de betaalperiode. Daarna blijven je gekochte credits gewoon staan.</p>
           </div>
         )}
 
         {/* Buy credits */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
           <h2 className="font-semibold text-gray-900 mb-1">Credits kopen</h2>
-          <p className="text-sm text-gray-500 mb-5">Kies een pakket — credits vervallen nooit.</p>
+          <p className="text-sm text-gray-500 mb-5">Kies een pakket — gekochte credits vervallen nooit.</p>
           <div className="flex flex-col gap-3">
             {PACKAGES.map((pkg) => (
               <div key={pkg.priceId} className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors">
