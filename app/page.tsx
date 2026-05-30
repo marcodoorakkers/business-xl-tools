@@ -3,42 +3,42 @@ import { createClient } from "@/lib/supabase/server";
 
 const tools = [
   {
-    icon: "🎙️",
+    icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>,
     name: "Voice Mail Draft",
     description: "Spreek in wat je wilt mailen. Ontvang binnen seconden een kant-en-klaar concept.",
     color: "from-purple-500 to-indigo-500",
     bg: "bg-purple-50",
   },
   {
-    icon: "📝",
+    icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>,
     name: "Meeting Memo",
     description: "Neem je vergadering op en ontvang automatisch gestructureerde notulen.",
     color: "from-blue-500 to-cyan-500",
     bg: "bg-blue-50",
   },
   {
-    icon: "🔍",
+    icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
     name: "Vacaturezoeker",
     description: "Plak je CV of profiel en vind direct actuele freelance & contract vacatures wereldwijd.",
     color: "from-green-500 to-teal-500",
     bg: "bg-green-50",
   },
   {
-    icon: "📋",
+    icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
     name: "CV Builder",
     description: "Upload je CV als PDF en ontvang een professioneel CV op maat — kies uit 6 templates en download als Word.",
     color: "from-rose-500 to-pink-500",
     bg: "bg-rose-50",
   },
   {
-    icon: "🎯",
+    icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>,
     name: "Presentatie Outline",
     description: "Geef je onderwerp en duur op en ontvang direct een complete slideopbouw met spreektips.",
     color: "from-violet-500 to-purple-500",
     bg: "bg-violet-50",
   },
   {
-    icon: "✨",
+    icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"/><polyline points="14 2 14 8 20 8"/><path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44z"/></svg>,
     name: "Document Opmaken",
     description: "Upload een Word-document en ontvang een professioneel opgemaakte versie met inhoudsopgave, koppen en paginanummers.",
     color: "from-teal-500 to-cyan-500",
@@ -57,7 +57,7 @@ export default async function LandingPage() {
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">⚡</span>
+          <svg className="w-6 h-6 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
           <span className="font-bold text-gray-900 text-lg">TimeSaver<span className="text-blue-600">Tools</span></span>
         </div>
         <div className="flex items-center gap-3">
@@ -122,7 +122,7 @@ export default async function LandingPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {tools.map((tool) => (
             <div key={tool.name} className={`${tool.bg} rounded-3xl p-7 flex flex-col gap-4`}>
-              <div className={`w-12 h-12 bg-gradient-to-br ${tool.color} rounded-2xl flex items-center justify-center text-2xl shadow-md`}>
+              <div className={`w-12 h-12 bg-gradient-to-br ${tool.color} rounded-2xl flex items-center justify-center text-white shadow-md`}>
                 {tool.icon}
               </div>
               <div>
