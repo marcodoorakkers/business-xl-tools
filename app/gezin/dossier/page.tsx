@@ -132,6 +132,23 @@ export default function GezinDossierPage() {
     supabase.from("profiles").select("credits, subscription_credits").single().then(({ data }) => {
       if (data) setCredits((data.credits ?? 0) + (data.subscription_credits ?? 0));
     });
+
+    // Load file shared via iOS/Android share sheet
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("from_share") === "1") {
+      fetch("/api/gezin/share-target")
+        .then((r) => r.json())
+        .then(async (data: { files?: { name: string; type: string; data: string }[] }) => {
+          if (!data.files?.length) return;
+          const fileObjects = data.files.map((f) => {
+            const bytes = atob(f.data);
+            const arr = new Uint8Array(bytes.length);
+            for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+            return new File([arr], f.name || "gedeeld-document", { type: f.type });
+          });
+          await addFiles(fileObjects);
+        })
+        .catch(() => {});
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addFiles = useCallback(async (newFiles: File[]) => {

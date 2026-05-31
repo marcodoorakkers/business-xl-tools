@@ -31,13 +31,6 @@ const tools = [
     bg: "bg-rose-50",
   },
   {
-    icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>,
-    name: "Presentatie Outline",
-    description: "Geef je onderwerp en duur op en ontvang direct een complete slideopbouw met spreektips.",
-    color: "from-violet-500 to-purple-500",
-    bg: "bg-violet-50",
-  },
-  {
     icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"/><polyline points="14 2 14 8 20 8"/><path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44z"/></svg>,
     name: "Document Opmaken",
     description: "Upload een Word-document en ontvang een professioneel opgemaakte versie met inhoudsopgave, koppen en paginanummers.",
@@ -81,16 +74,16 @@ export default async function LandingPage() {
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 pt-16 pb-20 text-center">
         <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
-          ✨ Slimme tools voor iedereen
+          Voor ZZP&apos;ers en MKB
         </div>
         <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-          Doe meer in<br />
+          De admin die je vertraagt.<br />
           <span className="bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
-            minder tijd
+            Wij nemen hem over.
           </span>
         </h1>
         <p className="text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-          Een groeiende collectie tools die dagelijkse klusjes van je overnemen. Jij doet de leuke dingen, wij de rest.
+          Spreek je mail in en ontvang hem kant-en-klaar. Neem een vergadering op, laat de notulen uitwerken. Upload je CV, ontvang een bijgewerkte versie. Alles in seconden.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           {loggedIn ? (
@@ -138,24 +131,34 @@ export default async function LandingPage() {
       <section className="bg-gray-50 py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Hoe werkt het?</h2>
-            <p className="text-gray-500">Zo simpel is het.</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">In drie stappen klaar</h2>
+            <p className="text-gray-500">Geen installatie, geen handleiding.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {[
-              { step: "1", title: "Maak een account", desc: "Registreer gratis en ontvang direct 10 credits.", icon: "👤" },
-              { step: "2", title: "Kies een tool", desc: "Kies wat je nodig hebt en vul in wat gevraagd wordt.", icon: "🛠️" },
-              { step: "3", title: "Ontvang je resultaat", desc: "Binnen seconden klaar — kopiëren, downloaden of mailen.", icon: "🎉" },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-2xl mx-auto mb-4">
-                  {item.icon}
-                </div>
-                <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Stap {item.step}</div>
-                <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-500 text-sm">{item.desc}</p>
+            <div className="text-center">
+              <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-600">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
               </div>
-            ))}
+              <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Stap 1</div>
+              <h3 className="font-bold text-gray-900 mb-2">Gratis account maken</h3>
+              <p className="text-gray-500 text-sm">Direct 10 credits — geen creditcard nodig.</p>
+            </div>
+            <div className="text-center">
+              <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-600">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </div>
+              <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Stap 2</div>
+              <h3 className="font-bold text-gray-900 mb-2">Tool kiezen en invullen</h3>
+              <p className="text-gray-500 text-sm">Kies wat je nodig hebt, typ of spreek je input in.</p>
+            </div>
+            <div className="text-center">
+              <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 text-blue-600">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              </div>
+              <div className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Stap 3</div>
+              <h3 className="font-bold text-gray-900 mb-2">Resultaat ontvangen</h3>
+              <p className="text-gray-500 text-sm">Kopieer, download of mail direct — soms duurt het letterlijk 10 seconden.</p>
+            </div>
           </div>
         </div>
       </section>
@@ -244,9 +247,9 @@ export default async function LandingPage() {
       {/* CTA */}
       <section className="max-w-6xl mx-auto px-6 py-24 text-center">
         <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl p-12 text-white">
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Klaar om tijd te besparen?</h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Probeer het gratis</h2>
           <p className="text-blue-200 text-lg mb-8 max-w-xl mx-auto">
-            Maak vandaag nog een gratis account en ontdek hoe makkelijk het is.
+            Geen creditcard nodig. Begin met 10 gratis credits en ervaar hoe snel het werkt.
           </p>
           {loggedIn ? (
             <Link href="/dashboard"
@@ -267,7 +270,7 @@ export default async function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col items-center gap-4 text-xs text-gray-400">
           <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-3">
             <div className="flex items-center gap-2">
-              <span>⚡</span>
+              <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
               <span className="font-medium text-gray-500">TimeSaverTools</span>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-3">
