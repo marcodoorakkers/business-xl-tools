@@ -3,7 +3,7 @@ import { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "NooitMeerPostKwijt",
-    short_name: "MijnDossier",
+    short_name: "NooitMeerPostKwijt",
     description: "Scan je post en sla hem veilig op.",
     start_url: "/",
     display: "standalone",
@@ -16,12 +16,12 @@ export default function manifest(): MetadataRoute.Manifest {
         type: "image/png",
       },
       {
-        src: "/icon-192.png",
+        src: "/gezin-apple-touch-icon.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/icon-512.png",
+        src: "/gezin-apple-touch-icon.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
