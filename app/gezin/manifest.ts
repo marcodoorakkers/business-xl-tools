@@ -27,7 +27,6 @@ export default function manifest(): MetadataRoute.Manifest {
         purpose: "maskable",
       },
     ],
-    // @ts-expect-error share_target not yet in Next.js MetadataRoute.Manifest types
     share_target: {
       action: "/api/gezin/share-target",
       method: "POST",
