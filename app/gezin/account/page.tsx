@@ -2,19 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
-import BuyCreditsButton from "@/app/account/BuyCreditsButton";
 import SubscribeButton from "@/app/account/SubscribeButton";
 import CancelSubscriptionButton from "@/app/account/CancelSubscriptionButton";
 import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
 
-const PACKAGES = [
-  { name: "10 scans",  credits: 10,  price: "€1,99",  priceId: process.env.STRIPE_PRICE_10!,  perScan: "€0,20/scan" },
-  { name: "50 scans",  credits: 50,  price: "€7,49",  priceId: process.env.STRIPE_PRICE_50!,  perScan: "€0,15/scan" },
-  { name: "100 scans", credits: 100, price: "€11,99", priceId: process.env.STRIPE_PRICE_100!, perScan: "€0,12/scan" },
-  { name: "200 scans", credits: 200, price: "€19,99", priceId: process.env.STRIPE_PRICE_200!, perScan: "€0,10/scan" },
-];
 
 export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string; credits?: string }> }) {
   const supabase = await createClient();
@@ -136,27 +129,6 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
             <p className="text-amber-700 text-sm">Je abonnementsscans zijn nog geldig tot het einde van de betaalperiode. Daarna blijven je gekochte scans gewoon staan.</p>
           </div>
         )}
-
-        {/* Scans kopen */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-6">
-          <h2 className="font-semibold text-gray-900 mb-1">Scans kopen</h2>
-          <p className="text-sm text-gray-500 mb-5">Kies een pakket — scans verlopen nooit.</p>
-          <div className="flex flex-col gap-3">
-            {PACKAGES.map((pkg) => (
-              <div key={pkg.priceId} className="flex items-center justify-between p-3 rounded-xl border border-gray-200 bg-gray-50 hover:bg-amber-50 transition-colors">
-                <div>
-                  <p className="font-semibold text-gray-900">{pkg.name}</p>
-                  <p className="text-xs text-gray-400">{pkg.perScan}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-bold text-gray-900 text-sm">{pkg.price}</span>
-                  <BuyCreditsButton priceId={pkg.priceId} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-gray-400 mt-4">Betalen via iDEAL, creditcard of Bancontact</p>
-        </div>
 
         {/* Cross-promo TimeSaverTools */}
         <a

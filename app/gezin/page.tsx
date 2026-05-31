@@ -165,7 +165,7 @@ export default function GezinLandingPage() {
         <div className="max-w-3xl mx-auto py-16 border-t border-gray-100 text-center">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2">Prijzen</p>
           <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Eenvoudig en transparant</h2>
-          <p className="text-gray-500 text-sm mb-10">Start gratis. Kies een abonnement of koop scans wanneer je ze nodig hebt.</p>
+          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €3,99/maand. Geen creditcard nodig om te starten.</p>
 
           {/* Maandelijks abonnement */}
           <div className="bg-amber-500 rounded-2xl p-7 text-left text-white mb-5 relative shadow-md">
@@ -192,55 +192,7 @@ export default function GezinLandingPage() {
             </div>
           </div>
 
-          <p className="text-xs text-gray-400 mb-6">Of koop scans eenmalig — verlopen nooit</p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 text-left">
-              <h3 className="font-bold text-gray-900 text-lg mb-1">Gratis</h3>
-              <p className="text-xs text-gray-400 mb-4">Probeer het uit</p>
-              <p className="text-3xl font-extrabold text-gray-900 mb-4">€0</p>
-              <div className="text-sm text-gray-500 space-y-1 mb-6">
-                <p>10 scans bij aanmelding</p>
-                <p>Slimme analyse</p>
-                <p>Acties bijhouden</p>
-              </div>
-              <Link href="/aanmelden" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
-                Gratis beginnen
-              </Link>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 text-left">
-              <h3 className="font-bold text-gray-900 text-lg mb-1">50 scans</h3>
-              <p className="text-xs text-gray-400 mb-4">Als je regelmatig post ontvangt</p>
-              <p className="text-3xl font-extrabold text-gray-900 mb-0.5">€7,49</p>
-              <p className="text-xs text-gray-400 mb-4">€0,15 per scan</p>
-              <div className="text-sm text-gray-500 space-y-1 mb-6">
-                <p>Verlopen nooit</p>
-                <p>Alle functies</p>
-                <p>OneDrive &amp; Dropbox</p>
-              </div>
-              <Link href="/account" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
-                Kopen
-              </Link>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 text-left relative">
-              <span className="absolute -top-3 left-4 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">Beste prijs</span>
-              <h3 className="font-bold text-gray-900 text-lg mb-1">200 scans</h3>
-              <p className="text-xs text-gray-400 mb-4">Als je veel post ontvangt</p>
-              <p className="text-3xl font-extrabold text-gray-900 mb-0.5">€19,99</p>
-              <p className="text-xs text-gray-400 mb-4">€0,10 per scan</p>
-              <div className="text-sm text-gray-500 space-y-1 mb-6">
-                <p>Verlopen nooit</p>
-                <p>Alle functies</p>
-                <p>OneDrive &amp; Dropbox</p>
-              </div>
-              <Link href="/account" className="block text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2.5 rounded-xl text-sm transition-colors">
-                Kopen
-              </Link>
-            </div>
-          </div>
-          <p className="text-xs text-gray-400 mt-5">Betaal via iDEAL, creditcard of Bancontact.</p>
+          <p className="text-xs text-gray-400 mt-2">Betaal via iDEAL, creditcard of Bancontact · Opzegbaar wanneer je wil</p>
         </div>
 
         {/* Privacy */}
