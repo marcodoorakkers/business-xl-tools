@@ -54,7 +54,7 @@ export default function GezinLandingPage() {
                 Inloggen
               </Link>
             </div>
-            <p className="text-xs text-gray-400 mt-3">Geen creditcard nodig · 10 gratis scans</p>
+            <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig</p>
           </div>
 
           {/* Foto */}
@@ -169,11 +169,11 @@ export default function GezinLandingPage() {
 
           {/* Maandelijks abonnement */}
           <div className="bg-amber-500 rounded-2xl p-7 text-left text-white mb-5 relative shadow-md">
-            <span className="absolute -top-3 left-6 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full">Meest flexibel</span>
+            <span className="absolute -top-3 left-6 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full">Eerste maand gratis</span>
             <div className="flex items-start justify-between gap-6 flex-wrap">
               <div className="flex-1">
                 <h3 className="font-bold text-xl mb-1">Maandelijks abonnement</h3>
-                <p className="text-amber-100 text-sm mb-4">50 scans per maand · ongebruikte scans vervallen elke maand · opzegbaar wanneer je wil</p>
+                <p className="text-amber-100 text-sm mb-4">50 scans per maand · geen creditcard nodig om te starten · opzegbaar wanneer je wil</p>
                 <div className="text-sm text-amber-50 space-y-1">
                   <p>50 scans elke maand</p>
                   <p>OneDrive &amp; Dropbox</p>
@@ -183,10 +183,10 @@ export default function GezinLandingPage() {
               <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
                 <div>
                   <p className="text-4xl font-extrabold">€3,99</p>
-                  <p className="text-amber-200 text-sm">/maand</p>
+                  <p className="text-amber-200 text-sm">/maand na proefperiode</p>
                 </div>
                 <Link href="/aanmelden" className="bg-white text-amber-600 hover:bg-amber-50 font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
-                  Starten →
+                  Gratis starten →
                 </Link>
               </div>
             </div>

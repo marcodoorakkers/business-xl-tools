@@ -59,6 +59,9 @@ export async function POST(req: NextRequest) {
       .update({ stripe_customer_id: customerId })
       .eq("id", user.id);
 
+    const isFamilySite =
+      origin?.includes("nooitmeerpostkwijt.nl") ?? false;
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
@@ -68,6 +71,10 @@ export async function POST(req: NextRequest) {
       cancel_url: `${baseUrl}/account?payment=cancelled`,
       payment_method_types: ["card", "ideal", "sepa_debit"],
       locale: "nl",
+      ...(isFamilySite && {
+        subscription_data: { trial_period_days: 30 },
+        payment_method_collection: "if_required",
+      }),
     });
 
     return NextResponse.json({ url: session.url });

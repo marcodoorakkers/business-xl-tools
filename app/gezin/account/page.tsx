@@ -91,14 +91,26 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <span>⭐</span>
               <h2 className="font-bold text-gray-900 text-lg">Maandelijks abonnement</h2>
             </div>
-            <p className="text-gray-500 text-sm mb-4">50 scans per maand · ongebruikte scans vervallen aan eind van de maand · opzegbaar wanneer je wil</p>
+            <p className="text-gray-500 text-sm mb-1">50 scans per maand · opzegbaar wanneer je wil</p>
+            <p className="text-amber-600 text-sm font-semibold mb-4">Eerste maand gratis — geen creditcard nodig</p>
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-3xl font-extrabold text-gray-900">€3,99</span>
-                <span className="text-gray-400 text-sm ml-1">/maand</span>
+                <span className="text-gray-400 text-sm ml-1">/maand na proefperiode</span>
               </div>
               <SubscribeButton priceId={proPriceId} />
             </div>
+          </div>
+        )}
+
+        {subscriptionStatus === "trialing" && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-amber-600 font-bold text-lg">✓</span>
+              <h2 className="font-bold text-amber-800 text-lg">Proefperiode actief</h2>
+            </div>
+            <p className="text-amber-700 text-sm">Je zit in je gratis proefmaand. Je hebt 50 scans beschikbaar. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt.</p>
+            <ManageSubscriptionButton />
           </div>
         )}
 

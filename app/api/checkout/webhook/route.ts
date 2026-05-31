@@ -52,12 +52,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Missing user_id" }, { status: 400 });
       }
 
+      const sub = await stripe.subscriptions.retrieve(session.subscription as string);
+      const subStatus = sub.status === "trialing" ? "trialing" : "active";
+
       await supabase
         .from("profiles")
         .update({
           stripe_customer_id: session.customer as string,
           stripe_subscription_id: session.subscription as string,
-          subscription_status: "active",
+          subscription_status: subStatus,
         })
         .eq("id", userId);
 
