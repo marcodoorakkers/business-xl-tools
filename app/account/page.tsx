@@ -4,8 +4,6 @@ import Navbar from "@/components/Navbar";
 import ChangePasswordForm from "./ChangePasswordForm";
 import DeleteAccountButton from "./DeleteAccountButton";
 import BuyCreditsButton from "./BuyCreditsButton";
-import SubscribeButton from "./SubscribeButton";
-import CancelSubscriptionButton from "./CancelSubscriptionButton";
 import ManageSubscriptionButton from "./ManageSubscriptionButton";
 
 const PACKAGES = [
@@ -35,8 +33,6 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   const params = await searchParams;
   const paymentStatus = params.payment;
   const addedCredits = params.credits;
-
-  const proPriceId = process.env.STRIPE_PRO_PRICE_ID!;
 
   const formattedPeriodEnd = subscriptionPeriodEnd
     ? new Date(subscriptionPeriodEnd).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })
@@ -75,26 +71,6 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             <p className="text-blue-200 text-sm mt-1">credits beschikbaar · vervallen nooit</p>
           )}
         </div>
-
-        {/* Maandelijks subscription section */}
-        {!subscriptionStatus && (
-          <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg shadow-amber-200">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">⭐</span>
-              <h2 className="font-bold text-lg">Maandelijks abonnement</h2>
-            </div>
-            <p className="text-amber-100 text-sm mb-4">
-              50 credits per maand · ongebruikte credits vervallen elke maand · opzegbaar wanneer je wil
-            </p>
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-3xl font-extrabold">€3,99</span>
-                <span className="text-amber-100 text-sm ml-1">/maand</span>
-              </div>
-              <SubscribeButton priceId={proPriceId} />
-            </div>
-          </div>
-        )}
 
         {subscriptionStatus === "active" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-6">

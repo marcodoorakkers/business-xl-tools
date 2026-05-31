@@ -167,9 +167,9 @@ export default async function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 py-24">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Simpele prijzen</h2>
-          <p className="text-gray-500">Begin gratis of kies het Maandelijks abonnement voor de beste waarde.</p>
+          <p className="text-gray-500">Begin gratis. Koop extra credits wanneer je ze nodig hebt — ze vervallen nooit.</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {/* Gratis */}
           <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
             <div>
@@ -183,26 +183,6 @@ export default async function LandingPage() {
             <Link href="/auth/register"
               className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
               Begin gratis →
-            </Link>
-          </div>
-
-          {/* Maandelijks */}
-          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-amber-500 text-white shadow-xl shadow-amber-200 scale-105">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-amber-600 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
-              ⭐ Aanbevolen
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-amber-100">Maandelijks</p>
-              <p className="text-4xl font-extrabold text-white">€3,99</p>
-              <p className="text-sm mt-1 text-amber-100">/maand</p>
-            </div>
-            <div className="text-3xl font-bold text-white">
-              50 <span className="text-base font-normal text-amber-100">credits/maand</span>
-            </div>
-            <p className="text-xs text-amber-100">Ongebruikte credits vervallen elke maand · opzegbaar wanneer je wil</p>
-            <Link href="/account"
-              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-white text-amber-600 hover:bg-amber-50">
-              Start Maandelijks →
             </Link>
           </div>
 
@@ -224,24 +204,26 @@ export default async function LandingPage() {
           </div>
 
           {/* 200 credits */}
-          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-gray-50">
+          <div className="relative rounded-3xl p-7 flex flex-col gap-4 bg-blue-600 text-white shadow-xl shadow-blue-200">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-blue-600 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">
+              Beste prijs
+            </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-gray-400">200 credits</p>
-              <p className="text-4xl font-extrabold text-gray-900">€19,99</p>
-              <p className="text-sm mt-1 text-gray-500">Voor regelmatig gebruik</p>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1 text-blue-200">200 credits</p>
+              <p className="text-4xl font-extrabold text-white">€19,99</p>
+              <p className="text-sm mt-1 text-blue-200">Voor regelmatig gebruik</p>
             </div>
-            <div className="text-3xl font-bold text-gray-900">
-              200 <span className="text-base font-normal text-gray-500">credits</span>
+            <div className="text-3xl font-bold text-white">
+              200 <span className="text-base font-normal text-blue-200">credits</span>
             </div>
-            <p className="text-xs text-gray-400">€0,10 per credit · vervallen nooit</p>
+            <p className="text-xs text-blue-200">€0,10 per credit · vervallen nooit</p>
             <Link href="/auth/register"
-              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-blue-600 text-white hover:bg-blue-700">
+              className="mt-auto text-center py-2.5 rounded-xl text-sm font-semibold transition-colors bg-white text-blue-600 hover:bg-blue-50">
               Koop credits →
             </Link>
           </div>
-
         </div>
-        <p className="text-center text-xs text-gray-400 mt-6">Alle prijzen zijn excl. BTW · Betalen via iDEAL, creditcard of Bancontact · Abonnementscredits vervallen maandelijks · Gekochte credits vervallen nooit</p>
+        <p className="text-center text-xs text-gray-400 mt-6">Alle prijzen zijn excl. BTW · Betalen via iDEAL, creditcard of Bancontact · Credits vervallen nooit</p>
       </section>
 
       {/* CTA */}
