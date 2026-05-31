@@ -43,7 +43,7 @@ export default async function DashboardPage() {
       ],
     },
     {
-      label: "Documenten & Presentaties",
+      label: "Documenten",
       tools: [
         {
           name: "Document Opmaken",
@@ -53,15 +53,6 @@ export default async function DashboardPage() {
           icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"/><polyline points="14 2 14 8 20 8"/><path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44z"/></svg>,
           color: "from-teal-500 to-cyan-500",
           bg: "bg-teal-50",
-        },
-        {
-          name: "Presentatie Outline",
-          description: "Geef je onderwerp en duur op en ontvang direct een complete slideopbouw met spreektips.",
-          href: "/tools/presentation-outline",
-          credits: 1,
-          icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>,
-          color: "from-violet-500 to-purple-500",
-          bg: "bg-violet-50",
         },
         ...(process.env.MIJN_DOSSIER_ENABLED === "true" ? [{
           name: "MijnDossier",
