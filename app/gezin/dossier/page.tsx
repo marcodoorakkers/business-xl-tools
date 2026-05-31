@@ -354,7 +354,7 @@ export default function GezinDossierPage() {
               </svg>
             </Link>
             {credits !== null && (
-              <span className="text-xs text-gray-400 font-medium">{credits} credits</span>
+              <span className="text-xs text-gray-400 font-medium">{credits} scans</span>
             )}
             <button
               onClick={async () => { await supabase.auth.signOut(); router.push("/"); }}

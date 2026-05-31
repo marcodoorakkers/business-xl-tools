@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 import SubscribeButton from "@/app/account/SubscribeButton";
-import CancelSubscriptionButton from "@/app/account/CancelSubscriptionButton";
 import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
@@ -70,10 +69,10 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
         <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-white">
           <p className="text-amber-100 text-sm mb-1">Jouw scans</p>
           <p className="text-5xl font-extrabold">{credits}</p>
-          {subscriptionStatus === "active" && subscriptionCredits > 0 ? (
-            <p className="text-amber-100 text-sm mt-1">{subscriptionCredits} abonnement (deze maand) · {purchasedCredits} gekocht (verlopen nooit)</p>
+          {subscriptionStatus === "active" || subscriptionStatus === "trialing" ? (
+            <p className="text-amber-100 text-sm mt-1">scans beschikbaar deze maand · ongebruikte scans vervallen einde maand</p>
           ) : (
-            <p className="text-amber-100 text-sm mt-1">scans beschikbaar · verlopen nooit</p>
+            <p className="text-amber-100 text-sm mt-1">scans beschikbaar</p>
           )}
         </div>
 
@@ -126,7 +125,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
             <h2 className="font-bold text-amber-800 text-lg mb-1">
               Abonnement loopt af{formattedPeriodEnd ? ` op ${formattedPeriodEnd}` : ""}
             </h2>
-            <p className="text-amber-700 text-sm">Je abonnementsscans zijn nog geldig tot het einde van de betaalperiode. Daarna blijven je gekochte scans gewoon staan.</p>
+            <p className="text-amber-700 text-sm">Je scans zijn nog geldig tot het einde van de betaalperiode.</p>
           </div>
         )}
 
