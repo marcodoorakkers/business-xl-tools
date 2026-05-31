@@ -32,7 +32,7 @@ export default function GezinLandingPage() {
           <div className="flex-1 max-w-xl">
             <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Ken je dit?</p>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-5 leading-tight">
-              Waar is<br />die brief?
+              Waar is<br />mijn post?
             </h1>
             <p className="text-lg text-gray-500 mb-8 leading-relaxed">
               Je staat aan de telefoon met de verzekeraar. Die wil je polisnummer. Jij zoekt — in de la, in de map, in de stapel op het bureau. De brief is er ergens, maar je hebt nu geen tijd voor dit.
