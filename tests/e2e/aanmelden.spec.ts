@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Aanmeldpagina", () => {
   test("toont het registratieformulier", async ({ page }) => {
     await page.goto("/aanmelden");
-    await expect(page.getByText("Account aanmaken")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Account aanmaken" })).toBeVisible();
     await expect(page.locator("input[type='email']")).toBeVisible();
     await expect(page.locator("input[type='password']").first()).toBeVisible();
     await expect(page.getByRole("button", { name: /account aanmaken/i })).toBeVisible();

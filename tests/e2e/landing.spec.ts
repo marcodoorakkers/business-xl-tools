@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Landingspagina", () => {
   test("laadt correct en toont de hero-tekst", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("h1").filter({ hasText: /waar is mijn post/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("h1").filter({ hasText: /waar is[\s\S]*mijn post/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("toont de abonnementsprijs", async ({ page }) => {
