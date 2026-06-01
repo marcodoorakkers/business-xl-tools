@@ -33,15 +33,14 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
   const { data: profile } = await admin
     .from("profiles")
-    .select("id, subscription_credits, subscription_status")
+    .select("id, subscription_status")
     .eq("scan_email_token", scanToken)
     .single();
 
   if (!profile) return NextResponse.json({ error: "Onbekend scan-adres" }, { status: 404 });
 
   const hasAccess =
-    profile.subscription_credits > 0 &&
-    (profile.subscription_status === "active" || profile.subscription_status === "trialing");
+    profile.subscription_status === "active" || profile.subscription_status === "trialing";
   if (!hasAccess) return NextResponse.json({ skipped: true });
 
   // Base64 → Buffer — nooit opslaan, alleen in memory
@@ -185,11 +184,6 @@ Formaat:
       status: "open",
     });
   }
-
-  await admin
-    .from("profiles")
-    .update({ subscription_credits: profile.subscription_credits - 1 })
-    .eq("id", profile.id);
 
   return NextResponse.json({ ok: true, afzender: analysis.afzender, actie: analysis.actie ?? null });
 }
