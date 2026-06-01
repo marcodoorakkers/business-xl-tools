@@ -1,17 +1,18 @@
 # Testplan — NooitMeerPostKwijt
 
-**Versie:** 1.0  
-**Datum:** mei 2025  
-**Doel:** End-to-end validatie van alle kernfuncties vóór go-to-market
+**Versie:** 2.0  
+**Datum:** juni 2026  
+**Doel:** End-to-end validatie van alle kernfuncties
 
 ---
 
 ## Voorbereiding
 
 - [ ] Gebruik een e-mailadres dat nog **niet** in Supabase staat (nieuw testaccount)
-- [ ] Gebruik een Stripe testkaart: `4242 4242 4242 4242`, vervaldatum `12/34`, CVC `123`
+- [ ] Stripe testkaart: `4242 4242 4242 4242`, vervaldatum `12/34`, CVC `123`
 - [ ] Test primair op **mobiel (iPhone Safari)** — dit is het primaire platform
 - [ ] Vercel deployment staat op **Ready** voor de laatste commit
+- [ ] OneDrive en/of Dropbox testaccount beschikbaar
 
 ---
 
@@ -25,7 +26,7 @@
 
 **Verwacht:**
 - Bevestigingspagina verschijnt ("Controleer je inbox")
-- E-mail arriveert van NooitMeerPostKwijt (niet Supabase Auth)
+- E-mail arriveert van NooitMeerPostKwijt
 - E-mail heeft amber-knop "Bevestig mijn e-mailadres →"
 
 ---
@@ -33,14 +34,14 @@
 ### T02 — E-mailbevestiging
 **Stappen:**
 1. Open de bevestigingsmail
-2. Hover over de knop — controleer dat de link naar **nooitmeerpostkwijt.nl** gaat (niet business-xl-tools.vercel.app)
+2. Controleer dat de link naar **nooitmeerpostkwijt.nl** gaat (niet business-xl-tools.vercel.app)
 3. Klik op de knop
 
 **Verwacht:**
 - Browser opent nooitmeerpostkwijt.nl
-- Gebruiker landt op **/dossier** (niet /dashboard of foutpagina)
-- Welkomstmail arriveert ("je 10 gratis scans staan klaar")
+- Gebruiker landt op **/dossier**
 - Supabase toont gebruiker als bevestigd
+- subscription_status = `trialing`, subscription_credits = 50
 
 ---
 
@@ -52,7 +53,7 @@
 
 **Verwacht:**
 - Redirect naar /dossier
-- Creditssaldo zichtbaar in header
+- Scansaldo zichtbaar in header (bijv. "50 scans")
 
 ---
 
@@ -73,7 +74,7 @@
 2. Ga handmatig naar nooitmeerpostkwijt.nl/inloggen
 
 **Verwacht:**
-- Automatisch redirect naar /dossier (niet de inlogpagina tonen)
+- Automatisch redirect naar /dossier
 
 ---
 
@@ -82,12 +83,10 @@
 ### T06 — Document uploaden (foto)
 **Stappen:**
 1. Open het dossier
-2. Tik op het uploadgebied / camera-knop
-3. Maak een foto van een brief of selecteer een bestaande foto
+2. Selecteer een foto van een brief
 
 **Verwacht:**
-- Upload start direct
-- Voortgangsindicator zichtbaar ("Analyseren...")
+- Upload start direct, voortgangsindicator zichtbaar
 - Na analyse: suggesties voor type, afzender, datum, mappad, bestandsnaam
 - Actie + deadline gevuld als aanwezig in document
 
@@ -95,31 +94,48 @@
 
 ### T07 — Document uploaden (PDF)
 **Stappen:**
-1. Selecteer een PDF-bestand via upload
+1. Selecteer een PDF-bestand
 
 **Verwacht:**
-- Zelfde flow als T06
-- PDF correct geanalyseerd
+- Zelfde flow als T06, PDF correct geanalyseerd
 
 ---
 
-### T08 — Creditaftrek na scan
+### T08 — Multi-pagina document
 **Stappen:**
-1. Noteer het creditssaldo vóór de scan
-2. Voer een scan uit (T06 of T07)
-3. Sla het document op
+1. Upload meerdere foto's tegelijk (meerdere pagina's van één brief)
 
 **Verwacht:**
-- Creditssaldo daalt met 1 na opslaan
-- Als saldo 0: melding dat er geen credits meer zijn
+- Alle pagina's worden samengevoegd en als één document geanalyseerd
 
 ---
 
-### T09 — Opslaan in OneDrive
+### T09 — Scanaftrek
 **Stappen:**
-1. Koppel OneDrive via /dossier/instellingen (Microsoft login)
-2. Scan een document
-3. Klik "Opslaan in OneDrive"
+1. Noteer het scansaldo vóór de scan
+2. Voer een scan uit en sla op
+
+**Verwacht:**
+- Scansaldo daalt met 1
+- Bij saldo 0: melding "Niet genoeg credits" (402)
+
+---
+
+### T10 — Afzenderherkenning
+**Stappen:**
+1. Scan een document van afzender X, sla op
+2. Scan een tweede document van dezelfde afzender X
+
+**Verwacht:**
+- Bij de tweede scan: mappad en type zijn al correct voorgesteld (consistent met de eerste scan)
+- Geen handmatige correctie nodig
+
+---
+
+### T11 — Opslaan in OneDrive
+**Stappen:**
+1. Koppel OneDrive via /dossier/instellingen
+2. Scan een document, klik "Opslaan in OneDrive"
 
 **Verwacht:**
 - Document verschijnt in OneDrive op het voorgestelde mappad
@@ -128,133 +144,185 @@
 
 ---
 
-### T10 — Opslaan in Dropbox
+### T12 — Opslaan in Dropbox
 **Stappen:**
 1. Koppel Dropbox via /dossier/instellingen
-2. Scan een document
-3. Klik "Opslaan in Dropbox"
+2. Scan een document, klik "Opslaan in Dropbox"
 
 **Verwacht:**
-- Document verschijnt in Dropbox
-- Zelfde als T09
+- Document verschijnt in Dropbox — zelfde als T11
 
 ---
 
-## Module 3 — Archief & acties
+## Module 3 — Archief
 
-### T11 — Archief bekijken
+### T13 — Archief bekijken
 **Stappen:**
 1. Scan en sla minimaal 3 documenten op
 2. Ga naar /dossier/archief
 
 **Verwacht:**
-- Alle opgeslagen documenten zichtbaar
-- Gesorteerd op datum (nieuwste eerst)
-- Download-knop werkt
+- Alle documenten zichtbaar, gesorteerd op datum (nieuwste eerst)
+- Documenttype en afzender zichtbaar per item
+- Download-link werkt
 
 ---
 
-### T12 — Acties bekijken
+### T14 — Zoeken in archief
+**Stappen:**
+1. Typ een deel van een afzendernaam of onderwerp in het zoekveld
+
+**Verwacht:**
+- Lijst filtert direct op de invoer
+- Resultaten tonen overeenkomende documenten
+
+---
+
+## Module 4 — Acties & herinneringen
+
+### T15 — Acties bekijken
 **Stappen:**
 1. Scan een document met een zichtbare actie/deadline (bijv. een factuur)
 2. Ga naar /acties
 
 **Verwacht:**
-- Actie verschijnt met deadline en type
-- Actie kan worden afgehandeld (status wijzigt)
+- Actie verschijnt met deadline, urgentiekleur en actietype
+- Filter op "Open", "Gedaan", "Overgeslagen" werkt
 
 ---
 
-## Module 4 — Betaling (eenmalige credits)
-
-### T13 — Credits kopen (eenmalig)
+### T16 — Actie afhandelen
 **Stappen:**
-1. Ga naar /account
-2. Kies "10 scans — €1,99" → klik "Kopen →"
-3. Stripe checkout opent
-4. Betaal met testkaart `4242 4242 4242 4242`
+1. Klik "Markeer als gedaan" bij een open actie
 
 **Verwacht:**
-- Redirect naar /account?payment=success&credits=10
-- Groene succesmelding: "Betaling geslaagd! 10 scans zijn toegevoegd"
-- Creditssaldo +10 in Supabase (controleer in dashboard)
-- Credits zichtbaar in dossier-header
+- Actie verdwijnt uit de open lijst
+- Verschijnt onder "Gedaan"
+- Actie kan worden heropend
 
 ---
 
-### T14 — Mislukte betaling
+### T17 — Actie overslaan & verwijderen
 **Stappen:**
-1. Gebruik testkaart `4000 0000 0000 0002` (declined)
+1. Klik "Overslaan" bij een open actie
+2. Ga naar tab "Overgeslagen"
+3. Klik "Verwijderen"
 
 **Verwacht:**
-- Stripe toont foutmelding
-- Geen credits bijgekomen
-- Redirect naar /account?payment=cancelled
+- Actie verplaatst naar overgeslagen
+- Na verwijderen verdwijnt de actie volledig
+
+---
+
+### T18 — Agenda-export Google Calendar
+**Stappen:**
+1. Open een actie met deadline
+2. Klik "Agenda" → "Google Agenda"
+
+**Verwacht:**
+- Nieuw tabblad opent met Google Calendar vooringevuld
+- Titel = actietekst, datum = deadline
+
+---
+
+### T19 — Agenda-export iCal/Outlook
+**Stappen:**
+1. Klik "Agenda" → "iCal / Outlook"
+
+**Verwacht:**
+- .ics-bestand wordt gedownload
+- Bestand kan worden geopend in Agenda.app / Outlook
+
+---
+
+### T20 — Actielijst.md sync
+**Stappen:**
+1. Koppel OneDrive of Dropbox
+2. Markeer een actie als gedaan
+
+**Verwacht:**
+- `{archiveRoot}/Actielijst.md` in OneDrive/Dropbox wordt bijgewerkt
+- Bestand bevat secties: Te laat / Deze week / Later / Geen deadline
+- Afgehandelde actie staat niet meer in het bestand
+
+---
+
+### T21 — Deadline herinnering (handmatig testen)
+**Stappen:**
+1. Maak een actie aan met deadline = morgen
+2. Roep `/api/reminders/send` aan via POST met juiste `Authorization: Bearer {CRON_SECRET}` header
+
+**Verwacht:**
+- E-mail arriveert met correct onderwerp en deadline-informatie
+- `reminder_sent_at` is ingevuld in Supabase
+- Tweede aanroep stuurt geen tweede mail (reminder_sent_at is al gevuld)
 
 ---
 
 ## Module 5 — Abonnement
 
-### T15 — Abonnement starten
+### T22 — Trial starten
 **Stappen:**
-1. Ga naar /account
-2. Klik "Starten →" bij het maandelijkse abonnement
-3. Betaal met testkaart
+1. Registreer nieuw account (T01+T02)
+2. Ga naar /account
 
 **Verwacht:**
-- Redirect naar /account?payment=subscribed
-- Groene melding: "Abonnement gestart! 50 scans zijn toegevoegd"
-- subscription_credits = 50 in Supabase (niet credits!)
-- Abonnementsstatus toont "actief" met volgende verlengingsdatum
-- Header toont "50 abonnement (deze maand) · X gekocht (verlopen nooit)"
+- Status toont "Proefperiode — eerste maand gratis"
+- 50 scans beschikbaar, geen betaalgegevens gevraagd
+- subscription_status = `trialing` in Supabase
 
 ---
 
-### T16 — Abonnement opzeggen
+### T23 — Abonnement starten (na trial)
+**Stappen:**
+1. Klik "Starten →" bij het abonnement op /account
+2. Betaal met testkaart in Stripe Checkout
+
+**Verwacht:**
+- Redirect naar /account?payment=subscribed
+- Melding: "Abonnement gestart! Je eerste maand is gratis — 50 scans staan klaar."
+- subscription_status = `active` in Supabase
+
+---
+
+### T24 — Abonnement opzeggen
 **Stappen:**
 1. Klik "Beheren" bij actief abonnement
 2. Zeg op via Stripe Customer Portal
 
 **Verwacht:**
-- Status wijzigt naar "loopt af op [datum]"
-- Amber melding: "Abonnement loopt af op..."
-- Tekst: "Je abonnementsscans zijn nog geldig tot het einde van de betaalperiode"
-- Na vervaldatum (Stripe test clock): subscription_credits = 0, credits ongewijzigd
+- Status wijzigt naar "loopt af op [datum]" (cancelling)
+- Scans blijven beschikbaar tot einde betaalperiode
+- Na vervaldatum: subscription_credits = 0
 
 ---
 
-### T17 — Credits gebruik-het-of-verlies-het
+### T25 — Maandelijkse reset (Stripe test clock)
 **Stappen:**
-1. Start abonnement (50 subscription_credits)
-2. Gebruik 10 scans
-3. Simuleer maandelijkse verlenging via Stripe test clock
+1. Start abonnement, gebruik 10 scans (40 resterend)
+2. Versnelling via Stripe test clock naar volgende maand
 
 **Verwacht:**
-- Na verlenging: subscription_credits reset naar 50 (niet 90!)
+- subscription_credits reset naar 50 (niet 90)
 - Resterende 40 abonnementsscans zijn vervallen
 
 ---
 
 ## Module 6 — Account & instellingen
 
-### T18 — Wachtwoord wijzigen
+### T26 — Wachtwoord wijzigen
 **Stappen:**
-1. Ga naar /account
-2. Voer huidig wachtwoord + nieuw wachtwoord in
-3. Sla op
-4. Log uit en log opnieuw in met nieuw wachtwoord
+1. Ga naar /account → wachtwoord wijzigen
+2. Log uit en log opnieuw in met nieuw wachtwoord
 
 **Verwacht:**
-- Wachtwoord succesvol gewijzigd
-- Inloggen met nieuw wachtwoord werkt
+- Wachtwoord succesvol gewijzigd, inloggen werkt
 
 ---
 
-### T19 — Account verwijderen
+### T27 — Account verwijderen
 **Stappen:**
-1. Ga naar /account
-2. Klik "Account verwijderen"
-3. Bevestig
+1. Ga naar /account → "Account verwijderen" → bevestig
 
 **Verwacht:**
 - Account verwijderd uit Supabase
@@ -265,27 +333,35 @@
 
 ## Module 7 — Mobiel & PWA
 
-### T20 — PWA installeren op iPhone
+### T28 — PWA installeren op iPhone
 **Stappen:**
 1. Open nooitmeerpostkwijt.nl in Safari op iPhone
-2. Tik op het Deel-icoon → "Zet op beginscherm"
-3. Voeg toe
+2. Tik op Deel-icoon → "Zet op beginscherm"
 
 **Verwacht:**
-- Icoon: amber vierkant met envelopje (niet wit blanco)
-- Naam: "NooitMeerPostKwijt" (niet "TimeSaverTools" of de URL)
-- App opent zonder Safari-adresbalk (volledig scherm)
+- Icoon: amber vierkant met envelopje
+- Naam: "NooitMeerPostKwijt"
+- App opent zonder Safari-adresbalk
 
 ---
 
-### T21 — Mobiele navigatie
+### T29 — Web Share Target (Android)
+**Stappen:**
+1. Installeer PWA op Android
+2. Maak een foto en deel via de systeemdeelknop → kies NooitMeerPostKwijt
+
+**Verwacht:**
+- App opent met de foto al geladen in het dossier
+
+---
+
+### T30 — Mobiele navigatie
 **Stappen:**
 1. Open het dossier op mobiel
 
 **Verwacht:**
-- Header past op het scherm zonder overloop
+- Header past op scherm zonder overloop
 - Alle navigatie-items (Acties, Archief, ⚙️, 👤) zichtbaar en aantikbaar
-- Upload-knop groot genoeg voor vingers
 
 ---
 
@@ -293,26 +369,35 @@
 
 | Test | Resultaat | Opmerking |
 |------|-----------|-----------|
-| T01  | ⬜ | |
-| T02  | ⬜ | |
-| T03  | ⬜ | |
-| T04  | ⬜ | |
-| T05  | ⬜ | |
-| T06  | ⬜ | |
-| T07  | ⬜ | |
-| T08  | ⬜ | |
-| T09  | ⬜ | |
-| T10  | ⬜ | |
-| T11  | ⬜ | |
-| T12  | ⬜ | |
-| T13  | ⬜ | |
-| T14  | ⬜ | |
-| T15  | ⬜ | |
-| T16  | ⬜ | |
-| T17  | ⬜ | |
-| T18  | ⬜ | |
-| T19  | ⬜ | |
-| T20  | ⬜ | |
-| T21  | ⬜ | |
+| T01 | ⬜ | |
+| T02 | ⬜ | |
+| T03 | ⬜ | |
+| T04 | ⬜ | |
+| T05 | ⬜ | |
+| T06 | ⬜ | |
+| T07 | ⬜ | |
+| T08 | ⬜ | |
+| T09 | ⬜ | |
+| T10 | ⬜ | |
+| T11 | ⬜ | |
+| T12 | ⬜ | |
+| T13 | ⬜ | |
+| T14 | ⬜ | |
+| T15 | ⬜ | |
+| T16 | ⬜ | |
+| T17 | ⬜ | |
+| T18 | ⬜ | |
+| T19 | ⬜ | |
+| T20 | ⬜ | |
+| T21 | ⬜ | |
+| T22 | ⬜ | |
+| T23 | ⬜ | |
+| T24 | ⬜ | |
+| T25 | ⬜ | |
+| T26 | ⬜ | |
+| T27 | ⬜ | |
+| T28 | ⬜ | |
+| T29 | ⬜ | |
+| T30 | ⬜ | |
 
 **Legenda:** ✅ Geslaagd · ❌ Mislukt · ⏭️ Overgeslagen · ⬜ Nog niet uitgevoerd
