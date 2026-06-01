@@ -63,6 +63,32 @@ export async function POST(req: NextRequest) {
       : { type: "image" as const, source: { type: "base64" as const, media_type: mediaType, data: base64 } };
   }));
 
+  // Bekende afzenders ophalen voor consistente categorisering
+  const { data: recentDocs } = await supabase
+    .from("documents")
+    .select("afzender, mappad, type")
+    .eq("user_id", user.id)
+    .not("afzender", "is", null)
+    .not("mappad", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  // Dedupliceer: meest recente mappad per afzender
+  const senderMap = new Map<string, { mappad: string; type: string | null }>();
+  for (const doc of recentDocs ?? []) {
+    if (doc.afzender && !senderMap.has(doc.afzender)) {
+      senderMap.set(doc.afzender, { mappad: doc.mappad, type: doc.type });
+    }
+  }
+
+  const senderInstruction = senderMap.size > 0
+    ? `\n\nBekende afzenders van deze gebruiker — gebruik dit voor consistente mappad en type classificatie:\n${
+        [...senderMap.entries()]
+          .map(([afz, { mappad, type }]) => `- ${afz} → mappad: ${mappad}${type ? `, type: ${type}` : ""}`)
+          .join("\n")
+      }`
+    : "";
+
   const familyInstruction =
     familyMemberNames.length > 0
       ? `\n\nDe gezinsleden zijn: ${familyMemberNames.join(", ")}. Voeg een veld 'gezinslid' toe met de meest waarschijnlijke ontvanger op basis van de naam/adres op het document (of null als onduidelijk).`
@@ -96,7 +122,7 @@ Formaat:
   "actie": "concrete actie die ondernomen moet worden, bijv. 'Betaal €156 aan gemeente' of 'Reageer vóór de deadline' — null als er geen actie vereist is",
   "actie_deadline": "YYYY-MM-DD van de uiterste datum voor de actie, of null",
   "actie_type": "betaling/reageren/aanvragen/registreren/overig — of null als er geen actie is"
-}${familyInstruction}`,
+}${senderInstruction}${familyInstruction}`,
             },
           ],
         },

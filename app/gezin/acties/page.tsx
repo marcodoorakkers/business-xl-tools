@@ -160,6 +160,10 @@ export default function GezinActiesPage() {
 
   useEffect(() => { loadActions(); }, [loadActions]);
 
+  async function syncActielijst() {
+    fetch("/api/tools/mijn-dossier/sync-actielijst", { method: "POST" }).catch(() => {});
+  }
+
   async function updateStatus(id: string, status: "gedaan" | "overgeslagen" | "open") {
     setUpdating(id);
     try {
@@ -169,6 +173,7 @@ export default function GezinActiesPage() {
         body: JSON.stringify({ status }),
       });
       setActions(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+      syncActielijst();
     } finally {
       setUpdating(null);
     }
@@ -179,6 +184,7 @@ export default function GezinActiesPage() {
     try {
       await fetch(`/api/tools/mijn-dossier/acties/${id}`, { method: "DELETE" });
       setActions(prev => prev.filter(a => a.id !== id));
+      syncActielijst();
     } finally {
       setUpdating(null);
     }

@@ -226,6 +226,7 @@ export default function GezinDossierPage() {
           file_url: fileUrl ?? null,
         }),
       });
+      fetch("/api/tools/mijn-dossier/sync-actielijst", { method: "POST" }).catch(() => {});
     } catch (err) {
       console.error("Kon actie niet opslaan:", err);
     }
