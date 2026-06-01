@@ -29,7 +29,7 @@ export async function GET() {
 
   const { data: members } = await admin
     .from("archive_family_members")
-    .select("name")
+    .select("name, full_name")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
@@ -37,6 +37,7 @@ export async function GET() {
     connected: !!tokenRow,
     archiveRoot: tokenRow?.archive_root ?? "Archief",
     familyMembers: (members ?? []).map((m: { name: string }) => m.name),
+    familyMemberDetails: members ?? [],
     dropboxConnected: !!dropboxRow,
     dropboxArchiveRoot: dropboxRow?.archive_root ?? "Archief",
     storagePreference: archiveSettings?.storage_preference ?? "local",

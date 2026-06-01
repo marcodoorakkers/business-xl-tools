@@ -16,10 +16,19 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
 
   const familyMembersRaw = formData.get("family_members") as string | null;
-  let familyMemberNames: string[] = [];
+  interface FamilyMemberData { name: string; full_name?: string | null }
+  let familyData: FamilyMemberData[] = [];
   if (familyMembersRaw) {
-    try { familyMemberNames = JSON.parse(familyMembersRaw); } catch { familyMemberNames = []; }
+    try {
+      const parsed = JSON.parse(familyMembersRaw);
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === "string") {
+        familyData = parsed.map((n: string) => ({ name: n }));
+      } else {
+        familyData = parsed;
+      }
+    } catch { familyData = []; }
   }
+  const familyMemberNames = familyData.map(m => m.name);
 
   // Ondersteuning voor meerdere bestanden (file_0, file_1, ...) én enkel bestand (file)
   const fileCountRaw = formData.get("file_count");
@@ -90,8 +99,8 @@ export async function POST(req: NextRequest) {
     : "";
 
   const familyInstruction =
-    familyMemberNames.length > 0
-      ? `\n\nDe gezinsleden zijn: ${familyMemberNames.join(", ")}. Voeg een veld 'gezinslid' toe met de meest waarschijnlijke ontvanger op basis van de naam/adres op het document (of null als onduidelijk).`
+    familyData.length > 0
+      ? `\n\nDe gezinsleden zijn:\n${familyData.map(m => m.full_name ? `- ${m.name} (volledige naam: ${m.full_name})` : `- ${m.name}`).join("\n")}\nVoeg een veld 'gezinslid' toe met de korte naam (bijv. "${familyData[0].name}") van de meest waarschijnlijke ontvanger op basis van naam, initialen of adres op het document. Geef null als het onduidelijk is.`
       : "";
 
   const pageNote = uploadedFiles.length > 1 ? `\n\nDit document bestaat uit ${uploadedFiles.length} pagina's (hierboven afgebeeld). Analyseer het als één geheel document.` : "";

@@ -10,7 +10,7 @@ export async function GET() {
   const admin = createAdminClient();
   const { data } = await admin
     .from("archive_family_members")
-    .select("id, name")
+    .select("id, name, full_name")
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
@@ -22,18 +22,39 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const { name } = await req.json();
+  const { name, full_name } = await req.json();
   if (!name?.trim()) return NextResponse.json({ error: "Naam is verplicht" }, { status: 400 });
 
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("archive_family_members")
-    .insert({ user_id: user.id, name: name.trim() })
-    .select("id, name")
+    .insert({ user_id: user.id, name: name.trim(), full_name: full_name?.trim() || null })
+    .select("id, name, full_name")
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
+  return NextResponse.json(data);
+}
+
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+
+  const { id, full_name } = await req.json();
+  if (!id) return NextResponse.json({ error: "ID is verplicht" }, { status: 400 });
+
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("archive_family_members")
+    .update({ full_name: full_name?.trim() || null })
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .select("id, name, full_name")
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
 

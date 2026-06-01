@@ -96,6 +96,7 @@ export default function GezinDossierPage() {
   const [bestandsnaam, setBestandsnaam] = useState("");
   const [gezinslid, setGezinslid] = useState("");
   const [familyMembers, setFamilyMembers] = useState<string[]>([]);
+  const [familyMemberDetails, setFamilyMemberDetails] = useState<{ name: string; full_name?: string | null }[]>([]);
   const [includeActie, setIncludeActie] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [savedInfo, setSavedInfo] = useState<{ pad: string; url?: string } | null>(null);
@@ -117,6 +118,7 @@ export default function GezinDossierPage() {
         connected: boolean;
         archiveRoot: string;
         familyMembers: string[];
+        familyMemberDetails?: { name: string; full_name?: string | null }[];
         dropboxConnected: boolean;
         dropboxArchiveRoot: string;
         storagePreference: string;
@@ -125,6 +127,7 @@ export default function GezinDossierPage() {
         setDropboxConnected(data.dropboxConnected);
         setArchiveRoot(data.archiveRoot ?? "Archief");
         setFamilyMembers(data.familyMembers ?? []);
+        setFamilyMemberDetails(data.familyMemberDetails ?? []);
         setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox");
       })
       .catch(() => {});
@@ -189,7 +192,7 @@ export default function GezinDossierPage() {
     compressed.forEach((f, i) => formData.append(`file_${i}`, f));
     formData.append("file_count", String(compressed.length));
     if (familyMembers.length > 0) {
-      formData.append("family_members", JSON.stringify(familyMembers));
+      formData.append("family_members", JSON.stringify(familyMemberDetails.length > 0 ? familyMemberDetails : familyMembers));
     }
     try {
       const res = await fetch("/api/tools/mijn-dossier", { method: "POST", body: formData });

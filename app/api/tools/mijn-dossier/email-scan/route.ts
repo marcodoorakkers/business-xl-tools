@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
   // Gezinsleden ophalen
   const { data: familyRows } = await admin
     .from("archive_family_members")
-    .select("name")
+    .select("name, full_name")
     .eq("user_id", profile.id)
     .order("created_at", { ascending: true });
   const familyMemberNames = (familyRows ?? []).map((r: { name: string }) => r.name);
@@ -101,7 +101,9 @@ export async function POST(req: NextRequest) {
   ].filter(Boolean).join("\n");
 
   const familyInstruction = familyMemberNames.length > 0
-    ? `\n\nDe gezinsleden zijn: ${familyMemberNames.join(", ")}. Voeg een veld 'gezinslid' toe met de meest waarschijnlijke ontvanger. Gebruik hiervoor (in volgorde van prioriteit): naam/adres op het document, onderwerp van de e-mail, bekende afzender-gezinslid koppeling. Geef null als het onduidelijk is.${
+    ? `\n\nDe gezinsleden zijn:\n${(familyRows ?? []).map((r: { name: string; full_name?: string | null }) =>
+        r.full_name ? `- ${r.name} (volledige naam: ${r.full_name})` : `- ${r.name}`
+      ).join("\n")}\nVoeg een veld 'gezinslid' toe met de korte naam (bijv. "${familyMemberNames[0]}") van de meest waarschijnlijke ontvanger. Gebruik hiervoor (in volgorde van prioriteit): naam/initialen/adres op het document, onderwerp van de e-mail, bekende afzender-gezinslid koppeling. Geef null als het onduidelijk is.${
         gezinslidMap.size > 0
           ? `\n\nBekende afzender → gezinslid koppelingen:\n${[...gezinslidMap.entries()].map(([a, g]) => `- ${a} → ${g}`).join("\n")}`
           : ""

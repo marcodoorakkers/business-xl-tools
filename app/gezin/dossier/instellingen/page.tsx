@@ -17,6 +17,7 @@ interface StatusData {
 interface FamilyMember {
   id: string;
   name: string;
+  full_name?: string | null;
 }
 
 function InstellingenContent() {
@@ -27,6 +28,9 @@ function InstellingenContent() {
   const [dropboxArchiveRoot, setDropboxArchiveRoot] = useState("Archief");
   const [storagePreference, setStoragePreference] = useState("local");
   const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberFullName, setNewMemberFullName] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFullName, setEditFullName] = useState("");
   const [savingRoot, setSavingRoot] = useState(false);
   const [savingDropboxRoot, setSavingDropboxRoot] = useState(false);
   const [addingMember, setAddingMember] = useState(false);
@@ -124,16 +128,33 @@ function InstellingenContent() {
       const res = await fetch("/api/tools/mijn-dossier/onedrive/family", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newMemberName.trim() }),
+        body: JSON.stringify({ name: newMemberName.trim(), full_name: newMemberFullName.trim() || null }),
       });
       if (!res.ok) throw new Error();
       const member: FamilyMember = await res.json();
       setFamilyMembers((prev) => [...prev, member]);
       setNewMemberName("");
+      setNewMemberFullName("");
     } catch {
       showToast("error", "Toevoegen mislukt.");
     } finally {
       setAddingMember(false);
+    }
+  }
+
+  async function saveFullName(id: string) {
+    try {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/family", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, full_name: editFullName.trim() || null }),
+      });
+      if (!res.ok) throw new Error();
+      const updated: FamilyMember = await res.json();
+      setFamilyMembers((prev) => prev.map((m) => m.id === id ? updated : m));
+      setEditingId(null);
+    } catch {
+      showToast("error", "Opslaan mislukt.");
     }
   }
 
@@ -319,27 +340,67 @@ function InstellingenContent() {
           </p>
           <ul className="space-y-2">
             {familyMembers.map((m) => (
-              <li key={m.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2">
-                <span className="text-sm text-gray-800">{m.name}</span>
-                <button onClick={() => deleteMember(m.id)}
-                  className="text-gray-400 hover:text-red-500 text-lg leading-none transition-colors"
-                  aria-label="Verwijderen">×</button>
+              <li key={m.id} className="bg-gray-50 rounded-xl px-4 py-2">
+                {editingId === m.id ? (
+                  <div className="space-y-2">
+                    <span className="text-sm font-medium text-gray-800">{m.name}</span>
+                    <div className="flex gap-2">
+                      <input type="text" value={editFullName}
+                        onChange={(e) => setEditFullName(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") saveFullName(m.id); if (e.key === "Escape") setEditingId(null); }}
+                        autoFocus
+                        className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                        placeholder="bijv. X.M. Doorakkers" />
+                      <button onClick={() => saveFullName(m.id)}
+                        className="text-xs bg-amber-500 hover:bg-amber-600 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors">
+                        Opslaan
+                      </button>
+                      <button onClick={() => setEditingId(null)}
+                        className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1.5 transition-colors">
+                        Annuleer
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-sm text-gray-800">{m.name}</span>
+                      {m.full_name && <span className="text-xs text-gray-400 ml-2">{m.full_name}</span>}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => { setEditingId(m.id); setEditFullName(m.full_name ?? ""); }}
+                        className="text-xs text-gray-400 hover:text-amber-500 transition-colors"
+                        aria-label="Volledige naam instellen">
+                        {m.full_name ? "✎" : "+ naam"}
+                      </button>
+                      <button onClick={() => deleteMember(m.id)}
+                        className="text-gray-400 hover:text-red-500 text-lg leading-none transition-colors"
+                        aria-label="Verwijderen">×</button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
             {familyMembers.length === 0 && (
               <li className="text-sm text-gray-400 italic">Nog geen gezinsleden toegevoegd.</li>
             )}
           </ul>
-          <div className="flex gap-2 pt-2 border-t border-gray-100">
-            <input type="text" value={newMemberName}
-              onChange={(e) => setNewMemberName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") addMember(); }}
-              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-              placeholder="Naam gezinslid" />
-            <button onClick={addMember} disabled={addingMember || !newMemberName.trim()}
-              className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
-              {addingMember ? "Toevoegen…" : "Toevoegen"}
-            </button>
+          <div className="space-y-2 pt-2 border-t border-gray-100">
+            <div className="flex gap-2">
+              <input type="text" value={newMemberName}
+                onChange={(e) => setNewMemberName(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") addMember(); }}
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                placeholder="Roepnaam (bijv. Xavi)" />
+              <button onClick={addMember} disabled={addingMember || !newMemberName.trim()}
+                className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                {addingMember ? "Toevoegen…" : "Toevoegen"}
+              </button>
+            </div>
+            <input type="text" value={newMemberFullName}
+              onChange={(e) => setNewMemberFullName(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
+              placeholder="Volledige naam optioneel (bijv. X.M. Doorakkers)" />
           </div>
         </div>
       </main>
