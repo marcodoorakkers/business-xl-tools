@@ -391,7 +391,7 @@ function InstellingenContent() {
                 onChange={(e) => setNewMemberName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") addMember(); }}
                 className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-                placeholder="Roepnaam (bijv. Xavi)" />
+                placeholder="Roepnaam (bijv. Jan)" />
               <button onClick={addMember} disabled={addingMember || !newMemberName.trim()}
                 className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
                 {addingMember ? "Toevoegen…" : "Toevoegen"}
