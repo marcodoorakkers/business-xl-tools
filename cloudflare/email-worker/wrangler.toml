@@ -1,0 +1,9 @@
+name = "nmmrk-email-scanner"
+main = "index.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+WEBHOOK_URL = "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/email-scan"
+
+# Secrets (stel in via: wrangler secret put WEBHOOK_SECRET)
+# WEBHOOK_SECRET = ...

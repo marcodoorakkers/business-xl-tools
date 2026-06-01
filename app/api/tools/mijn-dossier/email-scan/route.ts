@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createHmac } from "crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { getValidAccessToken, uploadFileToOneDrive } from "@/lib/onedrive";
 import { getValidDropboxToken, forceRefreshDropboxToken, uploadFileToDropbox } from "@/lib/dropbox";
@@ -8,29 +7,27 @@ import { getValidDropboxToken, forceRefreshDropboxToken, uploadFileToDropbox } f
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-function verifyMailgunSignature(timestamp: string, token: string, signature: string): boolean {
-  const key = process.env.MAILGUN_WEBHOOK_SIGNING_KEY;
-  if (!key) return false;
-  const hash = createHmac("sha256", key).update(timestamp + token).digest("hex");
-  return hash === signature;
-}
-
 export async function POST(req: NextRequest) {
-  const formData = await req.formData();
+  // Cloudflare Worker stuurt een gedeeld secret mee
+  const secret = req.headers.get("x-webhook-secret");
+  if (!secret || secret !== process.env.CLOUDFLARE_WEBHOOK_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  // Mailgun signature verificatie
-  const timestamp = formData.get("timestamp") as string;
-  const token = formData.get("token") as string;
-  const signature = formData.get("signature") as string;
+  const body = await req.json() as {
+    recipient: string;
+    filename: string;
+    contentType: string;
+    data: string; // base64
+  };
 
-  if (!verifyMailgunSignature(timestamp, token, signature)) {
-    return NextResponse.json({ error: "Ongeldige handtekening" }, { status: 401 });
+  const { recipient, filename, contentType, data } = body;
+  if (!recipient || !data) {
+    return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
 
   // Token uit het e-mailadres halen: abc123@scan.nooitmeerpostkwijt.nl → abc123
-  const recipient = (formData.get("recipient") as string ?? "").toLowerCase();
-  const scanToken = recipient.split("@")[0];
-  if (!scanToken) return NextResponse.json({ error: "Ongeldig adres" }, { status: 400 });
+  const scanToken = recipient.split("@")[0].toLowerCase();
 
   // Gebruiker opzoeken via token
   const admin = createAdminClient();
@@ -42,29 +39,14 @@ export async function POST(req: NextRequest) {
 
   if (!profile) return NextResponse.json({ error: "Onbekend scan-adres" }, { status: 404 });
 
-  const hasAccess = profile.subscription_credits > 0 &&
+  const hasAccess =
+    profile.subscription_credits > 0 &&
     (profile.subscription_status === "active" || profile.subscription_status === "trialing");
-  if (!hasAccess) {
-    // Stil weggooien — gebruiker heeft geen actief abonnement of geen scans meer
-    return NextResponse.json({ skipped: true });
-  }
+  if (!hasAccess) return NextResponse.json({ skipped: true });
 
-  // Eerste bruikbare bijlage vinden (PDF of afbeelding)
-  const attachmentCount = parseInt(formData.get("attachment-count") as string ?? "0");
-  let attachment: File | null = null;
-  for (let i = 1; i <= attachmentCount; i++) {
-    const f = formData.get(`attachment-${i}`) as File | null;
-    if (f && (f.type === "application/pdf" || f.type.startsWith("image/"))) {
-      attachment = f;
-      break;
-    }
-  }
-
-  if (!attachment) return NextResponse.json({ skipped: true, reason: "Geen bruikbare bijlage" });
-
-  // Bijlage inlezen — nooit opslaan, alleen in memory
-  const buffer = Buffer.from(await attachment.arrayBuffer());
-  const base64 = buffer.toString("base64");
+  // Base64 → Buffer — nooit opslaan, alleen in memory
+  const buffer = Buffer.from(data, "base64");
+  const isPdf = contentType === "application/pdf";
 
   // Eerder gescande afzenders ophalen voor consistente categorisering
   const { data: recentDocs } = await admin
@@ -90,10 +72,9 @@ export async function POST(req: NextRequest) {
 
   // AI-analyse
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const isPdf = attachment.type === "application/pdf";
   const contentBlock = isPdf
-    ? { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data: base64 } }
-    : { type: "image" as const, source: { type: "base64" as const, media_type: attachment.type as "image/jpeg" | "image/png" | "image/gif" | "image/webp", data: base64 } };
+    ? { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data } }
+    : { type: "image" as const, source: { type: "base64" as const, media_type: contentType as "image/jpeg" | "image/png" | "image/gif" | "image/webp", data } };
 
   let analysis: Record<string, string>;
   try {
@@ -133,12 +114,12 @@ Formaat:
     return NextResponse.json({ error: "AI-analyse mislukt" }, { status: 500 });
   }
 
-  const bestandsnaam = analysis.bestandsnaam ?? "document";
+  const bestandsnaam = analysis.bestandsnaam ?? filename.replace(/\.[^.]+$/, "") ?? "document";
   const ext = isPdf ? ".pdf" : ".jpg";
   const fullFilename = `${bestandsnaam}${ext}`;
   const mappad = analysis.mappad ?? "Overig";
 
-  // Uploaden naar cloud (attachment wordt na deze functie weggegooid)
+  // Uploaden naar cloud — buffer wordt na deze aanroep vrijgegeven
   let fileUrl: string | null = null;
   let storage: string | null = null;
 
@@ -147,10 +128,10 @@ Formaat:
     const { data: tokenRow } = await admin.from("onedrive_tokens").select("archive_root").eq("user_id", profile.id).single();
     const archiveRoot = tokenRow?.archive_root ?? "Archief";
     try {
-      const { webUrl } = await uploadFileToOneDrive(onedriveToken, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, attachment.type);
+      const { webUrl } = await uploadFileToOneDrive(onedriveToken, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, contentType);
       fileUrl = webUrl;
       storage = "onedrive";
-    } catch { /* ga door met Dropbox */ }
+    } catch { /* ga door naar Dropbox */ }
   }
 
   if (!fileUrl) {
@@ -159,7 +140,7 @@ Formaat:
       const { data: tokenRow } = await admin.from("dropbox_tokens").select("archive_root").eq("user_id", profile.id).single();
       const archiveRoot = tokenRow?.archive_root ?? "Archief";
       try {
-        const result = await uploadFileToDropbox(dropboxToken, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, attachment.type);
+        const result = await uploadFileToDropbox(dropboxToken, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, contentType);
         fileUrl = result.webUrl;
         storage = "dropbox";
       } catch (err) {
@@ -167,7 +148,7 @@ Formaat:
           const refreshed = await forceRefreshDropboxToken(profile.id);
           if (refreshed) {
             try {
-              const result = await uploadFileToDropbox(refreshed, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, attachment.type);
+              const result = await uploadFileToDropbox(refreshed, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, contentType);
               fileUrl = result.webUrl;
               storage = "dropbox";
             } catch { /* upload mislukt */ }
@@ -205,7 +186,6 @@ Formaat:
     });
   }
 
-  // Credit aftrekken
   await admin
     .from("profiles")
     .update({ subscription_credits: profile.subscription_credits - 1 })
