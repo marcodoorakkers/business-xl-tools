@@ -69,6 +69,17 @@ export async function POST(req: NextRequest) {
         .join("\n")}`
     : "";
 
+  // Gezinsleden ophalen
+  const { data: familyRows } = await admin
+    .from("archive_family_members")
+    .select("name")
+    .eq("user_id", profile.id)
+    .order("created_at", { ascending: true });
+  const familyMemberNames = (familyRows ?? []).map((r: { name: string }) => r.name);
+  const familyInstruction = familyMemberNames.length > 0
+    ? `\n\nDe gezinsleden zijn: ${familyMemberNames.join(", ")}. Voeg een veld 'gezinslid' toe met de meest waarschijnlijke ontvanger op basis van de naam/adres op het document (of null als onduidelijk).`
+    : "";
+
   // AI-analyse
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const contentBlock = isPdf
@@ -100,7 +111,7 @@ Formaat:
   "actie": "concrete actie die ondernomen moet worden — null als er geen actie vereist is",
   "actie_deadline": "YYYY-MM-DD van de uiterste datum voor de actie, of null",
   "actie_type": "betaling/reageren/aanvragen/registreren/overig — of null als er geen actie is"
-}${senderInstruction}`,
+}${senderInstruction}${familyInstruction}`,
           },
         ],
       }],
@@ -116,7 +127,12 @@ Formaat:
   const bestandsnaam = analysis.bestandsnaam ?? filename.replace(/\.[^.]+$/, "") ?? "document";
   const ext = isPdf ? ".pdf" : ".jpg";
   const fullFilename = `${bestandsnaam}${ext}`;
-  const mappad = analysis.mappad ?? "Overig";
+  const gezinslid = (analysis.gezinslid && familyMemberNames.includes(analysis.gezinslid))
+    ? analysis.gezinslid
+    : null;
+  const mappad = gezinslid
+    ? `${gezinslid}/${analysis.mappad ?? "Overig"}`
+    : (analysis.mappad ?? "Overig");
 
   // Uploaden naar cloud — buffer wordt na deze aanroep vrijgegeven
   let fileUrl: string | null = null;
@@ -167,6 +183,7 @@ Formaat:
     onderwerp: analysis.onderwerp ?? null,
     mappad: mappad ?? null,
     samenvatting: analysis.samenvatting ?? null,
+    gezinslid: gezinslid,
     file_url: fileUrl,
     storage: storage ?? "email",
   });
