@@ -76,6 +76,7 @@ app/
     manifest.ts                  — NMMPK PWA manifest (amber thema, gezin-icoon)
     account/page.tsx             — NMMPK account (abonnement beheren)
     dossier/page.tsx             — NMMPK scan-interface (client component)
+    dossier/instellingen/page.tsx — opslag, gezinsleden, scan-e-mailadres
     aanmelden/page.tsx           — NMMPK registratie
     inloggen/page.tsx            — NMMPK login
   api/
@@ -84,11 +85,24 @@ app/
       webhook/route.ts           — Stripe webhook handler
     gezin/
       share-target/route.ts      — Web Share Target (Android PWA, POST + GET)
-components/
-  Navbar.tsx                     — TST navbar
-  NMMPKLogo.tsx                  — NMMPK logo component
-lib/supabase/                    — client + server Supabase helpers
-middleware.ts                    — domein-routing: nooitmeerpostkwijt.nl → /gezin/*
+    tools/mijn-dossier/
+      route.ts                   — handmatige scan (AI-analyse + upload)
+      email-scan/route.ts        — Cloudflare webhook-ontvanger (inbound e-mail)
+      scan-email/token/route.ts  — persoonlijk scan-e-mailadres ophalen/genereren
+      onedrive/family/route.ts   — gezinsleden CRUD (GET/POST/PATCH/DELETE)
+      onedrive/status/route.ts   — verbindingsstatus + gezinsleden + opslagvoorkeur
+      sync-actielijst/route.ts   — actielijst als Markdown naar OneDrive/Dropbox
+cloudflare/
+  email-worker/                  — Cloudflare Email Worker (postal-mime, wrangler)
+    index.js                     — MIME-parser, stuurt bijlage als base64 naar webhook
+    wrangler.toml                — worker naam + WEBHOOK_URL var
+docs/
+  BACKLOG.md                     — uitgestelde features met motivatie
+  Cloudflare-setup.md            — stap-voor-stap installatiegids
+  PRD-NooitMeerPostKwijt.md
+  Testplan-NooitMeerPostKwijt.md
+supabase/migrations/
+  add_scan_email_token.sql       — scan_email_token kolom op profiles
 ```
 
 ## PWA (NMMPK)
@@ -100,4 +114,21 @@ middleware.ts                    — domein-routing: nooitmeerpostkwijt.nl → /
 
 ## E-mail
 
-Transactionele e-mails gaan via Resend met `@timesavertools.nl` als afzenderdomein.
+- **Outbound** (transactioneel): Resend met `@timesavertools.nl` als afzenderdomein
+- **Inbound** (scan via e-mail): Cloudflare Email Workers op `nooitmeerpostkwijt.nl`
+  - Catch-all route → Worker `nmmrk-email-scanner` → webhook `email-scan/route.ts`
+  - Elke gebruiker heeft een uniek `scan_email_token` (UUID) als persoonlijk scanadres
+  - Bijlage (PDF/afbeelding) wordt in-memory verwerkt, nooit opgeslagen op server
+  - Toegang: alleen `subscription_status = active | trialing` (geen credits-check)
+  - Secrets: `CLOUDFLARE_WEBHOOK_SECRET` in Vercel, `WEBHOOK_SECRET` in Wrangler
+
+## Gezinsleden (NMMPK)
+
+- Opgeslagen in `archive_family_members` (user_id, name, full_name)
+- `full_name` optioneel — gebruikt voor herkenning van initialen/achternamen op documenten
+- Gedeeltelijke naamkoppeling: als Claude "Xavi" teruggeeft maar de opgeslagen naam "Xavi (X.M. Doorakkers)" is, wordt de volledige naam gebruikt
+- Gezinslid-herkenning gebruikt (in volgorde): naam op document → e-mailonderwerp → historische afzender→gezinslid koppeling
+
+## Backlog
+
+Zie `docs/BACKLOG.md` voor uitgestelde features.
