@@ -32,6 +32,8 @@ export default {
       },
       body: JSON.stringify({
         recipient: message.to,
+        from: email.from?.address ?? message.from,
+        subject: email.subject ?? null,
         filename: attachment.filename ?? "document.pdf",
         contentType: attachment.mimeType ?? "application/pdf",
         data: base64,

@@ -16,12 +16,14 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json() as {
     recipient: string;
+    from?: string;
+    subject?: string;
     filename: string;
     contentType: string;
     data: string; // base64
   };
 
-  const { recipient, filename, contentType, data } = body;
+  const { recipient, from, subject, filename, contentType, data } = body;
   if (!recipient || !data) {
     return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
@@ -76,8 +78,34 @@ export async function POST(req: NextRequest) {
     .eq("user_id", profile.id)
     .order("created_at", { ascending: true });
   const familyMemberNames = (familyRows ?? []).map((r: { name: string }) => r.name);
+
+  // Historische gezinslid per afzender ophalen
+  const { data: gezinslidDocs } = await admin
+    .from("documents")
+    .select("afzender, gezinslid")
+    .eq("user_id", profile.id)
+    .not("afzender", "is", null)
+    .not("gezinslid", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(100);
+  const gezinslidMap = new Map<string, string>();
+  for (const doc of gezinslidDocs ?? []) {
+    if (doc.afzender && doc.gezinslid && !gezinslidMap.has(doc.afzender)) {
+      gezinslidMap.set(doc.afzender, doc.gezinslid);
+    }
+  }
+
+  const emailContext = [
+    from ? `Afkomstig van e-mailadres: ${from}` : null,
+    subject ? `Onderwerp van de e-mail: ${subject}` : null,
+  ].filter(Boolean).join("\n");
+
   const familyInstruction = familyMemberNames.length > 0
-    ? `\n\nDe gezinsleden zijn: ${familyMemberNames.join(", ")}. Voeg een veld 'gezinslid' toe met de meest waarschijnlijke ontvanger op basis van de naam/adres op het document (of null als onduidelijk).`
+    ? `\n\nDe gezinsleden zijn: ${familyMemberNames.join(", ")}. Voeg een veld 'gezinslid' toe met de meest waarschijnlijke ontvanger. Gebruik hiervoor (in volgorde van prioriteit): naam/adres op het document, onderwerp van de e-mail, bekende afzender-gezinslid koppeling. Geef null als het onduidelijk is.${
+        gezinslidMap.size > 0
+          ? `\n\nBekende afzender → gezinslid koppelingen:\n${[...gezinslidMap.entries()].map(([a, g]) => `- ${a} → ${g}`).join("\n")}`
+          : ""
+      }${emailContext ? `\n\nE-mailcontext:\n${emailContext}` : ""}`
     : "";
 
   // AI-analyse
