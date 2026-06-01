@@ -350,7 +350,7 @@ function InstellingenContent() {
                         onKeyDown={(e) => { if (e.key === "Enter") saveFullName(m.id); if (e.key === "Escape") setEditingId(null); }}
                         autoFocus
                         className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-                        placeholder="bijv. X.M. Doorakkers" />
+                        placeholder="bijv. J. de Vries" />
                       <button onClick={() => saveFullName(m.id)}
                         className="text-xs bg-amber-500 hover:bg-amber-600 text-white font-semibold px-3 py-1.5 rounded-lg transition-colors">
                         Opslaan
@@ -400,7 +400,7 @@ function InstellingenContent() {
             <input type="text" value={newMemberFullName}
               onChange={(e) => setNewMemberFullName(e.target.value)}
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-              placeholder="Volledige naam optioneel (bijv. X.M. Doorakkers)" />
+              placeholder="Volledige naam optioneel (bijv. J. de Vries)" />
           </div>
         </div>
       </main>
