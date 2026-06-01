@@ -129,8 +129,8 @@ export default function GezinDossierPage() {
       })
       .catch(() => {});
 
-    supabase.from("profiles").select("credits, subscription_credits").single().then(({ data }) => {
-      if (data) setCredits((data.credits ?? 0) + (data.subscription_credits ?? 0));
+    supabase.from("profiles").select("subscription_credits").single().then(({ data }) => {
+      if (data) setCredits(data.subscription_credits ?? 0);
     });
 
     // Load file shared via iOS/Android share sheet

@@ -8,25 +8,22 @@ import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
 
 
-export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string; credits?: string }> }) {
+export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string }> }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/gezin/inloggen");
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("credits, subscription_credits, subscription_status, subscription_period_end")
+    .select("subscription_credits, subscription_status, subscription_period_end")
     .eq("id", user.id)
     .single();
 
-  const purchasedCredits = profile?.credits ?? 0;
-  const subscriptionCredits = profile?.subscription_credits ?? 0;
-  const credits = purchasedCredits + subscriptionCredits;
+  const credits = profile?.subscription_credits ?? 0;
   const subscriptionStatus = profile?.subscription_status ?? null;
   const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
   const params = await searchParams;
   const paymentStatus = params.payment;
-  const addedCredits = params.credits;
   const proPriceId = process.env.STRIPE_PRO_PRICE_ID!;
 
   const formattedPeriodEnd = subscriptionPeriodEnd
@@ -49,14 +46,9 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
         <h1 className="text-2xl font-extrabold text-gray-900">Account</h1>
 
         {/* Betaalfeedback */}
-        {paymentStatus === "success" && (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
-            🎉 Betaling geslaagd! {addedCredits} scans zijn toegevoegd aan je account.
-          </div>
-        )}
         {paymentStatus === "subscribed" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
-            🎉 Abonnement gestart! 50 scans zijn toegevoegd.
+            Abonnement gestart! Je eerste maand is gratis — 50 scans staan klaar.
           </div>
         )}
         {paymentStatus === "cancelled" && (
@@ -67,7 +59,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
 
         {/* Scans saldo */}
         <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-white">
-          <p className="text-amber-100 text-sm mb-1">Jouw scans</p>
+          <p className="text-amber-100 text-sm mb-1">Jouw scans deze maand</p>
           <p className="text-5xl font-extrabold">{credits}</p>
           {subscriptionStatus === "active" || subscriptionStatus === "trialing" ? (
             <p className="text-amber-100 text-sm mt-1">scans beschikbaar deze maand · ongebruikte scans vervallen einde maand</p>
