@@ -20,5 +20,5 @@ export async function GET() {
     await admin.from("profiles").update({ scan_email_token: token }).eq("id", user.id);
   }
 
-  return NextResponse.json({ email: `${token}@scan.nooitmeerpostkwijt.nl` });
+  return NextResponse.json({ email: `${token}@nooitmeerpostkwijt.nl` });
 }

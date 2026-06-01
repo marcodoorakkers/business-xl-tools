@@ -2,8 +2,8 @@ import PostalMime from "postal-mime";
 
 export default {
   async email(message, env) {
-    // Alleen emails aan *@scan.nooitmeerpostkwijt.nl verwerken
-    if (!message.to.endsWith("@scan.nooitmeerpostkwijt.nl")) return;
+    // Alleen emails aan *@nooitmeerpostkwijt.nl verwerken
+    if (!message.to.endsWith("@nooitmeerpostkwijt.nl")) return;
 
     // Volledige e-mail parsen (MIME)
     const rawEmail = await new Response(message.raw).arrayBuffer();
