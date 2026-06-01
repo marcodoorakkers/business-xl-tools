@@ -1,8 +1,104 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
+
+function googleCalendarUrl(actie: string, deadline: string, afzender: string | null) {
+  const d = deadline.replace(/-/g, "");
+  const next = deadline.replace(/-/g, "").slice(0, 6) +
+    String(Number(deadline.slice(8, 10)) + 1).padStart(2, "0");
+  const details = afzender ? `Van: ${afzender}` : "";
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: actie,
+    dates: `${d}/${next}`,
+    details,
+    sf: "true",
+  });
+  return `https://calendar.google.com/calendar/render?${params}`;
+}
+
+function downloadIcs(actie: string, deadline: string, afzender: string | null) {
+  const d = deadline.replace(/-/g, "");
+  const next = deadline.replace(/-/g, "").slice(0, 6) +
+    String(Number(deadline.slice(8, 10)) + 1).padStart(2, "0");
+  const description = afzender ? `Van: ${afzender}` : "";
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//NooitMeerPostKwijt//NL",
+    "BEGIN:VEVENT",
+    `DTSTART;VALUE=DATE:${d}`,
+    `DTEND;VALUE=DATE:${next}`,
+    `SUMMARY:${actie.replace(/\n/g, "\\n")}`,
+    description ? `DESCRIPTION:${description}` : "",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].filter(Boolean).join("\r\n");
+
+  const blob = new Blob([ics], { type: "text/calendar" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${actie.slice(0, 40).replace(/[^a-zA-Z0-9]/g, "_")}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function CalendarButton({ actie, deadline, afzender }: { actie: string; deadline: string; afzender: string | null }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        title="Toevoegen aan agenda"
+        className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border border-gray-200 bg-white text-gray-500 hover:border-amber-400 hover:text-amber-600 transition-colors"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path strokeLinecap="round" d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        Agenda
+      </button>
+      {open && (
+        <div className="absolute left-0 bottom-full mb-1.5 z-10 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden min-w-[160px]">
+          <a
+            href={googleCalendarUrl(actie, deadline, afzender)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-colors"
+          >
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 18H5V9h14v12zM7 11h2v2H7zm4 0h2v2h-2zm4 0h2v2h-2z"/>
+            </svg>
+            Google Agenda
+          </a>
+          <button
+            onClick={() => { downloadIcs(actie, deadline, afzender); setOpen(false); }}
+            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-colors border-t border-gray-100"
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2M7 10l5 5 5-5M12 15V3" />
+            </svg>
+            iCal / Outlook
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface DocumentAction {
   id: string;
@@ -216,6 +312,13 @@ export default function GezinActiesPage() {
                             <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${URGENCY_STYLES[dl.urgency]}`}>
                               {dl.label}
                             </span>
+                          )}
+                          {action.deadline && filter === "open" && (
+                            <CalendarButton
+                              actie={action.actie}
+                              deadline={action.deadline}
+                              afzender={action.afzender}
+                            />
                           )}
                         </div>
                       </div>
