@@ -31,6 +31,7 @@ function InstellingenContent() {
   const [savingDropboxRoot, setSavingDropboxRoot] = useState(false);
   const [addingMember, setAddingMember] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [scanEmail, setScanEmail] = useState<string | null>(null);
 
   const showToast = useCallback((type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -60,6 +61,12 @@ function InstellingenContent() {
       .then((r) => r.json())
       .then((data: { familyMembers: FamilyMember[] }) => {
         setFamilyMembers(data.familyMembers ?? []);
+      });
+
+    fetch("/api/tools/mijn-dossier/scan-email/token")
+      .then((r) => r.json())
+      .then((data: { email?: string }) => {
+        if (data.email) setScanEmail(data.email);
       });
   }, []);
 
@@ -276,6 +283,32 @@ function InstellingenContent() {
             </div>
             <p className="text-xs text-gray-400">De naam van de hoofdmap in je Dropbox (standaard: Archief).</p>
           </div>
+        </div>
+
+        {/* Scan via e-mail */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
+          <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Scan via e-mail</h2>
+          <p className="text-xs text-gray-500">
+            Stuur of forward een e-mail met PDF-bijlage naar jouw persoonlijke scan-adres. De bijlage wordt automatisch geanalyseerd en toegevoegd aan je dossier.
+          </p>
+          {scanEmail ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <span className="text-sm font-mono text-amber-800 break-all flex-1">{scanEmail}</span>
+                <button
+                  onClick={() => { navigator.clipboard.writeText(scanEmail); showToast("success", "E-mailadres gekopieerd!"); }}
+                  className="shrink-0 text-xs text-amber-600 hover:text-amber-800 font-medium border border-amber-300 rounded-lg px-2.5 py-1 transition-colors"
+                >
+                  Kopieer
+                </button>
+              </div>
+              <p className="text-xs text-gray-400">
+                Dit adres is persoonlijk — deel het niet. Documenten worden direct verwerkt en nooit permanent op onze servers opgeslagen.
+              </p>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-400">Laden…</div>
+          )}
         </div>
 
         {/* Gezinsleden */}
