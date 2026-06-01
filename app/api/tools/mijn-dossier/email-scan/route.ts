@@ -157,9 +157,13 @@ Formaat:
   const bestandsnaam = analysis.bestandsnaam ?? filename.replace(/\.[^.]+$/, "") ?? "document";
   const ext = isPdf ? ".pdf" : ".jpg";
   const fullFilename = `${bestandsnaam}${ext}`;
-  const gezinslid = (analysis.gezinslid && familyMemberNames.includes(analysis.gezinslid))
-    ? analysis.gezinslid
+  const matchedGezinslid = analysis.gezinslid
+    ? (familyMemberNames.find(n => n === analysis.gezinslid) ??
+       familyMemberNames.find(n => n.toLowerCase().startsWith(analysis.gezinslid.toLowerCase() + " ") ||
+                                   n.toLowerCase().startsWith(analysis.gezinslid.toLowerCase() + "(")) ??
+       null)
     : null;
+  const gezinslid = matchedGezinslid;
   const mappad = gezinslid
     ? `${gezinslid}/${analysis.mappad ?? "Overig"}`
     : (analysis.mappad ?? "Overig");

@@ -201,11 +201,13 @@ export default function GezinDossierPage() {
       setAnalysis(data);
       setMappad(data.mappad ?? "");
       setBestandsnaam(data.bestandsnaam ?? "");
-      if (data.gezinslid && familyMembers.includes(data.gezinslid)) {
-        setGezinslid(data.gezinslid);
-      } else {
-        setGezinslid("");
-      }
+      const matched = data.gezinslid
+        ? (familyMembers.find(n => n === data.gezinslid) ??
+           familyMembers.find(n => n.toLowerCase().startsWith(data.gezinslid.toLowerCase() + " ") ||
+                                   n.toLowerCase().startsWith(data.gezinslid.toLowerCase() + "(")) ??
+           null)
+        : null;
+      setGezinslid(matched ?? "");
       setStep("suggestion");
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Er is iets misgegaan");
