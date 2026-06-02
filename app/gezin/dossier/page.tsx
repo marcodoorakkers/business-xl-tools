@@ -105,7 +105,6 @@ export default function GezinDossierPage() {
   const [archiveRoot, setArchiveRoot] = useState("Archief");
   const [storagePreference, setStoragePreference] = useState<"local" | "onedrive" | "dropbox">("local");
   const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
-  const [credits, setCredits] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pageInputRef = useRef<HTMLInputElement>(null);
@@ -135,9 +134,6 @@ export default function GezinDossierPage() {
       })
       .catch(() => {});
 
-    supabase.from("profiles").select("subscription_credits").single().then(({ data }) => {
-      if (data) setCredits(data.subscription_credits ?? 0);
-    });
 
     // Load file shared via iOS/Android share sheet
     if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("from_share") === "1") {
@@ -363,9 +359,6 @@ export default function GezinDossierPage() {
                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
               </svg>
             </Link>
-            {credits !== null && (
-              <span className="text-xs text-gray-400 font-medium">{credits} scans</span>
-            )}
             <button
               onClick={async () => { await supabase.auth.signOut(); router.push("/"); }}
               className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
