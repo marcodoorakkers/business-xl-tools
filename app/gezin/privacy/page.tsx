@@ -55,12 +55,13 @@ export default function GezinPrivacyPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.3 Geüploade documenten</h3>
-                <p className="text-sm text-gray-600 mb-1">Om AI-analyse mogelijk te maken, verwerken wij tijdelijk de foto&apos;s of PDF&apos;s die jij uploadt. Dit kunnen documenten zijn zoals brieven, facturen of polissen. Deze bestanden worden:</p>
+                <p className="text-sm text-gray-600 mb-1">Om AI-analyse mogelijk te maken, verwerken wij tijdelijk de foto&apos;s of PDF&apos;s die jij uploadt of via e-mail doorstuurt. Dit kunnen documenten zijn zoals brieven, facturen of polissen. Deze bestanden worden:</p>
                 <ul className="list-disc list-inside text-sm space-y-0.5 text-gray-600">
                   <li>Via een beveiligde verbinding naar Anthropic verzonden voor analyse</li>
                   <li>Niet permanent opgeslagen op onze servers na verwerking</li>
                 </ul>
-                <p className="text-sm text-gray-500 mt-2">Documenten die jij zelf opslaat in OneDrive, Dropbox of lokaal worden door jou beheerd — niet door ons.</p>
+                <p className="text-sm text-gray-500 mt-2">Als je documenten doorstuurt via e-mail, verwerken wij tijdelijk het afzenderadres van die e-mail om de analyse te kunnen uitvoeren. Dit adres wordt niet opgeslagen na verwerking.</p>
+                <p className="text-sm text-gray-500 mt-1">Documenten die jij zelf opslaat in OneDrive, Dropbox of lokaal worden door jou beheerd — niet door ons.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.4 Acties en instellingen</h3>
@@ -144,7 +145,8 @@ export default function GezinPrivacyPage() {
                     ["Supabase", "Database en authenticatie"],
                     ["Stripe", "Betalingsverwerking"],
                     ["Vercel", "Hosting van de website"],
-                    ["Resend", "Verzenden van e-mails"],
+                    ["Resend", "Verzenden van transactionele e-mails"],
+                    ["Cloudflare", "Domeinbeveiliging en verwerking van inkomende e-mails (scan via e-mail)"],
                     ["Microsoft OneDrive", "Cloudopslag (alleen als je kiest voor OneDrive-opslag)"],
                     ["Dropbox", "Cloudopslag (alleen als je kiest voor Dropbox-opslag)"],
                   ].map(([party, purpose], i) => (
