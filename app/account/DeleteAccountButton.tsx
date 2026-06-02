@@ -8,11 +8,10 @@ export default function DeleteAccountButton() {
   const [confirm, setConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
 
   async function handleDelete() {
     setLoading(true);
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await createClient().auth.getSession();
     if (!session) return;
 
     await fetch("/api/account/delete", {
@@ -20,7 +19,7 @@ export default function DeleteAccountButton() {
       headers: { Authorization: `Bearer ${session.access_token}` },
     });
 
-    await supabase.auth.signOut();
+    await createClient().auth.signOut();
     router.push("/auth/login");
   }
 

@@ -14,8 +14,6 @@ export default function GezinRegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
-
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -30,7 +28,7 @@ export default function GezinRegisterPage() {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { error } = await createClient().auth.signUp({
       email,
       password,
       options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/dossier` },

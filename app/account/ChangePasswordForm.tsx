@@ -9,7 +9,6 @@ export default function ChangePasswordForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const supabase = createClient();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +25,7 @@ export default function ChangePasswordForm() {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await createClient().auth.updateUser({ password });
     setLoading(false);
 
     if (error) {

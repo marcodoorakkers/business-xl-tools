@@ -6,10 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function ToolNav({ label }: { label: string }) {
   const router = useRouter();
-  const supabase = createClient();
-
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await createClient().auth.signOut();
     router.push("/auth/login");
   }
 

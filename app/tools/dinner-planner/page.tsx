@@ -32,10 +32,9 @@ export default function DinnerPlannerPage() {
   const [expandedDay, setExpandedDay] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    createClient().auth.getUser().then(({ data: { user } }) => {
       if (user?.email) setEmail(user.email);
     });
   }, []);

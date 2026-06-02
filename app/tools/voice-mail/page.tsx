@@ -25,7 +25,6 @@ export default function VoiceMailPage() {
   const [transcript, setTranscript] = useState("");
   const [showTranscript, setShowTranscript] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const supabase = createClient();
 
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);

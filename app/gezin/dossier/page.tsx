@@ -109,7 +109,6 @@ export default function GezinDossierPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pageInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     fetch("/api/tools/mijn-dossier/onedrive/status")
@@ -367,7 +366,7 @@ export default function GezinDossierPage() {
               Feedback
             </a>
             <button
-              onClick={async () => { await supabase.auth.signOut(); router.push("/"); }}
+              onClick={async () => { await createClient().auth.signOut(); router.push("/"); }}
               className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
             >
               Uitloggen
