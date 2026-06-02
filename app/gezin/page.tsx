@@ -235,7 +235,13 @@ export default function GezinLandingPage() {
         {/* Knipoog */}
         <div className="max-w-2xl mx-auto mb-10 py-8 px-6 bg-amber-50 rounded-2xl border border-amber-100 text-center">
           <p className="text-sm text-gray-600 leading-relaxed">
-            <span className="text-lg mr-1">😉</span> Overigens ook gewoon handig thuis — voor iedereen die de stapel op de keukentafel wil opruimen.
+            <span className="inline-flex items-center justify-center w-8 h-8 bg-amber-100 rounded-lg mr-2 flex-shrink-0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+            </span>
+            Overigens ook gewoon handig thuis — voor iedereen die de stapel op de keukentafel wil opruimen.
           </p>
         </div>
 
