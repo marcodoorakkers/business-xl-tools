@@ -56,6 +56,13 @@ export default function GezinDisclaimerPage() {
           </section>
 
           <section>
+            <h2 className="text-lg font-bold text-gray-900 mb-2">Fair use</h2>
+            <p>
+              NooitMeerPostKwijt is bedoeld voor persoonlijk en zakelijk gebruik door individuele gebruikers en kleine ondernemingen. Geautomatiseerd gebruik, bulk-uploads via scripts en het doorverkopen van toegang zijn niet toegestaan. Bij structureel misbruik behouden wij ons het recht voor een account zonder voorafgaande kennisgeving te beperken of op te heffen.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-lg font-bold text-gray-900 mb-2">Contact</h2>
             <p>
               Heb je vragen of opmerkingen? Stuur een e-mail naar{" "}

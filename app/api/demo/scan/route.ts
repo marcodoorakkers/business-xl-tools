@@ -1,13 +1,60 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createHash } from "crypto";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/gif"];
+const RATE_LIMIT = 5;          // max verzoeken per window
+const WINDOW_MINUTES = 10;     // window in minuten
+
+async function checkRateLimit(ipHash: string): Promise<boolean> {
+  const admin = createAdminClient();
+  const windowStart = new Date(Date.now() - WINDOW_MINUTES * 60 * 1000).toISOString();
+
+  const { data } = await admin
+    .from("demo_rate_limits")
+    .select("count, window_start")
+    .eq("ip_hash", ipHash)
+    .single();
+
+  if (!data) {
+    // Eerste verzoek van dit IP
+    await admin.from("demo_rate_limits").insert({ ip_hash: ipHash, count: 1, window_start: new Date().toISOString() });
+    return true;
+  }
+
+  if (data.window_start < windowStart) {
+    // Window verlopen — reset
+    await admin.from("demo_rate_limits").update({ count: 1, window_start: new Date().toISOString() }).eq("ip_hash", ipHash);
+    return true;
+  }
+
+  if (data.count >= RATE_LIMIT) {
+    return false; // Limiet bereikt
+  }
+
+  await admin.from("demo_rate_limits").update({ count: data.count + 1 }).eq("ip_hash", ipHash);
+  return true;
+}
 
 export async function POST(req: NextRequest) {
+  // Rate limiting — IP wordt gehasht, nooit rauw opgeslagen
+  const forwarded = req.headers.get("x-forwarded-for");
+  const ip = forwarded ? forwarded.split(",")[0].trim() : req.headers.get("x-real-ip") ?? "unknown";
+  const ipHash = createHash("sha256").update(ip).digest("hex").substring(0, 16);
+
+  const allowed = await checkRateLimit(ipHash);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: `Te veel verzoeken. Probeer het over ${WINDOW_MINUTES} minuten opnieuw.` },
+      { status: 429 }
+    );
+  }
+
   let formData: FormData;
   try {
     formData = await req.formData();
