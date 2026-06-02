@@ -216,7 +216,7 @@ function InstellingenContent() {
       <main className="max-w-lg mx-auto px-6 py-8 space-y-5">
         <div className="mb-2">
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Instellingen</h1>
-          <p className="text-gray-500 text-sm">Beheer je opslagvoorkeur, koppelingen en gezinsleden.</p>
+          <p className="text-gray-500 text-sm">Beheer je opslagvoorkeur, koppelingen en geadresseerden.</p>
         </div>
 
         {/* Opslagvoorkeur */}
@@ -381,9 +381,9 @@ function InstellingenContent() {
 
         {/* Gezinsleden */}
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
-          <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Gezinsleden</h2>
+          <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Geadresseerden</h2>
           <p className="text-xs text-gray-500">
-            Voeg gezinsleden toe zodat documenten automatisch aan de juiste persoon worden gekoppeld.
+            Voeg personen of entiteiten toe zodat documenten automatisch aan de juiste naam worden gekoppeld.
           </p>
           <ul className="space-y-2">
             {familyMembers.map((m) => (
@@ -429,7 +429,7 @@ function InstellingenContent() {
               </li>
             ))}
             {familyMembers.length === 0 && (
-              <li className="text-sm text-gray-400 italic">Nog geen gezinsleden toegevoegd.</li>
+              <li className="text-sm text-gray-400 italic">Nog geen geadresseerden toegevoegd.</li>
             )}
           </ul>
           <div className="space-y-2 pt-2 border-t border-gray-100">

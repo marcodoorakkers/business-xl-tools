@@ -64,7 +64,7 @@ export default function GezinPrivacyPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.4 Acties en instellingen</h3>
-                <p className="text-sm text-gray-600">Actiepunten die je bijhoudt en instellingen zoals gezinsleden worden opgeslagen in onze beveiligde database, gekoppeld aan jouw account.</p>
+                <p className="text-sm text-gray-600">Actiepunten die je bijhoudt en instellingen zoals geadresseerden worden opgeslagen in onze beveiligde database, gekoppeld aan jouw account.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.5 Technische gegevens</h3>

@@ -151,7 +151,7 @@ export default function ArchiefPage() {
                 onChange={(e) => setFilterGezinslid(e.target.value)}
                 className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
               >
-                <option value="">Alle gezinsleden</option>
+                <option value="">Alle geadresseerden</option>
                 {gezinsleden.map((g) => (
                   <option key={g} value={g}>{g}</option>
                 ))}
