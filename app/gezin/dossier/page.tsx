@@ -515,13 +515,13 @@ export default function GezinDossierPage() {
               </div>
               {familyMembers.length > 0 && (
                 <div>
-                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Gezinslid</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Geadresseerde</label>
                   <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => setGezinslid("")}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${gezinslid === "" ? "bg-amber-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
                     >
-                      Gezin
+                      Alle
                     </button>
                     {familyMembers.map((m) => (
                       <button

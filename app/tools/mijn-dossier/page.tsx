@@ -793,7 +793,7 @@ export default function BriefArchiefPage() {
 
               {familyMembers.length > 0 && (
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Gezinslid</label>
+                  <label className="text-xs text-gray-500 mb-1 block">Geadresseerde</label>
                   <select
                     value={gezinslid}
                     onChange={(e) => setGezinslid(e.target.value)}

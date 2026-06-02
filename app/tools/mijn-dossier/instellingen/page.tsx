@@ -295,9 +295,9 @@ function InstellingenContent() {
         </div>
 
         <div className="bg-white border border-gray-200 rounded-3xl p-6 space-y-5">
-          <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Gezinsleden</h2>
+          <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Geadresseerden</h2>
           <p className="text-xs text-gray-500">
-            De AI gebruikt deze namen om documenten aan het juiste gezinslid toe te wijzen.
+            NooitMeerPostKwijt gebruikt deze namen om documenten aan de juiste persoon of entiteit toe te wijzen.
           </p>
 
           <ul className="space-y-2">
@@ -314,7 +314,7 @@ function InstellingenContent() {
               </li>
             ))}
             {familyMembers.length === 0 && (
-              <li className="text-sm text-gray-400 italic">Nog geen gezinsleden toegevoegd.</li>
+              <li className="text-sm text-gray-400 italic">Nog geen geadresseerden toegevoegd.</li>
             )}
           </ul>
 
@@ -325,7 +325,7 @@ function InstellingenContent() {
               onChange={(e) => setNewMemberName(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") addMember(); }}
               className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              placeholder="Naam gezinslid"
+              placeholder="Naam (persoon of entiteit)"
             />
             <button
               onClick={addMember}
