@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
@@ -57,7 +57,7 @@ function formatDate(dateStr: string | null): string {
   }
 }
 
-export default function ArchiefPage() {
+function ArchiefContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -300,5 +300,13 @@ export default function ArchiefPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function ArchiefPage() {
+  return (
+    <Suspense fallback={null}>
+      <ArchiefContent />
+    </Suspense>
   );
 }
