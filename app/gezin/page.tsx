@@ -188,14 +188,14 @@ export default function GezinLandingPage() {
         <div className="max-w-3xl mx-auto py-16 border-t border-gray-100 text-center">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2">Prijzen</p>
           <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Minder dan één uur zoeken per jaar</h2>
-          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €3,99/maand. Geen creditcard nodig om te starten. Zakelijk aftrekbaar.</p>
+          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €3,99/maand incl. BTW. Geen creditcard nodig om te starten. Zakelijk aftrekbaar.</p>
 
           <div className="bg-amber-500 rounded-2xl p-7 text-left text-white mb-5 relative shadow-md">
             <span className="absolute -top-3 left-6 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full">Eerste maand gratis</span>
             <div className="flex items-start justify-between gap-6 flex-wrap">
               <div className="flex-1">
                 <h3 className="font-bold text-xl mb-1">Maandelijks abonnement</h3>
-                <p className="text-amber-100 text-sm mb-4">Geen creditcard nodig · opzegbaar wanneer je wil</p>
+                <p className="text-amber-100 text-sm mb-4">€3,99/maand incl. BTW · geen creditcard nodig · opzegbaar wanneer je wil</p>
                 <div className="text-sm text-amber-50 space-y-1">
                   <p>Onbeperkt scannen</p>
                   <p>OneDrive &amp; Dropbox</p>
@@ -216,7 +216,7 @@ export default function GezinLandingPage() {
             </div>
           </div>
 
-          <p className="text-xs text-gray-400 mt-2">Betaal via iDEAL, creditcard of Bancontact · Opzegbaar wanneer je wil</p>
+          <p className="text-xs text-gray-400 mt-2">Betaal via iDEAL, creditcard of Bancontact · Opzegbaar wanneer je wil · Prijzen incl. BTW</p>
         </div>
 
         {/* Privacy */}
