@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 
@@ -57,14 +58,27 @@ function formatDate(dateStr: string | null): string {
 }
 
 export default function ArchiefPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
-  const [query, setQuery] = useState("");
-  const [filterGezinslid, setFilterGezinslid] = useState("");
-  const [filterType, setFilterType] = useState("");
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
+  const [filterGezinslid, setFilterGezinslid] = useState(() => searchParams.get("gezinslid") ?? "");
+  const [filterType, setFilterType] = useState(() => searchParams.get("type") ?? "");
   const [gezinsleden, setGezinsleden] = useState<string[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // Filters in URL bijhouden
+  const updateUrl = useCallback((q: string, gezinslid: string, type: string) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (gezinslid) params.set("gezinslid", gezinslid);
+    if (type) params.set("type", type);
+    const qs = params.toString();
+    router.replace(qs ? `/dossier/archief?${qs}` : "/dossier/archief", { scroll: false });
+  }, [router]);
 
   const fetchDocuments = useCallback(async () => {
     if (!query && !filterGezinslid && !filterType) return;
@@ -88,6 +102,12 @@ export default function ArchiefPage() {
   useEffect(() => {
     fetchDocuments();
   }, [fetchDocuments]);
+
+  // Bij initieel laden: als er URL-params zijn, meteen als "gezocht" markeren
+  useEffect(() => {
+    if (query || filterGezinslid || filterType) setHasSearched(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Haal gezinsleden op voor filter
   useEffect(() => {
@@ -137,7 +157,7 @@ export default function ArchiefPage() {
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => { setQuery(e.target.value); updateUrl(e.target.value, filterGezinslid, filterType); }}
               placeholder="Zoek op afzender, onderwerp of omschrijving..."
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-300"
             />
@@ -148,7 +168,7 @@ export default function ArchiefPage() {
             {gezinsleden.length > 0 && (
               <select
                 value={filterGezinslid}
-                onChange={(e) => setFilterGezinslid(e.target.value)}
+                onChange={(e) => { setFilterGezinslid(e.target.value); updateUrl(query, e.target.value, filterType); }}
                 className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
               >
                 <option value="">Alle geadresseerden</option>
@@ -160,7 +180,7 @@ export default function ArchiefPage() {
             {uniqueTypes.length > 0 && (
               <select
                 value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
+                onChange={(e) => { setFilterType(e.target.value); updateUrl(query, filterGezinslid, e.target.value); }}
                 className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
               >
                 <option value="">Alle types</option>
@@ -171,7 +191,7 @@ export default function ArchiefPage() {
             )}
             {(query || filterGezinslid || filterType) && (
               <button
-                onClick={() => { setQuery(""); setFilterGezinslid(""); setFilterType(""); setHasSearched(false); setDocuments([]); }}
+                onClick={() => { setQuery(""); setFilterGezinslid(""); setFilterType(""); setHasSearched(false); setDocuments([]); updateUrl("", "", ""); }}
                 className="text-xs text-amber-600 hover:text-amber-800 font-medium px-3 py-2 rounded-xl border border-amber-200 transition-colors"
               >
                 Wis filters
