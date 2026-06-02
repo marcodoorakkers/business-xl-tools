@@ -159,6 +159,19 @@ export default function GezinLandingPage() {
           </div>
         </div>
 
+        {/* Testimonial */}
+        <div className="max-w-2xl mx-auto py-12 border-t border-gray-100">
+          <blockquote className="relative">
+            <span className="text-6xl text-amber-200 font-serif leading-none absolute -top-4 -left-2 select-none">&ldquo;</span>
+            <p className="text-lg text-gray-700 leading-relaxed pl-8 italic">
+              Mijn boekhouder vroeg om de oorspronkelijke aanslag VPB. Vroeger betekende dat een uur spitten door een stapel papier in mijn kast. Nu zoek ik het op en heb het in tien seconden.
+            </p>
+            <footer className="mt-4 pl-8 text-sm text-gray-400 font-medium not-italic">
+              — Jeroen, eigenaar van een eenmanszaak
+            </footer>
+          </blockquote>
+        </div>
+
         {/* Pricing */}
         <div className="max-w-3xl mx-auto py-16 border-t border-gray-100 text-center">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2">Prijzen</p>
