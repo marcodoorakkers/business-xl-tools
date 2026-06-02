@@ -58,8 +58,10 @@ Elke tool trekt credits af in de API route (`app/api/tools/[tool]/route.ts`). Zo
 ### NooitMeerPostKwijt
 - **Abonnement-only** — geen losse scan-pakketten
 - Eerste maand gratis, geen creditcard nodig (`payment_method_collection: "if_required"`, `trial_period_days: 30`)
-- Daarna €3,99/maand · 50 scans per maand
+- Daarna €3,99/maand incl. BTW · onbeperkt scannen
 - Abonnement-statussen: `trialing` → `active` → `cancelling` → `null`
+- NMPK-abonnees krijgen automatisch **10 TST credits per maand** (bijgeschreven via Stripe webhook bij start + verlenging)
+- Toegangscheck altijd op `subscription_status` (active/trialing), nooit op `subscription_credits`
 
 ## Projectstructuur
 
@@ -76,7 +78,8 @@ app/
     manifest.ts                  — NMMPK PWA manifest (amber thema, gezin-icoon)
     account/page.tsx             — NMMPK account (abonnement beheren)
     dossier/page.tsx             — NMMPK scan-interface (client component)
-    dossier/instellingen/page.tsx — opslag, gezinsleden, scan-e-mailadres
+    dossier/instellingen/page.tsx — opslag, geadresseerden, mapstructuur, scan-e-mailadres
+    dossier/archief/page.tsx     — zoeken en filteren, filters bewaard in URL
     aanmelden/page.tsx           — NMMPK registratie
     inloggen/page.tsx            — NMMPK login
   api/
@@ -89,8 +92,8 @@ app/
       route.ts                   — handmatige scan (AI-analyse + upload)
       email-scan/route.ts        — Cloudflare webhook-ontvanger (inbound e-mail)
       scan-email/token/route.ts  — persoonlijk scan-e-mailadres ophalen/genereren
-      onedrive/family/route.ts   — gezinsleden CRUD (GET/POST/PATCH/DELETE)
-      onedrive/status/route.ts   — verbindingsstatus + gezinsleden + opslagvoorkeur
+      onedrive/family/route.ts   — geadresseerden CRUD (GET/POST/PATCH/DELETE) incl. full_name
+      onedrive/status/route.ts   — verbindingsstatus + geadresseerden + opslagvoorkeur + mapstructuur
       sync-actielijst/route.ts   — actielijst als Markdown naar OneDrive/Dropbox
 cloudflare/
   email-worker/                  — Cloudflare Email Worker (postal-mime, wrangler)
@@ -103,6 +106,10 @@ docs/
   Testplan-NooitMeerPostKwijt.md
 supabase/migrations/
   add_scan_email_token.sql       — scan_email_token kolom op profiles
+  add_onboarding_emails.sql      — onboarding_emails tabel (welkom/dag3/trial_ending tracking)
+  add_full_name_family.sql       — full_name kolom op archive_family_members (ALTER TABLE)
+  add_folder_structure.sql       — folder_structure kolom op archive_settings (ALTER TABLE)
+  add_demo_rate_limits.sql       — demo_rate_limits tabel (IP-hash, count, window_start)
 ```
 
 ## PWA (NMMPK)
@@ -122,12 +129,34 @@ supabase/migrations/
   - Toegang: alleen `subscription_status = active | trialing` (geen credits-check)
   - Secrets: `CLOUDFLARE_WEBHOOK_SECRET` in Vercel, `WEBHOOK_SECRET` in Wrangler
 
-## Gezinsleden (NMMPK)
+## Geadresseerden (NMMPK)
 
+- Vroeger "Gezinsleden" — hernoemd naar "Geadresseerden" in de UI (personen én entiteiten zoals BV/eenmanszaak)
 - Opgeslagen in `archive_family_members` (user_id, name, full_name)
 - `full_name` optioneel — gebruikt voor herkenning van initialen/achternamen op documenten
 - Gedeeltelijke naamkoppeling: als Claude "Xavi" teruggeeft maar de opgeslagen naam "Xavi (X.M. Doorakkers)" is, wordt de volledige naam gebruikt
-- Gezinslid-herkenning gebruikt (in volgorde): naam op document → e-mailonderwerp → historische afzender→gezinslid koppeling
+- Herkenning gebruikt (in volgorde): naam op document → e-mailonderwerp → historische afzender→geadresseerde koppeling
+
+## Mapstructuur (NMMPK)
+
+- Instelling `folder_structure` in `archive_settings`: `by_subject` (standaard) of `by_person`
+- **Per onderwerp**: `{archiveRoot}/{mappad}/{bestand}` — geadresseerde alleen als label
+- **Per geadresseerde**: `{archiveRoot}/{geadresseerde}/{mappad}/{bestand}` — ideaal voor per-persoon maptoegang in OneDrive/Dropbox
+- Onbekende geadresseerde → `Gemeenschappelijk/`
+
+## Onboarding e-mailsequentie (NMMPK)
+
+- Cron dagelijks om 08:00 via `/api/onboarding/send`
+- **Welkomstmail**: trialing-gebruikers aangemeld in afgelopen 24u
+- **Dag 3**: trialing-gebruikers die nog geen document gescand hebben
+- **Trial ending**: 5 dagen voor einde proefperiode (op basis van `subscription_period_end`)
+- Bijgehouden in `onboarding_emails` tabel (user_id, email_type, sent_at)
+
+## Middleware — feature flag gedrag
+
+- `MIJN_DOSSIER_ENABLED` flag geldt ALLEEN voor timesavertools.nl, NIET voor nooitmeerpostkwijt.nl
+- Anders worden alle `/api/tools/mijn-dossier/*` routes geblokkeerd op het NMPK-domein
+- Supabase browser client (`createClient()`) mag NOOIT op module-niveau worden aangeroepen in client components — alleen inline in handlers (Next.js 16 pre-rendert anders)
 
 ## Backlog
 
