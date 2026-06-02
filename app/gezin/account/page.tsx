@@ -15,11 +15,10 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_credits, subscription_status, subscription_period_end")
+    .select("subscription_status, subscription_period_end")
     .eq("id", user.id)
     .single();
 
-  const credits = profile?.subscription_credits ?? 0;
   const subscriptionStatus = profile?.subscription_status ?? null;
   const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
   const params = await searchParams;
@@ -48,25 +47,14 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
         {/* Betaalfeedback */}
         {paymentStatus === "subscribed" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
-            Abonnement gestart! Je eerste maand is gratis — 50 scans staan klaar.
+            Abonnement gestart! Je eerste maand is gratis.
           </div>
         )}
         {paymentStatus === "cancelled" && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 text-yellow-700 text-sm font-medium">
-            Betaling geannuleerd. Je scans zijn niet gewijzigd.
+            Betaling geannuleerd.
           </div>
         )}
-
-        {/* Scans saldo */}
-        <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-6 text-white">
-          <p className="text-amber-100 text-sm mb-1">Jouw scans deze maand</p>
-          <p className="text-5xl font-extrabold">{credits}</p>
-          {subscriptionStatus === "active" || subscriptionStatus === "trialing" ? (
-            <p className="text-amber-100 text-sm mt-1">scans beschikbaar deze maand · ongebruikte scans vervallen einde maand</p>
-          ) : (
-            <p className="text-amber-100 text-sm mt-1">scans beschikbaar</p>
-          )}
-        </div>
 
         {/* Maandelijks abonnement */}
         {!subscriptionStatus && (
@@ -75,7 +63,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <span>⭐</span>
               <h2 className="font-bold text-gray-900 text-lg">Maandelijks abonnement</h2>
             </div>
-            <p className="text-gray-500 text-sm mb-1">50 scans per maand · opzegbaar wanneer je wil</p>
+            <p className="text-gray-500 text-sm mb-1">Onbeperkt scannen · opzegbaar wanneer je wil</p>
             <p className="text-amber-600 text-sm font-semibold mb-4">Eerste maand gratis — geen creditcard nodig</p>
             <div className="flex items-center justify-between">
               <div>
@@ -93,7 +81,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <span className="text-amber-600 font-bold text-lg">✓</span>
               <h2 className="font-bold text-amber-800 text-lg">Proefperiode actief</h2>
             </div>
-            <p className="text-amber-700 text-sm">Je zit in je gratis proefmaand. Je hebt 50 scans beschikbaar. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt.</p>
+            <p className="text-amber-700 text-sm">Je zit in je gratis proefmaand. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt.</p>
             <ManageSubscriptionButton />
           </div>
         )}
@@ -104,7 +92,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <span className="text-green-600 font-bold text-lg">✓</span>
               <h2 className="font-bold text-green-800 text-lg">Maandelijks abonnement actief</h2>
             </div>
-            <p className="text-green-700 text-sm">Je ontvangt elke maand 50 verse scans. Ongebruikte abonnementsscans vervallen aan het einde van de maand.</p>
+            <p className="text-green-700 text-sm">Je abonnement is actief. Onbeperkt scannen en archiveren.</p>
             {formattedPeriodEnd && (
               <p className="text-green-600 text-sm mt-1">Volgende verlenging: {formattedPeriodEnd}</p>
             )}
@@ -117,7 +105,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
             <h2 className="font-bold text-amber-800 text-lg mb-1">
               Abonnement loopt af{formattedPeriodEnd ? ` op ${formattedPeriodEnd}` : ""}
             </h2>
-            <p className="text-amber-700 text-sm">Je scans zijn nog geldig tot het einde van de betaalperiode.</p>
+            <p className="text-amber-700 text-sm">Je kunt de app nog gebruiken tot het einde van de betaalperiode.</p>
           </div>
         )}
 
@@ -131,7 +119,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           <span className="text-2xl">⚡</span>
           <div className="flex-1">
             <p className="text-sm font-semibold text-gray-900">Ook ZZP-er of ondernemer?</p>
-            <p className="text-xs text-gray-500">Ontdek onze zakelijke tools op TimeSaverTools.nl — je scans werken er ook.</p>
+            <p className="text-xs text-gray-500">Ontdek onze zakelijke tools op TimeSaverTools.nl.</p>
           </div>
           <span className="text-blue-400 group-hover:text-blue-600 transition-colors text-sm">→</span>
         </a>

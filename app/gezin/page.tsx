@@ -33,13 +33,13 @@ export default function GezinLandingPage() {
           <div className="flex-1 max-w-xl">
             <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Voor ZZP&apos;ers en kleine ondernemers</p>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-5 leading-tight">
-              Ergens in<br />die stapel zit<br />wat je zoekt.
+              Nooit meer<br />een deadline<br />missen.
             </h1>
             <p className="text-lg text-gray-500 mb-6 leading-relaxed">
-              Je boekhouder wil de aanslag VPB van vorig jaar. Je verzekeraar vraagt om het contract. Je bank wil bewijs van betaling. Elke keer opnieuw: spitten door een stapel papier en hopen dat het document ertussen zit.
+              Scan een brief, factuur of aanslag. NooitMeerPostKwijt herkent automatisch wat je moet doen en wanneer — van belastingaanslagen tot contractverlengingen. De deadline staat direct in je actielijst.
             </p>
             <p className="text-base text-gray-700 font-medium mb-8 leading-relaxed">
-              NooitMeerPostKwijt maakt een einde aan het zoeken. Scan je post zodra hij binnenkomt — de app herkent alles, slaat het op in jouw cloud en herinnert je aan deadlines.
+              En die stapel papier in je kast? Scan hem één keer en je vindt elk document terug in seconden.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
@@ -170,9 +170,9 @@ export default function GezinLandingPage() {
             <div className="flex items-start justify-between gap-6 flex-wrap">
               <div className="flex-1">
                 <h3 className="font-bold text-xl mb-1">Maandelijks abonnement</h3>
-                <p className="text-amber-100 text-sm mb-4">50 scans per maand · geen creditcard nodig · opzegbaar wanneer je wil</p>
+                <p className="text-amber-100 text-sm mb-4">Geen creditcard nodig · opzegbaar wanneer je wil</p>
                 <div className="text-sm text-amber-50 space-y-1">
-                  <p>50 scans per maand</p>
+                  <p>Onbeperkt scannen</p>
                   <p>OneDrive &amp; Dropbox</p>
                   <p>Personen en entiteiten koppelen</p>
                   <p>Zakelijk aftrekbaar</p>

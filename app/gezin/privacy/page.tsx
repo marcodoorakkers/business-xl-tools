@@ -49,7 +49,7 @@ export default function GezinPrivacyPage() {
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.2 Gebruik van de app</h3>
                 <ul className="list-disc list-inside text-sm space-y-0.5 text-gray-600">
-                  <li>Aantal gebruikte scans (credits)</li>
+                  <li>Abonnementsstatus</li>
                   <li>Tijdstip van gebruik</li>
                 </ul>
               </div>

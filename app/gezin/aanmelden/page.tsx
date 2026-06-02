@@ -56,7 +56,7 @@ export default function GezinRegisterPage() {
               <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Controleer je inbox</h1>
-            <p className="text-sm text-gray-600 mb-4">We hebben je een bevestigingsmail gestuurd. Klik op de link om je account te activeren — je krijgt direct 10 gratis scans.</p>
+            <p className="text-sm text-gray-600 mb-4">We hebben je een bevestigingsmail gestuurd. Klik op de link om je account te activeren — je eerste maand is gratis.</p>
             <Link href="/inloggen" className="text-sm text-amber-600 hover:underline font-medium">Terug naar inloggen</Link>
           </div>
         </div>
@@ -72,7 +72,7 @@ export default function GezinRegisterPage() {
         </div>
         <div className="bg-white rounded-3xl shadow-sm p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Account aanmaken</h1>
-          <p className="text-gray-500 text-sm mb-6">Start met 10 gratis scans</p>
+          <p className="text-gray-500 text-sm mb-6">Eerste maand gratis · geen creditcard nodig</p>
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">E-mailadres</label>
