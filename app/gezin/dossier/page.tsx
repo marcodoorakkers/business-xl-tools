@@ -104,6 +104,7 @@ export default function GezinDossierPage() {
   const [dropboxConnected, setDropboxConnected] = useState(false);
   const [archiveRoot, setArchiveRoot] = useState("Archief");
   const [storagePreference, setStoragePreference] = useState<"local" | "onedrive" | "dropbox">("local");
+  const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
   const [credits, setCredits] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -122,6 +123,7 @@ export default function GezinDossierPage() {
         dropboxConnected: boolean;
         dropboxArchiveRoot: string;
         storagePreference: string;
+        folderStructure?: string;
       }) => {
         setOneDriveConnected(data.connected);
         setDropboxConnected(data.dropboxConnected);
@@ -129,6 +131,7 @@ export default function GezinDossierPage() {
         setFamilyMembers(data.familyMembers ?? []);
         setFamilyMemberDetails(data.familyMemberDetails ?? []);
         setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox");
+        setFolderStructure((data.folderStructure ?? "by_subject") as "by_subject" | "by_person");
       })
       .catch(() => {});
 
@@ -280,7 +283,8 @@ export default function GezinDossierPage() {
 
     const fd = new FormData();
     fd.append("file", uploadFile);
-    fd.append("mappad", `${archiveRoot}/${gezinslid ? `${gezinslid}/` : ""}${mappad}`);
+    const person = folderStructure === "by_person" ? (gezinslid || "Gemeenschappelijk") : null;
+    fd.append("mappad", `${archiveRoot}/${person ? `${person}/` : ""}${mappad}`);
     fd.append("bestandsnaam", bestandsnaam);
 
     try {

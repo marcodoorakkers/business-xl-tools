@@ -12,6 +12,7 @@ interface StatusData {
   dropboxConnected: boolean;
   dropboxArchiveRoot: string;
   storagePreference: string;
+  folderStructure: string;
 }
 
 interface FamilyMember {
@@ -27,6 +28,7 @@ function InstellingenContent() {
   const [archiveRoot, setArchiveRoot] = useState("Archief");
   const [dropboxArchiveRoot, setDropboxArchiveRoot] = useState("Archief");
   const [storagePreference, setStoragePreference] = useState("local");
+  const [folderStructure, setFolderStructure] = useState("by_subject");
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberFullName, setNewMemberFullName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -59,6 +61,7 @@ function InstellingenContent() {
         setArchiveRoot(data.archiveRoot);
         setDropboxArchiveRoot(data.dropboxArchiveRoot);
         setStoragePreference(data.storagePreference);
+        setFolderStructure(data.folderStructure ?? "by_subject");
       });
 
     fetch("/api/tools/mijn-dossier/onedrive/family")
@@ -73,6 +76,19 @@ function InstellingenContent() {
         if (data.email) setScanEmail(data.email);
       });
   }, []);
+
+  async function saveFolderStructure(value: string) {
+    setFolderStructure(value);
+    try {
+      await fetch("/api/tools/mijn-dossier/onedrive/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ folderStructure: value }),
+      });
+    } catch {
+      showToast("error", "Opslaan mislukt.");
+    }
+  }
 
   async function saveStoragePreference(value: string) {
     setStoragePreference(value);
@@ -219,6 +235,37 @@ function InstellingenContent() {
               >
                 <span className="text-xl">{opt.icon}</span>
                 <span className="text-xs">{opt.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Mapstructuur */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
+          <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Mapstructuur</h2>
+          <p className="text-xs text-gray-500">
+            Bepaal hoe documenten worden ingedeeld in je cloudopslag.
+          </p>
+          <div className="space-y-2">
+            {[
+              { value: "by_subject", label: "Per onderwerp", example: "Archief / Financiën / Belasting" },
+              { value: "by_person", label: "Per geadresseerde", example: "Archief / Marco / Financiën / Belasting" },
+            ].map((opt) => (
+              <button key={opt.value} onClick={() => saveFolderStructure(opt.value)}
+                className={`w-full flex items-start gap-3 rounded-xl px-4 py-3 border transition-colors text-left ${
+                  folderStructure === opt.value
+                    ? "border-amber-400 bg-amber-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}>
+                <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                  folderStructure === opt.value ? "border-amber-500" : "border-gray-300"
+                }`}>
+                  {folderStructure === opt.value && <div className="w-2 h-2 rounded-full bg-amber-500" />}
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-800">{opt.label}</div>
+                  <div className="text-xs text-gray-400 mt-0.5">{opt.example}</div>
+                </div>
               </button>
             ))}
           </div>

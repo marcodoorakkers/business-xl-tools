@@ -164,8 +164,18 @@ Formaat:
        null)
     : null;
   const gezinslid = matchedGezinslid;
-  const mappad = gezinslid
-    ? `${gezinslid}/${analysis.mappad ?? "Overig"}`
+
+  // Mapstructuur instelling ophalen
+  const { data: archiveSettings } = await admin
+    .from("archive_settings")
+    .select("folder_structure")
+    .eq("user_id", profile.id)
+    .single();
+  const folderStructure = archiveSettings?.folder_structure ?? "by_subject";
+
+  const person = folderStructure === "by_person" ? (gezinslid ?? "Gemeenschappelijk") : null;
+  const mappad = person
+    ? `${person}/${analysis.mappad ?? "Overig"}`
     : (analysis.mappad ?? "Overig");
 
   // Uploaden naar cloud — buffer wordt na deze aanroep vrijgegeven

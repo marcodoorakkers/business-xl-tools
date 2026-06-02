@@ -23,7 +23,7 @@ export async function GET() {
 
   const { data: archiveSettings } = await admin
     .from("archive_settings")
-    .select("storage_preference")
+    .select("storage_preference, folder_structure")
     .eq("user_id", user.id)
     .single();
 
@@ -41,6 +41,7 @@ export async function GET() {
     dropboxConnected: !!dropboxRow,
     dropboxArchiveRoot: dropboxRow?.archive_root ?? "Archief",
     storagePreference: archiveSettings?.storage_preference ?? "local",
+    folderStructure: archiveSettings?.folder_structure ?? "by_subject",
   });
 }
 
@@ -82,6 +83,19 @@ export async function POST(req: NextRequest) {
     await admin.from("archive_settings").upsert({
       user_id: user.id,
       storage_preference: body.storagePreference,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "user_id" });
+    return NextResponse.json({ ok: true });
+  }
+
+  if (typeof body.folderStructure === "string") {
+    const valid = ["by_subject", "by_person"];
+    if (!valid.includes(body.folderStructure)) {
+      return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
+    }
+    await admin.from("archive_settings").upsert({
+      user_id: user.id,
+      folder_structure: body.folderStructure,
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
     return NextResponse.json({ ok: true });
