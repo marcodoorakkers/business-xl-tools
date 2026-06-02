@@ -2,8 +2,8 @@ import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 
 export const metadata = {
-  title: "NooitMeerPostKwijt — Nooit meer een brief kwijt",
-  description: "Scan je post. NooitMeerPostKwijt analyseert het document, herkent wat er moet gebeuren en houdt je acties bij.",
+  title: "NooitMeerPostKwijt — Digitaal archief voor ZZP'ers en kleine ondernemers",
+  description: "Scan je zakelijke post en vind elk document terug in seconden. AI herkent wat het is, wat er moet gebeuren en bewaart het automatisch in jouw OneDrive of Dropbox.",
 };
 
 export default function GezinLandingPage() {
@@ -25,20 +25,20 @@ export default function GezinLandingPage() {
         </div>
       </nav>
 
-      {/* Hero — split layout */}
       <main className="max-w-5xl mx-auto px-6">
+
+        {/* Hero */}
         <div className="flex flex-col lg:flex-row items-center gap-12 pt-12 pb-16">
-          {/* Tekst */}
           <div className="flex-1 max-w-xl">
-            <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Ken je dit?</p>
+            <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Voor ZZP&apos;ers en kleine ondernemers</p>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-5 leading-tight">
-              Waar is<br />mijn post?
+              Ergens in<br />die stapel zit<br />wat je zoekt.
             </h1>
-            <p className="text-lg text-gray-500 mb-8 leading-relaxed">
-              Je staat aan de telefoon met de verzekeraar. Die wil je polisnummer. Jij zoekt — in de la, in de map, in de stapel op het bureau. De brief is er ergens, maar je hebt nu geen tijd voor dit.
+            <p className="text-lg text-gray-500 mb-6 leading-relaxed">
+              Je boekhouder wil de aanslag VPB van vorig jaar. Je verzekeraar vraagt om het contract. Je bank wil bewijs van betaling. Elke keer opnieuw: spitten door een stapel papier en hopen dat het document ertussen zit.
             </p>
             <p className="text-base text-gray-700 font-medium mb-8 leading-relaxed">
-              NooitMeerPostKwijt lost dit op. Scan je post zodra hij binnenkomt. De app herkent alles en bewaart het automatisch. Nooit meer zoeken.
+              NooitMeerPostKwijt maakt een einde aan het zoeken. Scan je post zodra hij binnenkomt — de app herkent alles, slaat het op in jouw cloud en herinnert je aan deadlines.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
@@ -54,18 +54,48 @@ export default function GezinLandingPage() {
                 Inloggen
               </Link>
             </div>
-            <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig</p>
+            <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · zakelijk aftrekbaar</p>
           </div>
 
-          {/* Foto */}
           <div className="flex-1 w-full max-w-lg">
             <img
-              src="https://images.unsplash.com/photo-1758523419018-b3a112f7f770?w=700&q=80&auto=format&fit=crop"
-              alt="Iemand die post leest aan de keukentafel"
+              src="https://images.unsplash.com/photo-1568027762272-e4da8b386fe9?w=700&q=80&auto=format&fit=crop"
+              alt="Stapel papieren documenten op een bureau"
               className="w-full rounded-3xl shadow-lg object-cover aspect-[4/3]"
             />
-            <p className="text-xs text-gray-300 mt-1.5 text-right">Foto: Vitaly Gariev / Unsplash</p>
           </div>
+        </div>
+
+        {/* Pijn — wat kost het je? */}
+        <div className="py-14 border-t border-gray-100">
+          <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2 text-center">Herkenbaar?</p>
+          <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-10">Wat kost je het als je niets doet?</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            {[
+              {
+                icon: "🕐",
+                title: "Uren kwijt aan zoeken",
+                desc: "Minimaal twee keer per jaar een uur door papier spitten. Bij een uurtarief van €75 is dat €150 per jaar — alleen maar om iets terug te vinden.",
+              },
+              {
+                icon: "😬",
+                title: "Stress bij de aangifte",
+                desc: "Je boekhouder vraagt om documenten die je nu niet kunt vinden. Je belt terug met \"ik stuur het nog even op\" — en dan begint het zoeken.",
+              },
+              {
+                icon: "💸",
+                title: "Gemiste deadlines",
+                desc: "Een aanmaning die je niet hebt gezien. Een bezwaartermijn die is verlopen. Kwijtgeraakte post kost soms meer dan je denkt.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-gray-50 rounded-2xl p-5">
+                <p className="text-2xl mb-3">{item.icon}</p>
+                <h3 className="font-bold text-gray-900 mb-2 text-sm">{item.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-sm text-gray-400 mt-8">NooitMeerPostKwijt kost je <strong className="text-gray-600">€3,99 per maand</strong> — zakelijk aftrekbaar. En je bent nooit meer iets kwijt.</p>
         </div>
 
         {/* Hoe het werkt */}
@@ -76,18 +106,18 @@ export default function GezinLandingPage() {
             {[
               {
                 num: "01",
-                title: "Foto maken",
-                desc: "Maak een foto van de brief of upload een PDF. Meerdere pagina's? Geen probleem.",
+                title: "Scan of forward",
+                desc: "Maak een foto van de brief, upload een PDF, of forward een e-mail met bijlage rechtstreeks naar je persoonlijke scanadres.",
               },
               {
                 num: "02",
-                title: "Slim analyseren",
-                desc: "NooitMeerPostKwijt leest het document, herkent de afzender en ziet of er iets gedaan moet worden.",
+                title: "AI analyseert",
+                desc: "NooitMeerPostKwijt leest het document, herkent de afzender, het type en of er iets gedaan moet worden — inclusief deadline.",
               },
               {
                 num: "03",
-                title: "Bijhouden",
-                desc: "Het document gaat naar je eigen cloud. Acties verschijnen automatisch in jouw actielijst.",
+                title: "Altijd terugvindbaar",
+                desc: "Het document gaat naar de juiste map in jouw OneDrive of Dropbox. Zoek later op afzender, datum of onderwerp — in seconden.",
               },
             ].map((item) => (
               <div key={item.num} className="flex gap-5">
@@ -106,26 +136,26 @@ export default function GezinLandingPage() {
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2 text-center">Voorbeeld</p>
           <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-3">Zie hoe het werkt</h2>
           <p className="text-gray-500 text-center text-sm mb-8 leading-relaxed">
-            Eén foto van je brief. Binnen seconden weet je wat het is en wat je moet doen.
+            Eén scan van je aanslag. Binnen seconden weet je wat het is, wat je moet doen en staat het op de juiste plek.
           </p>
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
             <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 mb-4">
               <span className="text-2xl">📄</span>
               <div>
-                <p className="font-semibold text-gray-900 text-sm">Brief van Belastingdienst</p>
-                <p className="text-xs text-gray-400">Aanslag inkomstenbelasting 2025 · 2 pagina&apos;s</p>
+                <p className="font-semibold text-gray-900 text-sm">Belastingdienst — Aanslag VPB 2024</p>
+                <p className="text-xs text-gray-400">Vennootschapsbelasting · 3 pagina&apos;s</p>
               </div>
             </div>
             <p className="text-center text-gray-400 text-sm my-3">↓ NooitMeerPostKwijt analyseert…</p>
             <div className="bg-white border border-gray-200 rounded-xl p-4">
               <div className="flex flex-wrap gap-2 mb-3">
-                <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">📁 Belastingen</span>
-                <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">👤 M. de Vries</span>
+                <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">📁 Belastingen / VPB</span>
+                <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">🏢 Business XL</span>
                 <span className="bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">⚠️ Actie vereist</span>
               </div>
               <ul className="space-y-1.5 text-sm text-gray-700">
-                <li>— <strong>Actie:</strong> Bezwaar indienen vóór 15 augustus 2025</li>
-                <li>— <strong>Bedrag:</strong> €1.247 te betalen</li>
+                <li>— <strong>Actie:</strong> Betaal €2.340 vóór 31 augustus 2025</li>
+                <li>— <strong>Opgeslagen in:</strong> OneDrive / Business XL / Belastingen / VPB</li>
                 <li>— <strong>Deadline toegevoegd aan je actielijst</strong></li>
               </ul>
             </div>
@@ -135,26 +165,21 @@ export default function GezinLandingPage() {
         {/* Features */}
         <div className="py-16 border-t border-gray-100">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2 text-center">Mogelijkheden</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-10 text-center">Altijd grip op je post</h2>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-10 text-center">Alles wat je nodig hebt</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 gap-y-6 max-w-3xl mx-auto">
             {[
-              { title: "Automatisch archiveren", desc: "Documenten gaan direct naar de juiste map in je OneDrive of Dropbox." },
-              { title: "Acties bijhouden", desc: "Deadlines en to-do's worden automatisch herkend en bijgehouden." },
-              { title: "Meerdere personen", desc: "Koppel documenten aan een persoon — handig voor thuis of een klein bedrijf." },
-              { title: "Werkt op je telefoon", desc: "Geen app te installeren — voeg de site toe aan je beginscherm en scan direct vanuit je broekzak.", link: "/mobiel" },
-              { title: "Jouw cloud, jouw data", desc: "Documenten staan in je eigen OneDrive of Dropbox — niet op onze servers." },
-              { title: "Zoeken en terugvinden", desc: "Vind elk document terug via het archief — zoek op afzender, onderwerp of datum." },
+              { title: "Automatisch archiveren", desc: "Documenten gaan direct naar de juiste map in je OneDrive of Dropbox — ingedeeld per entiteit en onderwerp." },
+              { title: "Acties en deadlines bijhouden", desc: "Deadlines en openstaande acties worden automatisch herkend en bijgehouden in je actielijst." },
+              { title: "Personen én entiteiten", desc: "Koppel documenten aan jezelf, je BV, je eenmanszaak of je partner — elk in een eigen map." },
+              { title: "Doorsturen via e-mail", desc: "Forward een factuur of brief rechtstreeks naar je persoonlijke scanadres — werkt ook vanuit Gmail of Outlook.", },
+              { title: "Jouw cloud, jouw data", desc: "Documenten staan in je eigen OneDrive of Dropbox — niet op onze servers. Privé en veilig." },
+              { title: "Zoeken en terugvinden", desc: "Vind elk document terug via het archief. Zoek op afzender, onderwerp of datum — in seconden.", link: undefined },
             ].map((f) => (
               <div key={f.title} className="flex gap-3">
                 <span className="text-amber-400 font-bold mt-0.5 flex-shrink-0">—</span>
                 <div>
                   <p className="font-semibold text-gray-900 text-sm mb-0.5">{f.title}</p>
                   <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
-                  {"link" in f && f.link && (
-                    <Link href={f.link} className="text-xs text-amber-600 hover:text-amber-800 font-medium transition-colors">
-                      Zo werkt dat →
-                    </Link>
-                  )}
                 </div>
               </div>
             ))}
@@ -164,20 +189,20 @@ export default function GezinLandingPage() {
         {/* Pricing */}
         <div className="max-w-3xl mx-auto py-16 border-t border-gray-100 text-center">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2">Prijzen</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Eenvoudig en transparant</h2>
-          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €3,99/maand. Geen creditcard nodig om te starten.</p>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Minder dan één uur zoeken per jaar</h2>
+          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €3,99/maand. Geen creditcard nodig om te starten. Zakelijk aftrekbaar.</p>
 
-          {/* Maandelijks abonnement */}
           <div className="bg-amber-500 rounded-2xl p-7 text-left text-white mb-5 relative shadow-md">
             <span className="absolute -top-3 left-6 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full">Eerste maand gratis</span>
             <div className="flex items-start justify-between gap-6 flex-wrap">
               <div className="flex-1">
                 <h3 className="font-bold text-xl mb-1">Maandelijks abonnement</h3>
-                <p className="text-amber-100 text-sm mb-4">50 scans per maand · geen creditcard nodig om te starten · opzegbaar wanneer je wil</p>
+                <p className="text-amber-100 text-sm mb-4">50 scans per maand · geen creditcard nodig · opzegbaar wanneer je wil</p>
                 <div className="text-sm text-amber-50 space-y-1">
-                  <p>50 scans elke maand</p>
+                  <p>50 scans per maand</p>
                   <p>OneDrive &amp; Dropbox</p>
-                  <p>Meerdere personen koppelen</p>
+                  <p>Personen en entiteiten koppelen</p>
+                  <p>Zakelijk aftrekbaar</p>
                 </div>
               </div>
               <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
@@ -196,29 +221,37 @@ export default function GezinLandingPage() {
         </div>
 
         {/* Privacy */}
-        <div className="max-w-2xl mx-auto mb-16 py-10 border-t border-gray-100">
-          <h2 className="text-xl font-extrabold text-gray-900 mb-3">Jouw post, alleen voor jou</h2>
+        <div className="max-w-2xl mx-auto mb-10 py-10 border-t border-gray-100">
+          <h2 className="text-xl font-extrabold text-gray-900 mb-3">Jouw documenten, alleen voor jou</h2>
           <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-            Brieven van de Belastingdienst, je zorgverzekeraar of je bank zijn privé. Daarom bewaren we niets op onze eigen servers.
+            Belastingaanslagen, contracten en facturen zijn vertrouwelijk. Daarom bewaren we niets op onze eigen servers.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
             <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Documenten opgeslagen in jouw eigen OneDrive of Dropbox</p>
-            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Foto&apos;s worden tijdelijk verwerkt voor analyse, daarna verwijderd</p>
+            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Scans worden tijdelijk verwerkt voor analyse, daarna verwijderd</p>
             <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Alleen de analyse (categorie, acties) wordt opgeslagen</p>
             <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Je kunt al je data op elk moment volledig verwijderen</p>
           </div>
         </div>
 
+        {/* Knipoog */}
+        <div className="max-w-2xl mx-auto mb-10 py-8 px-6 bg-amber-50 rounded-2xl border border-amber-100 text-center">
+          <p className="text-sm text-gray-600 leading-relaxed">
+            <span className="text-lg mr-1">😉</span> Overigens ook gewoon handig thuis — voor iedereen die de stapel op de keukentafel wil opruimen.
+          </p>
+        </div>
+
         {/* CTA */}
         <div className="text-center pb-20 border-t border-gray-100 pt-14">
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Klaar om te beginnen?</h2>
-          <p className="text-gray-500 text-sm mb-7">Maak een gratis account aan en scan je eerste brief.</p>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Stop met zoeken. Begin vandaag.</h2>
+          <p className="text-gray-500 text-sm mb-7">Maak een gratis account aan en scan je eerste document.</p>
           <Link
             href="/aanmelden"
             className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold text-base px-8 py-4 rounded-xl transition-colors shadow-sm"
           >
             Gratis account aanmaken →
           </Link>
+          <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · zakelijk aftrekbaar</p>
         </div>
       </main>
 
