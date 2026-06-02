@@ -76,7 +76,7 @@ export default function DemoSection() {
       <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2 text-center">Probeer het zelf</p>
       <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-3">Upload een document en zie het live</h2>
       <p className="text-gray-500 text-center text-sm mb-8 leading-relaxed">
-        Geen account nodig. Upload een PDF of foto van een brief, factuur of aanslag — en zie binnen 10 seconden wat onze AI ervan maakt.
+        Geen account nodig. Upload een PDF of foto van een brief, factuur of aanslag — en zie binnen 10 seconden wat NooitMeerPostKwijt ervan maakt.
       </p>
 
       {/* Upload + button */}

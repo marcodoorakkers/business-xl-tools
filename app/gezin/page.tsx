@@ -4,7 +4,7 @@ import DemoSection from "./components/DemoSection";
 
 export const metadata = {
   title: "NooitMeerPostKwijt — Digitaal archief voor ZZP'ers en kleine ondernemers",
-  description: "Scan je zakelijke post en vind elk document terug in seconden. AI herkent wat het is, wat er moet gebeuren en bewaart het automatisch in jouw OneDrive of Dropbox.",
+  description: "Scan je zakelijke post en vind elk document terug in seconden. NooitMeerPostKwijt herkent wat het is, wat er moet gebeuren en bewaart het automatisch in jouw OneDrive of Dropbox.",
 };
 
 export default function GezinLandingPage() {
@@ -112,7 +112,7 @@ export default function GezinLandingPage() {
               },
               {
                 num: "02",
-                title: "AI analyseert",
+                title: "NooitMeerPostKwijt analyseert",
                 desc: "NooitMeerPostKwijt leest het document, herkent de afzender, het type en of er iets gedaan moet worden — inclusief deadline.",
               },
               {
