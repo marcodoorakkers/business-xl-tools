@@ -60,8 +60,8 @@ export default function GezinLandingPage() {
 
           <div className="flex-1 w-full max-w-lg">
             <img
-              src="https://images.unsplash.com/photo-1568027762272-e4da8b386fe9?w=700&q=80&auto=format&fit=crop"
-              alt="Stapel papieren documenten op een bureau"
+              src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=700&q=80&auto=format&fit=crop"
+              alt="Bureau met stapels papieren en documenten"
               className="w-full rounded-3xl shadow-lg object-cover aspect-[4/3]"
             />
           </div>
