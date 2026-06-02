@@ -133,7 +133,7 @@ function ArchiefContent() {
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <NMMPKLogo iconOnly />
           <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
-            ← Dossier
+            ← Post scannen
           </Link>
         </div>
       </header>
