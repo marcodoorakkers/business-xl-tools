@@ -359,6 +359,13 @@ export default function GezinDossierPage() {
                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
               </svg>
             </Link>
+            <a
+              href="mailto:nooitmeerpostkwijt@business-xl.nl?subject=Feedback%20NooitMeerPostKwijt&body=Hoi%2C%0A%0AIk%20wil%20het%20volgende%20melden%3A%0A%0A"
+              className="text-xs text-gray-400 hover:text-amber-500 transition-colors"
+              title="Feedback of probleem melden"
+            >
+              Feedback
+            </a>
             <button
               onClick={async () => { await supabase.auth.signOut(); router.push("/"); }}
               className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
