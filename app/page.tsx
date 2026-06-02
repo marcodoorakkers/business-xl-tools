@@ -224,6 +224,9 @@ export default async function LandingPage() {
           </div>
         </div>
         <p className="text-center text-xs text-gray-400 mt-6">Alle prijzen zijn excl. BTW · Betalen via iDEAL, creditcard of Bancontact · Credits vervallen nooit</p>
+        <p className="text-center text-xs text-blue-500 mt-2">
+          ✦ NooitMeerPostKwijt-abonnee? Je krijgt automatisch 10 gratis credits per maand. <a href="https://nooitmeerpostkwijt.nl" className="underline hover:text-blue-700">Meer info →</a>
+        </p>
       </section>
 
       {/* CTA */}

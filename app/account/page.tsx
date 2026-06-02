@@ -65,12 +65,17 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
           <p className="text-blue-200 text-sm mb-1">Jouw credits</p>
           <p className="text-5xl font-extrabold">{credits}</p>
-          {subscriptionStatus === "active" && subscriptionCredits > 0 ? (
-            <p className="text-blue-200 text-sm mt-1">{subscriptionCredits} abonnement (deze maand) · {purchasedCredits} gekocht (vervallen nooit)</p>
-          ) : (
-            <p className="text-blue-200 text-sm mt-1">credits beschikbaar · vervallen nooit</p>
-          )}
+          <p className="text-blue-200 text-sm mt-1">credits beschikbaar · vervallen nooit</p>
         </div>
+
+        {(subscriptionStatus === "active" || subscriptionStatus === "trialing") && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-center gap-3">
+            <span className="text-amber-500 text-lg flex-shrink-0">✦</span>
+            <p className="text-sm text-amber-800">
+              Je NooitMeerPostKwijt-abonnement geeft je elke maand <strong>10 gratis credits</strong> op TimeSaverTools.
+            </p>
+          </div>
+        )}
 
         {subscriptionStatus === "active" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-6">

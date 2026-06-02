@@ -72,6 +72,8 @@ export async function POST(req: NextRequest) {
         console.error("[webhook] Failed to set credits on subscription_start:", creditsError);
       }
 
+      // TST bonus: 10 gratis credits bij NMPK-abonnement
+      await supabase.rpc("add_credits", { user_id: userId, amount: 10 });
       await supabase.from("usage_logs").insert({
         user_id: userId,
         tool: "subscription_start",
@@ -133,6 +135,8 @@ export async function POST(req: NextRequest) {
       console.error("[webhook] Failed to reset renewal credits:", creditsError);
     }
 
+    // TST bonus: 10 gratis credits bij maandverlenging NMPK
+    await supabase.rpc("add_credits", { user_id: profile.id, amount: 10 });
     await supabase.from("usage_logs").insert({
       user_id: profile.id,
       tool: "subscription_renewal",
