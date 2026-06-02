@@ -81,7 +81,6 @@ function ArchiefContent() {
   }, [router]);
 
   const fetchDocuments = useCallback(async () => {
-    if (!query && !filterGezinslid && !filterType) return;
     setLoading(true);
     setHasSearched(true);
     try {
@@ -103,11 +102,6 @@ function ArchiefContent() {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  // Bij initieel laden: als er URL-params zijn, meteen als "gezocht" markeren
-  useEffect(() => {
-    if (query || filterGezinslid || filterType) setHasSearched(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Haal gezinsleden op voor filter
   useEffect(() => {
@@ -165,18 +159,16 @@ function ArchiefContent() {
 
           {/* Filters */}
           <div className="flex gap-2 flex-wrap">
-            {gezinsleden.length > 0 && (
-              <select
-                value={filterGezinslid}
-                onChange={(e) => { setFilterGezinslid(e.target.value); updateUrl(query, e.target.value, filterType); }}
-                className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
-              >
-                <option value="">Alle geadresseerden</option>
-                {gezinsleden.map((g) => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
-            )}
+            <select
+              value={filterGezinslid}
+              onChange={(e) => { setFilterGezinslid(e.target.value); updateUrl(query, e.target.value, filterType); }}
+              className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
+            >
+              <option value="">Alle geadresseerden</option>
+              {gezinsleden.map((g) => (
+                <option key={g} value={g}>{g}</option>
+              ))}
+            </select>
             {uniqueTypes.length > 0 && (
               <select
                 value={filterType}
@@ -206,12 +198,7 @@ function ArchiefContent() {
             <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
             Zoeken…
           </div>
-        ) : !hasSearched ? (
-          <div className="text-center py-16">
-            <p className="text-gray-500 font-medium mb-1">Zoek op afzender, onderwerp of trefwoord</p>
-            <p className="text-sm text-gray-400">Of filter op persoon of type document.</p>
-          </div>
-        ) : documents.length === 0 ? (
+        ) : documents.length === 0 && hasSearched ? (
           <div className="text-center py-16">
             <p className="text-gray-600 font-medium mb-1">Geen documenten gevonden</p>
             <p className="text-sm text-gray-400">Probeer een andere zoekterm of verwijder de filters.</p>
