@@ -75,7 +75,8 @@ export async function middleware(request: NextRequest) {
     originalPath.startsWith("/tools/mijn-dossier") ||
     originalPath.startsWith("/api/tools/mijn-dossier");
 
-  if (isMijnDossier && process.env.MIJN_DOSSIER_ENABLED !== "true") {
+  // MIJN_DOSSIER_ENABLED flag geldt alleen voor timesavertools.nl, niet voor nooitmeerpostkwijt.nl
+  if (isMijnDossier && !isFamilySite && process.env.MIJN_DOSSIER_ENABLED !== "true") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
