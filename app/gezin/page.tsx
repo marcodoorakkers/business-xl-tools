@@ -159,17 +159,29 @@ export default function GezinLandingPage() {
           </div>
         </div>
 
-        {/* Testimonial */}
-        <div className="max-w-2xl mx-auto py-12 border-t border-gray-100">
-          <blockquote className="relative">
-            <span className="text-6xl text-amber-200 font-serif leading-none absolute -top-4 -left-2 select-none">&ldquo;</span>
-            <p className="text-lg text-gray-700 leading-relaxed pl-8 italic">
-              Mijn boekhouder vroeg om de oorspronkelijke aanslag VPB. Vroeger betekende dat een uur spitten door een stapel papier in mijn kast. Nu zoek ik het op en heb het in tien seconden.
-            </p>
-            <footer className="mt-4 pl-8 text-sm text-gray-400 font-medium not-italic">
-              — Jeroen, eigenaar van een eenmanszaak
-            </footer>
-          </blockquote>
+        {/* Testimonials */}
+        <div className="py-12 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            <blockquote className="bg-gray-50 rounded-2xl p-6 relative">
+              <span className="text-5xl text-amber-200 font-serif leading-none absolute -top-3 left-4 select-none">&ldquo;</span>
+              <p className="text-sm text-gray-700 leading-relaxed italic pt-3">
+                Mijn boekhouder vroeg om de oorspronkelijke aanslag VPB. Vroeger betekende dat een uur spitten door een stapel papier in mijn kast. Nu zoek ik het op en heb het in tien seconden.
+              </p>
+              <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
+                — Jeroen, eigenaar van een eenmanszaak
+              </footer>
+            </blockquote>
+
+            <blockquote className="bg-gray-50 rounded-2xl p-6 relative">
+              <span className="text-5xl text-amber-200 font-serif leading-none absolute -top-3 left-4 select-none">&ldquo;</span>
+              <p className="text-sm text-gray-700 leading-relaxed italic pt-3">
+                Ik ging mijn auto verkopen en kon de brief van het RDW met de tenaamstellingscode niet snel genoeg vinden. Uiteindelijk heb ik maar een nieuwe code aangeschaft bij het RDW. Achteraf zo zonde.
+              </p>
+              <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
+                — Sandra, particulier
+              </footer>
+            </blockquote>
+          </div>
         </div>
 
         {/* Pricing */}
