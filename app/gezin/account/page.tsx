@@ -36,7 +36,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <NMMPKLogo iconOnly />
           <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
-            ← Terug
+            ← Post scannen
           </Link>
         </div>
       </header>
