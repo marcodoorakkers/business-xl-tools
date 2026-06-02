@@ -287,7 +287,7 @@ ${profileText.slice(0, 3000)}`;
   // Charge 2 credits
   await supabase.rpc("decrement_credits", { user_id: user.id });
   await supabase.rpc("decrement_credits", { user_id: user.id });
-  await logUsage(user.id, "cv-loopbaan", 2);
+  await logUsage(user.id, "cv-loopbaan", 1);
 
   return NextResponse.json({ cv, vacancies: allVacancies, profile: profileData });
 }

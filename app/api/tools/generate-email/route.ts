@@ -54,7 +54,7 @@ ${transcript}`,
     if (!retranslate) {
       await supabase.rpc("decrement_credits", { user_id: user.id });
       await supabase.rpc("decrement_credits", { user_id: user.id });
-      await logUsage(user.id, "voice-mail", 2);
+      await logUsage(user.id, "voice-mail", 1);
     }
 
     return NextResponse.json(email);

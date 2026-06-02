@@ -39,10 +39,10 @@ Elke tool trekt credits af in de API route (`app/api/tools/[tool]/route.ts`). Zo
 
 | Tool | Credits |
 |---|---|
-| Voice Mail Draft | 2 |
-| Meeting Memo | 2 |
-| Document Opmaken | 2 |
-| CV Builder | 2 |
+| Voice Mail Draft | 1 |
+| Meeting Memo | 1 |
+| Document Opmaken | 1 |
+| CV Builder | 1 |
 | Vacaturezoeker | 1 |
 | Weekmenu Planner | 1 |
 | MijnDossier | 1 |

@@ -119,7 +119,7 @@ ${profileText.slice(0, 4000)}`;
 
     await supabase.rpc("decrement_credits", { user_id: user.id });
     await supabase.rpc("decrement_credits", { user_id: user.id });
-    await logUsage(user.id, "cv-builder", 2);
+    await logUsage(user.id, "cv-builder", 1);
 
     return NextResponse.json({ ...cv, _lang: lang });
   } catch (err) {

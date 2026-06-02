@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     await supabase.rpc("decrement_credits", { user_id: user.id });
     await supabase.rpc("decrement_credits", { user_id: user.id });
 
-    await logUsage(user.id, "meeting-memo", 2);
+    await logUsage(user.id, "meeting-memo", 1);
 
     const now = new Date();
     notes._meta = {

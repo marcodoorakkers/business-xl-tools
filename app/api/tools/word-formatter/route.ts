@@ -329,7 +329,7 @@ ${rawText.slice(0, 6000)}`,
 
     await supabase.rpc("decrement_credits", { user_id: user.id });
     await supabase.rpc("decrement_credits", { user_id: user.id });
-    await logUsage(user.id, "word-formatter", 2);
+    await logUsage(user.id, "word-formatter", 1);
 
     const filename = file.name.replace(".docx", "") + "_opgemaakt.docx";
 
