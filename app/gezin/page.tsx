@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
+import DemoSection from "./components/DemoSection";
 
 export const metadata = {
   title: "NooitMeerPostKwijt — Digitaal archief voor ZZP'ers en kleine ondernemers",
@@ -131,36 +132,8 @@ export default function GezinLandingPage() {
           </div>
         </div>
 
-        {/* Voorbeeldscan */}
-        <div className="max-w-2xl mx-auto py-12 border-t border-gray-100">
-          <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2 text-center">Voorbeeld</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-3">Zie hoe het werkt</h2>
-          <p className="text-gray-500 text-center text-sm mb-8 leading-relaxed">
-            Eén scan van je aanslag. Binnen seconden weet je wat het is, wat je moet doen en staat het op de juiste plek.
-          </p>
-          <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
-            <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 mb-4">
-              <span className="text-2xl">📄</span>
-              <div>
-                <p className="font-semibold text-gray-900 text-sm">Belastingdienst — Aanslag VPB 2024</p>
-                <p className="text-xs text-gray-400">Vennootschapsbelasting · 3 pagina&apos;s</p>
-              </div>
-            </div>
-            <p className="text-center text-gray-400 text-sm my-3">↓ NooitMeerPostKwijt analyseert…</p>
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <div className="flex flex-wrap gap-2 mb-3">
-                <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">📁 Belastingen / VPB</span>
-                <span className="bg-amber-100 text-amber-700 text-xs font-semibold px-3 py-1 rounded-full">🏢 Business XL</span>
-                <span className="bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">⚠️ Actie vereist</span>
-              </div>
-              <ul className="space-y-1.5 text-sm text-gray-700">
-                <li>— <strong>Actie:</strong> Betaal €2.340 vóór 31 augustus 2025</li>
-                <li>— <strong>Opgeslagen in:</strong> OneDrive / Business XL / Belastingen / VPB</li>
-                <li>— <strong>Deadline toegevoegd aan je actielijst</strong></li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        {/* Interactieve demo */}
+        <DemoSection />
 
         {/* Features */}
         <div className="py-16 border-t border-gray-100">
