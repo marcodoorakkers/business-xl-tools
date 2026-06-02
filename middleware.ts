@@ -93,8 +93,8 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = effectivePath;
     const rewriteRes = NextResponse.rewrite(url);
-    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
-      rewriteRes.cookies.set(name, value);
+    supabaseResponse.cookies.getAll().forEach(({ name, value, ...options }) => {
+      rewriteRes.cookies.set(name, value, options); // opties (maxAge, etc.) meenemen
     });
     return rewriteRes;
   }
