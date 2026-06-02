@@ -178,7 +178,7 @@ export default function GezinLandingPage() {
                 Ik ging mijn auto verkopen en kon de brief van het RDW met de tenaamstellingscode niet snel genoeg vinden. Uiteindelijk heb ik maar een nieuwe code aangeschaft bij het RDW. Achteraf zo zonde.
               </p>
               <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
-                — Sandra, particulier
+                — Sandra, vennoot in een VOF
               </footer>
             </blockquote>
           </div>
