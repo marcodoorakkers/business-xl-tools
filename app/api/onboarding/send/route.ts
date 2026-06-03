@@ -148,7 +148,8 @@ function welcomeHtml() {
     <p style="margin:0 0 24px;color:#57534e;font-size:14px;line-height:1.6;">
       💡 <strong>Tip:</strong> Heb je Gmail? Je kunt facturen en brieven direct doorsturen naar je persoonlijke scanadres — te vinden in Instellingen.
     </p>
-    ${cta("https://nooitmeerpostkwijt.nl/dossier", "Open mijn dossier →")}
+    ${cta("https://nooitmeerpostkwijt.nl/dossier/aan-de-slag", "Aan de slag →")}
+    <p style="margin:16px 0 0;font-size:13px;color:#a8a29e;text-align:center;">Of ga direct naar <a href="https://nooitmeerpostkwijt.nl/dossier" style="color:#d97706;">Post scannen</a></p>
   `);
 }
 
