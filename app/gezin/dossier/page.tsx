@@ -344,7 +344,7 @@ export default function GezinDossierPage() {
               Acties
             </Link>
             <Link href="/dossier/archief" className="text-sm text-amber-700 font-medium hover:text-amber-500 transition-colors">
-              Archief
+              Documenten
             </Link>
             <Link href="/dossier/instellingen" className="text-gray-400 hover:text-gray-600 transition-colors" title="Instellingen">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -381,7 +381,7 @@ export default function GezinDossierPage() {
         {step === "idle" && (
           <div>
             <div className="mb-6">
-              <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Post scannen</h1>
+              <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Scannen</h1>
               <p className="text-gray-500 text-sm">Maak een foto of upload een PDF — wij regelen de rest.</p>
             </div>
 
