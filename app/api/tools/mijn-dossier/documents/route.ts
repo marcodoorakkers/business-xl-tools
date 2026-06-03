@@ -11,13 +11,15 @@ export async function GET(req: NextRequest) {
   const q = searchParams.get("q")?.trim() ?? "";
   const gezinslid = searchParams.get("gezinslid")?.trim() ?? "";
   const type = searchParams.get("type")?.trim() ?? "";
+  const offset = parseInt(searchParams.get("offset") ?? "0", 10);
+  const PAGE_SIZE = 20;
 
   let query = supabase
     .from("documents")
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(100);
+    .range(offset, offset + PAGE_SIZE); // fetch PAGE_SIZE+1 to detect hasMore
 
   if (q) {
     query = query.or(
@@ -34,7 +36,9 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  return NextResponse.json({ documents: data ?? [] });
+  const all = data ?? [];
+  const hasMore = all.length > PAGE_SIZE;
+  return NextResponse.json({ documents: hasMore ? all.slice(0, PAGE_SIZE) : all, hasMore });
 }
 
 // POST /api/tools/mijn-dossier/documents

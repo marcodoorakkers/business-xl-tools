@@ -63,7 +63,10 @@ function ArchiefContent() {
 
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [offset, setOffset] = useState(0);
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [filterGezinslid, setFilterGezinslid] = useState(() => searchParams.get("gezinslid") ?? "");
   const [filterType, setFilterType] = useState(() => searchParams.get("type") ?? "");
@@ -83,6 +86,7 @@ function ArchiefContent() {
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
     setHasSearched(true);
+    setOffset(0);
     try {
       const params = new URLSearchParams();
       if (query) params.set("q", query);
@@ -91,12 +95,32 @@ function ArchiefContent() {
       const res = await fetch(`/api/tools/mijn-dossier/documents?${params}`);
       const data = await res.json();
       setDocuments(data.documents ?? []);
+      setHasMore(data.hasMore ?? false);
     } catch {
       setDocuments([]);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
   }, [query, filterGezinslid, filterType]);
+
+  const loadMore = useCallback(async () => {
+    setLoadingMore(true);
+    try {
+      const newOffset = offset + 20;
+      const params = new URLSearchParams();
+      if (query) params.set("q", query);
+      if (filterGezinslid) params.set("gezinslid", filterGezinslid);
+      if (filterType) params.set("type", filterType);
+      params.set("offset", String(newOffset));
+      const res = await fetch(`/api/tools/mijn-dossier/documents?${params}`);
+      const data = await res.json();
+      setDocuments(prev => [...prev, ...(data.documents ?? [])]);
+      setHasMore(data.hasMore ?? false);
+      setOffset(newOffset);
+    } catch { /* stil falen */ }
+    finally { setLoadingMore(false); }
+  }, [query, filterGezinslid, filterType, offset]);
 
   useEffect(() => {
     fetchDocuments();
@@ -283,6 +307,18 @@ function ArchiefContent() {
                 </div>
               ))}
             </div>
+
+            {hasMore && (
+              <div className="text-center mt-6">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="px-6 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  {loadingMore ? "Laden…" : "Meer laden"}
+                </button>
+              </div>
+            )}
           </>
         )}
       </main>
