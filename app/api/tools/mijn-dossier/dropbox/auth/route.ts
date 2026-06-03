@@ -6,8 +6,11 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.redirect(new URL("/auth/login", request.url));
 
-  const origin = request.nextUrl.origin;
-  const redirectUri = `${origin}/api/tools/mijn-dossier/dropbox/callback`;
+  const host = request.nextUrl.hostname;
+  const isProduction = host === "nooitmeerpostkwijt.nl" || host === "www.nooitmeerpostkwijt.nl";
+  const redirectUri = isProduction
+    ? "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/dropbox/callback"
+    : `${request.nextUrl.origin}/api/tools/mijn-dossier/dropbox/callback`;
   const state = crypto.randomUUID();
 
   const params = new URLSearchParams({

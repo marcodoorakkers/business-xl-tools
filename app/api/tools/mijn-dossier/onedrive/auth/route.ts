@@ -6,8 +6,12 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.redirect(new URL("/auth/login", request.url));
 
-  const origin = request.nextUrl.origin;
-  const redirectUri = `${origin}/api/tools/mijn-dossier/onedrive/callback`;
+  // Gebruik vaste redirect URI in productie voor betrouwbare OAuth
+  const host = request.nextUrl.hostname;
+  const isProduction = host === "nooitmeerpostkwijt.nl" || host === "www.nooitmeerpostkwijt.nl";
+  const redirectUri = isProduction
+    ? "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/onedrive/callback"
+    : `${request.nextUrl.origin}/api/tools/mijn-dossier/onedrive/callback`;
   const state = crypto.randomUUID();
 
   const params = new URLSearchParams({
