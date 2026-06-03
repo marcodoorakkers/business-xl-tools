@@ -111,7 +111,7 @@ export default function GezinDossierPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch("/api/tools/mijn-dossier/onedrive/status")
+    fetch("/api/tools/mijn-dossier/onedrive/status", { cache: "no-store" })
       .then((r) => r.json())
       .then((data: {
         connected: boolean;

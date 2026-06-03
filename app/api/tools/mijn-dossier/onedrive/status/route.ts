@@ -80,11 +80,15 @@ export async function POST(req: NextRequest) {
     if (!valid.includes(body.storagePreference)) {
       return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
     }
-    await admin.from("archive_settings").upsert({
+    const { error: upsertErr } = await admin.from("archive_settings").upsert({
       user_id: user.id,
       storage_preference: body.storagePreference,
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
+    if (upsertErr) {
+      console.error("[status] storagePreference upsert failed:", upsertErr);
+      return NextResponse.json({ error: upsertErr.message }, { status: 500 });
+    }
     return NextResponse.json({ ok: true });
   }
 
