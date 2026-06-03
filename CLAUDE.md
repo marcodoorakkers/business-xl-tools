@@ -79,7 +79,8 @@ app/
     account/page.tsx             — NMMPK account (abonnement beheren)
     dossier/page.tsx             — NMMPK scan-interface (client component)
     dossier/instellingen/page.tsx — opslag, geadresseerden, mapstructuur, scan-e-mailadres
-    dossier/archief/page.tsx     — zoeken en filteren, filters bewaard in URL
+    dossier/archief/page.tsx     — zoeken en filteren, filters bewaard in URL, paginering (20 per keer)
+    dossier/aan-de-slag/page.tsx — onboarding pagina nieuwe gebruikers (4 stappen + tips)
     aanmelden/page.tsx           — NMMPK registratie
     inloggen/page.tsx            — NMMPK login
   api/
@@ -110,6 +111,7 @@ supabase/migrations/
   add_full_name_family.sql       — full_name kolom op archive_family_members (ALTER TABLE)
   add_folder_structure.sql       — folder_structure kolom op archive_settings (ALTER TABLE)
   add_demo_rate_limits.sql       — demo_rate_limits tabel (IP-hash, count, window_start)
+  add_promo_codes.sql            — promo_codes tabel + founding25 (25x 180 dagen trial)
 ```
 
 ## PWA (NMMPK)
@@ -157,6 +159,31 @@ supabase/migrations/
 - `MIJN_DOSSIER_ENABLED` flag geldt ALLEEN voor timesavertools.nl, NIET voor nooitmeerpostkwijt.nl
 - Anders worden alle `/api/tools/mijn-dossier/*` routes geblokkeerd op het NMPK-domein
 - Supabase browser client (`createClient()`) mag NOOIT op module-niveau worden aangeroepen in client components — alleen inline in handlers (Next.js 16 pre-rendert anders)
+
+## Naamgeving NMMPK (geldend)
+
+| Oud | Nieuw |
+|-----|-------|
+| Gezinsleden | Geadresseerden |
+| Archief (pagina) | Documenten |
+| Post scannen | Scannen |
+| Archiefmap naam | Dossiermap naam |
+| Standaard mapnaam "Archief" | "MijnDossier" |
+
+## Promo codes (NMMPK)
+
+- Tabel `promo_codes` (code, max_uses, uses, trial_days, active)
+- Actieve promo: `founding25` — 25x 180 dagen trial
+- Flow: `?promo=founding25` in aanmeld-URL → localStorage → SubscribeButton → create-session
+- Cap wordt atomisch gecontroleerd; bij max bereikt → gewone 30-daagse trial
+- Gebruik monitoren: `SELECT code, uses, max_uses FROM promo_codes;`
+
+## Storage (NMMPK)
+
+- Voorkeur opgeslagen in `archive_settings.storage_preference` ("local" | "onedrive" | "dropbox")
+- Default mapnaam: "MijnDossier"
+- OAuth redirect URIs zijn hardcoded voor productiedomein (nooitmeerpostkwijt.nl) — nooit dynamisch
+- Status-fetch in dossier page gebruikt `cache: "no-store"` om verouderde instelling te voorkomen
 
 ## Backlog
 
