@@ -26,7 +26,9 @@ export async function GET(request: NextRequest) {
   const storedState = request.cookies.get("dropbox_oauth_state")?.value;
   if (!storedState || storedState !== state) return NextResponse.redirect(failUrl);
 
-  const redirectUri = `${origin}/api/tools/mijn-dossier/dropbox/callback`;
+  const redirectUri = isGezinSite
+    ? "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/dropbox/callback"
+    : `${origin}/api/tools/mijn-dossier/dropbox/callback`;
 
   const params = new URLSearchParams({
     client_id: process.env.DROPBOX_CLIENT_ID!,

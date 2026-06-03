@@ -26,7 +26,9 @@ export async function GET(request: NextRequest) {
   const storedState = request.cookies.get("ms_oauth_state")?.value;
   if (!storedState || storedState !== state) return NextResponse.redirect(failUrl);
 
-  const redirectUri = `${origin}/api/tools/mijn-dossier/onedrive/callback`;
+  const redirectUri = isGezinSite
+    ? "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/onedrive/callback"
+    : `${origin}/api/tools/mijn-dossier/onedrive/callback`;
 
   const params = new URLSearchParams({
     client_id: process.env.MICROSOFT_CLIENT_ID!,
