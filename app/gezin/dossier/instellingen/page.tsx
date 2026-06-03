@@ -80,26 +80,33 @@ function InstellingenContent() {
   async function saveFolderStructure(value: string) {
     setFolderStructure(value);
     try {
-      await fetch("/api/tools/mijn-dossier/onedrive/status", {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ folderStructure: value }),
       });
+      if (!res.ok) throw new Error();
+      showToast("success", "Mapstructuur opgeslagen.");
     } catch {
-      showToast("error", "Opslaan mislukt.");
+      showToast("error", "Opslaan mislukt — probeer opnieuw.");
+      setFolderStructure(folderStructure);
     }
   }
 
   async function saveStoragePreference(value: string) {
     setStoragePreference(value);
     try {
-      await fetch("/api/tools/mijn-dossier/onedrive/status", {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ storagePreference: value }),
       });
+      if (!res.ok) throw new Error();
+      showToast("success", "Opslagvoorkeur opgeslagen.");
     } catch {
-      showToast("error", "Voorkeur opslaan mislukt.");
+      showToast("error", "Opslaan mislukt — probeer opnieuw.");
+      // Reset naar vorige waarde bij fout
+      setStoragePreference(storagePreference);
     }
   }
 
