@@ -563,30 +563,23 @@ export default function GezinDossierPage() {
 
             {/* Opslaan — gebaseerd op opslagvoorkeur uit instellingen */}
             <div className="space-y-2">
-              {storagePreference === "local" ? (
-                <button
-                  onClick={handleSaveLocal}
-                  className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-3.5 rounded-2xl transition-colors"
-                >
-                  💾 Downloaden / delen
-                </button>
-              ) : cloudConnected ? (
-                <button
-                  onClick={handleSaveCloud}
-                  className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-3.5 rounded-2xl transition-colors flex items-center justify-center gap-2"
-                >
-                  ☁️ Opslaan in {cloudLabel}
-                </button>
-              ) : (
+              {storagePreference !== "local" && !cloudConnected ? (
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
                   <p className="text-sm text-amber-800 mb-2 font-medium">{cloudLabel} is nog niet gekoppeld.</p>
                   <Link href="/dossier/instellingen" className="text-sm font-semibold text-amber-600 hover:text-amber-800 underline">
                     Koppelen in Instellingen →
                   </Link>
                 </div>
+              ) : (
+                <button
+                  onClick={storagePreference === "local" ? handleSaveLocal : handleSaveCloud}
+                  className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-3.5 rounded-2xl transition-colors"
+                >
+                  Opslaan in Dossier →
+                </button>
               )}
               <p className="text-center text-xs text-gray-400">
-                Opslag: <span className="font-medium">{storagePreference === "local" ? "Lokaal" : cloudLabel}</span>
+                Wordt opgeslagen {storagePreference === "local" ? "op dit apparaat" : `in ${cloudLabel}`}
                 {" · "}
                 <Link href="/dossier/instellingen" className="underline hover:text-gray-600">wijzigen</Link>
               </p>
