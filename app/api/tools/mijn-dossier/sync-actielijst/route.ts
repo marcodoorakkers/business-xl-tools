@@ -106,7 +106,7 @@ export async function POST() {
       .select("archive_root")
       .eq("user_id", user.id)
       .single();
-    const archiveRoot = tokenRow?.archive_root ?? "Archief";
+    const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
     try {
       await uploadFileToOneDrive(onedriveToken, `${archiveRoot}/Actielijst.md`, buffer, "text/markdown");
       results.onedrive = true;
@@ -123,7 +123,7 @@ export async function POST() {
       .select("archive_root")
       .eq("user_id", user.id)
       .single();
-    const archiveRoot = tokenRow?.archive_root ?? "Archief";
+    const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
     try {
       await uploadFileToDropbox(dropboxToken, `${archiveRoot}/Actielijst.md`, buffer, "text/markdown");
       results.dropbox = true;

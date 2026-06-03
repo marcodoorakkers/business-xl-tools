@@ -35,11 +35,11 @@ export async function GET() {
 
   return NextResponse.json({
     connected: !!tokenRow,
-    archiveRoot: tokenRow?.archive_root ?? "Archief",
+    archiveRoot: tokenRow?.archive_root ?? "MijnDossier",
     familyMembers: (members ?? []).map((m: { name: string }) => m.name),
     familyMemberDetails: members ?? [],
     dropboxConnected: !!dropboxRow,
-    dropboxArchiveRoot: dropboxRow?.archive_root ?? "Archief",
+    dropboxArchiveRoot: dropboxRow?.archive_root ?? "MijnDossier",
     storagePreference: archiveSettings?.storage_preference ?? "local",
     folderStructure: archiveSettings?.folder_structure ?? "by_subject",
   });

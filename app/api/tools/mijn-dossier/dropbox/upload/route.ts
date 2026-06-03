@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     .eq("user_id", user.id)
     .single();
 
-  const archiveRoot = tokenRow?.archive_root ?? "Archief";
+  const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;

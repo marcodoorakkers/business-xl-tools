@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     .eq("user_id", user.id)
     .single();
 
-  const archiveRoot = tokenRow?.archive_root ?? "Archief";
+  const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
   const parts = [archiveRoot, familyMember, mappad].map((s: string) => s?.trim()).filter(Boolean);
   const fullPath = parts.join("/");
 

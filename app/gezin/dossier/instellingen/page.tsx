@@ -315,17 +315,17 @@ function InstellingenContent() {
             </div>
           )}
           <div className="space-y-2 pt-2 border-t border-gray-100">
-            <label className="text-xs text-gray-500 block">Archiefmap naam</label>
+            <label className="text-xs text-gray-500 block">Dossiermap naam</label>
             <div className="flex gap-2">
               <input type="text" value={archiveRoot} onChange={(e) => setArchiveRoot(e.target.value)}
                 className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-                placeholder="Archief" />
+                placeholder="MijnDossier" />
               <button onClick={saveArchiveRoot} disabled={savingRoot}
                 className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
                 {savingRoot ? "Opslaan…" : "Opslaan"}
               </button>
             </div>
-            <p className="text-xs text-gray-400">De naam van de hoofdmap in je OneDrive (standaard: Archief).</p>
+            <p className="text-xs text-gray-400">De naam van de hoofdmap in je OneDrive (standaard: MijnDossier).</p>
           </div>
         </div>
 
@@ -356,17 +356,17 @@ function InstellingenContent() {
             </div>
           )}
           <div className="space-y-2 pt-2 border-t border-gray-100">
-            <label className="text-xs text-gray-500 block">Archiefmap naam</label>
+            <label className="text-xs text-gray-500 block">Dossiermap naam</label>
             <div className="flex gap-2">
               <input type="text" value={dropboxArchiveRoot} onChange={(e) => setDropboxArchiveRoot(e.target.value)}
                 className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-                placeholder="Archief" />
+                placeholder="MijnDossier" />
               <button onClick={saveDropboxArchiveRoot} disabled={savingDropboxRoot}
                 className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
                 {savingDropboxRoot ? "Opslaan…" : "Opslaan"}
               </button>
             </div>
-            <p className="text-xs text-gray-400">De naam van de hoofdmap in je Dropbox (standaard: Archief).</p>
+            <p className="text-xs text-gray-400">De naam van de hoofdmap in je Dropbox (standaard: MijnDossier).</p>
           </div>
         </div>
 

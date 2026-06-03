@@ -185,7 +185,7 @@ Formaat:
   const onedriveToken = await getValidAccessToken(profile.id);
   if (onedriveToken) {
     const { data: tokenRow } = await admin.from("onedrive_tokens").select("archive_root").eq("user_id", profile.id).single();
-    const archiveRoot = tokenRow?.archive_root ?? "Archief";
+    const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
     try {
       const { webUrl } = await uploadFileToOneDrive(onedriveToken, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, contentType);
       fileUrl = webUrl;
@@ -197,7 +197,7 @@ Formaat:
     let dropboxToken = await getValidDropboxToken(profile.id);
     if (dropboxToken) {
       const { data: tokenRow } = await admin.from("dropbox_tokens").select("archive_root").eq("user_id", profile.id).single();
-      const archiveRoot = tokenRow?.archive_root ?? "Archief";
+      const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
       try {
         const result = await uploadFileToDropbox(dropboxToken, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, contentType);
         fileUrl = result.webUrl;

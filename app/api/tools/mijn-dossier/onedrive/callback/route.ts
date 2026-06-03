@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     access_token: tokens.access_token,
     refresh_token: tokens.refresh_token,
     expires_at: expiresAt,
-    archive_root: "Archief",
+    archive_root: "MijnDossier",
     updated_at: new Date().toISOString(),
   }, { onConflict: "user_id" });
 
