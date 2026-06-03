@@ -15,10 +15,15 @@ export default function GezinRegisterPage() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Promo code uit URL opslaan in localStorage
+  const [promoActive, setPromoActive] = useState(false);
+
+  // Promo code uit URL opslaan in localStorage + banner tonen
   useEffect(() => {
     const promo = new URLSearchParams(window.location.search).get("promo");
-    if (promo) localStorage.setItem("nmpk_promo", promo);
+    if (promo) {
+      localStorage.setItem("nmpk_promo", promo);
+      setPromoActive(true);
+    }
   }, []);
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
@@ -74,6 +79,15 @@ export default function GezinRegisterPage() {
         <div className="text-center mb-8">
           <NMMPKLogo href="/" size="lg" />
         </div>
+        {promoActive && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 mb-4 flex items-start gap-3">
+            <span className="text-amber-500 text-lg flex-shrink-0">✦</span>
+            <div>
+              <p className="text-sm font-semibold text-amber-800">Je maakt gebruik van de Founding 25 actie</p>
+              <p className="text-xs text-amber-700 mt-0.5">Maak een account aan en start je abonnement — je krijgt <strong>6 maanden gratis</strong> in plaats van 1 maand.</p>
+            </div>
+          </div>
+        )}
         <div className="bg-white rounded-3xl shadow-sm p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Account aanmaken</h1>
           <p className="text-gray-500 text-sm mb-6">Eerste maand gratis · geen creditcard nodig</p>
