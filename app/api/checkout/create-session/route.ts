@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { priceId } = await req.json();
+  const { priceId, promoCode } = await req.json();
   if (!priceId) {
     return NextResponse.json({ error: "Ongeldig pakket" }, { status: 400 });
   }
@@ -62,6 +62,26 @@ export async function POST(req: NextRequest) {
     const isFamilySite =
       origin?.includes("nooitmeerpostkwijt.nl") ?? false;
 
+    // Promo code controleren
+    let trialDays = 30;
+    if (isFamilySite && promoCode) {
+      const { data: promo } = await adminSupabase
+        .from("promo_codes")
+        .select("trial_days, max_uses, uses, active")
+        .eq("code", promoCode)
+        .single();
+
+      if (promo && promo.active && promo.uses < promo.max_uses) {
+        trialDays = promo.trial_days;
+        // Gebruik atomisch ophogen
+        await adminSupabase
+          .from("promo_codes")
+          .update({ uses: promo.uses + 1 })
+          .eq("code", promoCode)
+          .eq("uses", promo.uses); // optimistic lock
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
@@ -72,7 +92,7 @@ export async function POST(req: NextRequest) {
       payment_method_types: ["card", "ideal", "sepa_debit"],
       locale: "nl",
       ...(isFamilySite && {
-        subscription_data: { trial_period_days: 30 },
+        subscription_data: { trial_period_days: trialDays },
         payment_method_collection: "if_required",
       }),
     });

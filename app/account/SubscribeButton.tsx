@@ -10,13 +10,17 @@ export default function SubscribeButton({ priceId }: { priceId: string }) {
     setLoading(true);
     setError(null);
     try {
+      const promoCode = typeof window !== "undefined"
+        ? localStorage.getItem("nmpk_promo") ?? undefined
+        : undefined;
       const res = await fetch("/api/checkout/create-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ priceId, promoCode }),
       });
       const data = await res.json();
       if (data.url) {
+        localStorage.removeItem("nmpk_promo");
         window.location.href = data.url;
       } else {
         setError(data.error ?? "Onbekende fout — probeer opnieuw");

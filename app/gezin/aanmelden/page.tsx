@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
@@ -14,6 +14,12 @@ export default function GezinRegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Promo code uit URL opslaan in localStorage
+  useEffect(() => {
+    const promo = new URLSearchParams(window.location.search).get("promo");
+    if (promo) localStorage.setItem("nmpk_promo", promo);
+  }, []);
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setError("");
