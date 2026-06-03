@@ -561,29 +561,35 @@ export default function GezinDossierPage() {
               </div>
             )}
 
-            {/* Opslaan buttons */}
-            <div className="space-y-3">
-              {cloudConnected && (
+            {/* Opslaan — gebaseerd op opslagvoorkeur uit instellingen */}
+            <div className="space-y-2">
+              {storagePreference === "local" ? (
+                <button
+                  onClick={handleSaveLocal}
+                  className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-3.5 rounded-2xl transition-colors"
+                >
+                  💾 Downloaden / delen
+                </button>
+              ) : cloudConnected ? (
                 <button
                   onClick={handleSaveCloud}
                   className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-3.5 rounded-2xl transition-colors flex items-center justify-center gap-2"
                 >
                   ☁️ Opslaan in {cloudLabel}
                 </button>
+              ) : (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                  <p className="text-sm text-amber-800 mb-2 font-medium">{cloudLabel} is nog niet gekoppeld.</p>
+                  <Link href="/dossier/instellingen" className="text-sm font-semibold text-amber-600 hover:text-amber-800 underline">
+                    Koppelen in Instellingen →
+                  </Link>
+                </div>
               )}
-              <button
-                onClick={handleSaveLocal}
-                className={`w-full ${cloudConnected ? "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50" : "bg-gray-900 hover:bg-gray-700 text-white"} font-semibold py-3.5 rounded-2xl transition-colors`}
-              >
-                💾 Downloaden / delen
-              </button>
-              {!cloudConnected && (
-                <p className="text-center text-xs text-gray-400">
-                  Verbind OneDrive of Dropbox in de{" "}
-                  <Link href="/dossier/instellingen" className="underline text-amber-600">instellingen</Link>
-                  {" "}voor automatisch opslaan.
-                </p>
-              )}
+              <p className="text-center text-xs text-gray-400">
+                Opslag: <span className="font-medium">{storagePreference === "local" ? "Lokaal" : cloudLabel}</span>
+                {" · "}
+                <Link href="/dossier/instellingen" className="underline hover:text-gray-600">wijzigen</Link>
+              </p>
             </div>
           </div>
         )}

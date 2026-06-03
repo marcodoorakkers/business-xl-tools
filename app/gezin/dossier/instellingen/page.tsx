@@ -189,9 +189,9 @@ function InstellingenContent() {
   }
 
   const storageOptions = [
-    { value: "local", label: "Lokale pc", icon: "💻" },
-    { value: "onedrive", label: "OneDrive", icon: "☁️" },
-    { value: "dropbox", label: "Dropbox", icon: "📦" },
+    { value: "local", label: "Lokale pc", icon: "💻", connected: true },
+    { value: "onedrive", label: "OneDrive", icon: "☁️", connected: status?.connected ?? false },
+    { value: "dropbox", label: "Dropbox", icon: "📦", connected: status?.dropboxConnected ?? false },
   ];
 
   return (
@@ -221,23 +221,40 @@ function InstellingenContent() {
 
         {/* Opslagvoorkeur */}
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
-          <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Opslagvoorkeur</h2>
-          <div className="flex gap-2">
-            {storageOptions.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => saveStoragePreference(opt.value)}
-                className={`flex-1 flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border text-sm font-medium transition-colors ${
-                  storagePreference === opt.value
-                    ? "border-amber-500 bg-amber-50 text-amber-700"
-                    : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <span className="text-xl">{opt.icon}</span>
-                <span className="text-xs">{opt.label}</span>
-              </button>
-            ))}
+          <div>
+            <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Opslaglocatie</h2>
+            <p className="text-xs text-gray-500 mt-1">Kies hier eenmalig waar documenten worden opgeslagen. Dit geldt voor alle scans.</p>
           </div>
+          <div className="flex gap-2">
+            {storageOptions.map((opt) => {
+              const isSelected = storagePreference === opt.value;
+              const needsConnection = opt.value !== "local" && !opt.connected;
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => saveStoragePreference(opt.value)}
+                  className={`flex-1 flex flex-col items-center gap-1 py-3 px-2 rounded-xl border text-sm font-medium transition-colors ${
+                    isSelected
+                      ? "border-amber-500 bg-amber-50 text-amber-700"
+                      : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  <span className="text-xl">{opt.icon}</span>
+                  <span className="text-xs">{opt.label}</span>
+                  {opt.value !== "local" && (
+                    <span className={`text-xs font-medium ${opt.connected ? "text-green-600" : "text-gray-400"}`}>
+                      {opt.connected ? "✓ Gekoppeld" : "Niet gekoppeld"}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {storagePreference !== "local" && !(storagePreference === "onedrive" ? status?.connected : status?.dropboxConnected) && (
+            <p className="text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2">
+              ⚠️ {storagePreference === "onedrive" ? "OneDrive" : "Dropbox"} is nog niet gekoppeld — koppel hieronder om te kunnen opslaan.
+            </p>
+          )}
         </div>
 
         {/* Mapstructuur */}
