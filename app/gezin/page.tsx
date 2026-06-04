@@ -18,13 +18,14 @@ export default async function GezinLandingPage() {
   if (user) redirect("/dossier");
 
   const admin = createAdminClient();
-  const { data: promo } = await admin
-    .from("promo_codes")
-    .select("uses, max_uses")
-    .eq("code", "founding25")
-    .single();
+  const { count: foundingCount } = await admin
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("promo_code", "founding25");
 
-  const remaining = Math.max(0, (promo?.max_uses ?? 25) - (promo?.uses ?? 0));
+  const max = 25;
+  const used = foundingCount ?? 0;
+  const remaining = Math.max(0, max - used);
 
   return (
     <div className="min-h-screen bg-white">

@@ -12,14 +12,13 @@ export const revalidate = 60;
 export default async function LaunchPage() {
 
   const admin = createAdminClient();
-  const { data: promo } = await admin
-    .from("promo_codes")
-    .select("uses, max_uses")
-    .eq("code", "founding25")
-    .single();
+  const { count: foundingCount } = await admin
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("promo_code", "founding25");
 
-  const used = promo?.uses ?? 0;
-  const max = promo?.max_uses ?? 25;
+  const max = 25;
+  const used = foundingCount ?? 0;
   const remaining = Math.max(0, max - used);
   const pct = Math.round((used / max) * 100);
 
