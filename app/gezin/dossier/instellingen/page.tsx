@@ -27,7 +27,7 @@ function InstellingenContent() {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [archiveRoot, setArchiveRoot] = useState("Archief");
   const [dropboxArchiveRoot, setDropboxArchiveRoot] = useState("Archief");
-  const [storagePreference, setStoragePreference] = useState("local");
+  const [storagePreference, setStoragePreference] = useState<string | null>(null);
   const [folderStructure, setFolderStructure] = useState("by_subject");
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberFullName, setNewMemberFullName] = useState("");
@@ -94,6 +94,7 @@ function InstellingenContent() {
   }
 
   async function saveStoragePreference(value: string) {
+    const previous = storagePreference;
     setStoragePreference(value);
     try {
       const res = await fetch("/api/tools/mijn-dossier/onedrive/status", {
@@ -105,8 +106,7 @@ function InstellingenContent() {
       showToast("success", "Opslagvoorkeur opgeslagen.");
     } catch {
       showToast("error", "Opslaan mislukt — probeer opnieuw.");
-      // Reset naar vorige waarde bij fout
-      setStoragePreference(storagePreference);
+      setStoragePreference(previous);
     }
   }
 
@@ -201,6 +201,8 @@ function InstellingenContent() {
     { value: "dropbox", label: "Dropbox", icon: "📦", connected: status?.dropboxConnected ?? false },
   ];
 
+  const storageLoaded = storagePreference !== null;
+
   return (
     <div className="min-h-screen bg-white">
       {toast && (
@@ -232,7 +234,7 @@ function InstellingenContent() {
             <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Opslaglocatie</h2>
             <p className="text-xs text-gray-500 mt-1">Kies hier eenmalig waar documenten worden opgeslagen. Dit geldt voor alle scans.</p>
           </div>
-          <div className="flex gap-2">
+          <div className={`flex gap-2 transition-opacity ${storageLoaded ? "opacity-100" : "opacity-0"}`}>
             {storageOptions.map((opt) => {
               const isSelected = storagePreference === opt.value;
               const needsConnection = opt.value !== "local" && !opt.connected;
