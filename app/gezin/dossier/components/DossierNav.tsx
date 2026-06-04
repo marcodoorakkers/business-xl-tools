@@ -43,6 +43,7 @@ export default function DossierNav() {
         <div className="flex items-center gap-4">
           {navLink("/acties", "Acties")}
           {navLink("/dossier/archief", "Documenten")}
+          {navLink("/ideeen", "💡 Ideeën")}
           {iconLink("/dossier/aan-de-slag", "Aan de slag",
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
