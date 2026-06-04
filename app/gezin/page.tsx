@@ -102,23 +102,23 @@ export default async function GezinLandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {[
               {
-                icon: "🕐",
+                icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
                 title: "Uren kwijt aan zoeken",
                 desc: "Minimaal twee keer per jaar een uur door papier spitten. Bij een uurtarief van €75 is dat €150 per jaar — alleen maar om iets terug te vinden.",
               },
               {
-                icon: "😬",
+                icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
                 title: "Stress bij de aangifte",
                 desc: "Je boekhouder vraagt om documenten die je nu niet kunt vinden. Je belt terug met \"ik stuur het nog even op\" — en dan begint het zoeken.",
               },
               {
-                icon: "💸",
+                icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
                 title: "Gemiste deadlines",
                 desc: "Een aanmaning die je niet hebt gezien. Een bezwaartermijn die is verlopen. Kwijtgeraakte post kost soms meer dan je denkt.",
               },
             ].map((item) => (
               <div key={item.title} className="bg-gray-50 rounded-2xl p-5">
-                <p className="text-2xl mb-3">{item.icon}</p>
+                <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mb-3">{item.icon}</div>
                 <h3 className="font-bold text-gray-900 mb-2 text-sm">{item.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
               </div>

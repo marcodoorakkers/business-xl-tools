@@ -54,17 +54,17 @@ const steps = [
 
 const tips = [
   {
-    icon: "👤",
+    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
     title: "Meerdere personen of bedrijven?",
     body: "Voeg ze toe als geadresseerden in Instellingen. NooitMeerPostKwijt koppelt documenten automatisch aan de juiste persoon op basis van naam of initialen.",
   },
   {
-    icon: "📁",
+    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>,
     title: "Mapstructuur instellen",
     body: "Kies in Instellingen voor 'Per geadresseerde' als je documenten per persoon wil indelen — ideaal als je meerdere entiteiten hebt.",
   },
   {
-    icon: "⏰",
+    icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
     title: "Acties en deadlines",
     body: "Documenten met een actie (betalen, reageren, aanvragen) verschijnen automatisch in je actielijst. Je krijgt een herinnering als de deadline nadert.",
   },
@@ -115,7 +115,7 @@ export default function AanDeSlagPage() {
           <div className="space-y-3">
             {tips.map((tip) => (
               <div key={tip.title} className="bg-gray-50 rounded-2xl px-5 py-4 flex gap-4">
-                <span className="text-xl flex-shrink-0">{tip.icon}</span>
+                <span className="flex-shrink-0 w-8 h-8 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">{tip.icon}</span>
                 <div>
                   <p className="text-sm font-semibold text-gray-800 mb-0.5">{tip.title}</p>
                   <p className="text-xs text-gray-500 leading-relaxed">{tip.body}</p>

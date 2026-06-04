@@ -98,7 +98,9 @@ export default function DemoSection() {
               className="hidden"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
             />
-            <p className="text-3xl mb-3">📄</p>
+            <div className="w-10 h-10 bg-amber-100 text-amber-500 rounded-xl flex items-center justify-center mb-3 mx-auto">
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
             {file ? (
               <>
                 <p className="font-semibold text-gray-800 text-sm">{file.name}</p>

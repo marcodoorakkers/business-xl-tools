@@ -42,7 +42,9 @@ export default function GezinMobielPage() {
           {/* iPhone */}
           <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8">
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-3xl"></span>
+              <span className="w-9 h-9 bg-gray-100 text-gray-600 rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              </span>
               <h2 className="text-xl font-bold text-gray-900">iPhone (Safari)</h2>
             </div>
             <ol className="flex flex-col gap-4">
@@ -63,7 +65,9 @@ export default function GezinMobielPage() {
           {/* Android */}
           <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8">
             <div className="flex items-center gap-3 mb-6">
-              <span className="text-3xl">🤖</span>
+              <span className="w-9 h-9 bg-gray-100 text-gray-600 rounded-xl flex items-center justify-center">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="17" r="1"/><line x1="9" y1="7" x2="15" y2="7"/></svg>
+              </span>
               <h2 className="text-xl font-bold text-gray-900">Android / Samsung (Chrome)</h2>
             </div>
             <ol className="flex flex-col gap-4">
