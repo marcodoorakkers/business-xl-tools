@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import NMMPKLogo from "@/components/NMMPKLogo";
+import DossierNav from "../components/DossierNav";
 
 interface StatusData {
   connected: boolean;
@@ -212,14 +212,7 @@ function InstellingenContent() {
         </div>
       )}
 
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <NMMPKLogo iconOnly />
-          <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
-            ← Scannen
-          </Link>
-        </div>
-      </header>
+      <DossierNav />
 
       <main className="max-w-lg mx-auto px-6 py-8 space-y-5">
         <div className="mb-2">

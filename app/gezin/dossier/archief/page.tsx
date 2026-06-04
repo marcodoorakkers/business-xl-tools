@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import NMMPKLogo from "@/components/NMMPKLogo";
+import DossierNav from "../components/DossierNav";
 
 interface Document {
   id: string;
@@ -153,14 +153,7 @@ function ArchiefContent() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <NMMPKLogo iconOnly />
-          <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
-            ← Scannen
-          </Link>
-        </div>
-      </header>
+      <DossierNav />
 
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="mb-6">
