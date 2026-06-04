@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 import DemoSection from "./components/DemoSection";
@@ -7,7 +9,11 @@ export const metadata = {
   description: "Scan je zakelijke post en vind elk document terug in seconden. NooitMeerPostKwijt herkent wat het is, wat er moet gebeuren en bewaart het automatisch in jouw OneDrive of Dropbox.",
 };
 
-export default function GezinLandingPage() {
+export default async function GezinLandingPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) redirect("/dossier");
+
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
