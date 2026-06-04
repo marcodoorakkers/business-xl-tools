@@ -184,6 +184,9 @@ supabase/migrations/
 - Default mapnaam: "MijnDossier"
 - OAuth redirect URIs zijn hardcoded voor productiedomein (nooitmeerpostkwijt.nl) — nooit dynamisch
 - Status-fetch in dossier page gebruikt `cache: "no-store"` om verouderde instelling te voorkomen
+- Opslaan via UPDATE + INSERT (niet upsert) — upsert vereist unique constraint die mogelijk ontbreekt
+- Opslagknop in scan pagina heet altijd "Opslaan in Dossier →", locatie als hint eronder
+- Documenten paginering: 20 per keer, "Meer laden" knop, offset via API param
 
 ## Backlog
 
