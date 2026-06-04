@@ -1,281 +1,154 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
-import DemoSection from "./components/DemoSection";
 
 export const metadata = {
   title: "NooitMeerPostKwijt — Digitaal archief voor ZZP'ers en kleine ondernemers",
   description: "Scan je zakelijke post en vind elk document terug in seconden. NooitMeerPostKwijt herkent wat het is, wat er moet gebeuren en bewaart het automatisch in jouw OneDrive of Dropbox.",
 };
 
+export const revalidate = 60;
+
 export default async function GezinLandingPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect("/dossier");
 
+  const admin = createAdminClient();
+  const { data: promo } = await admin
+    .from("promo_codes")
+    .select("uses, max_uses")
+    .eq("code", "founding25")
+    .single();
+
+  const used = promo?.uses ?? 0;
+  const max = promo?.max_uses ?? 25;
+  const remaining = Math.max(0, max - used);
+  const pct = Math.round((used / max) * 100);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-5 py-4 max-w-5xl mx-auto">
+      <nav className="flex items-center justify-between px-5 py-4 max-w-2xl mx-auto">
         <NMMPKLogo href="/" size="lg" />
-        <div className="flex gap-2 items-center">
-          <Link href="/inloggen" className="hidden sm:block text-sm text-gray-600 font-medium hover:text-gray-900 transition-colors px-3 py-2">
-            Inloggen
-          </Link>
-          <Link
-            href="/aanmelden"
-            className="text-sm bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
-          >
-            Gratis proberen
-          </Link>
-        </div>
+        <Link href="/inloggen" className="text-sm text-gray-500 font-medium hover:text-gray-900 transition-colors">
+          Inloggen
+        </Link>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-6">
+      <main className="max-w-2xl mx-auto px-6 pb-20">
 
-        {/* Hero */}
-        <div className="flex flex-col lg:flex-row items-center gap-12 pt-12 pb-16">
-          <div className="flex-1 max-w-xl">
-            <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Voor ZZP&apos;ers en kleine ondernemers</p>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-5 leading-tight">
-              Nooit meer<br />een deadline<br />missen.
-            </h1>
-            <p className="text-lg text-gray-500 mb-6 leading-relaxed">
-              Scan een brief, factuur of aanslag. NooitMeerPostKwijt herkent automatisch wat je moet doen en wanneer — van belastingaanslagen tot contractverlengingen. De deadline staat direct in je actielijst.
-            </p>
-            <p className="text-base text-gray-700 font-medium mb-8 leading-relaxed">
-              En die stapel papier in je kast? Scan hem één keer en je vindt elk document terug in seconden.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/aanmelden"
-                className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold text-base px-7 py-3.5 rounded-xl transition-colors shadow-sm text-center"
-              >
-                Gratis beginnen →
-              </Link>
-              <Link
-                href="/inloggen"
-                className="inline-block text-gray-600 hover:text-gray-900 font-medium text-base px-7 py-3.5 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors text-center"
-              >
-                Inloggen
-              </Link>
-            </div>
-            <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · zakelijk aftrekbaar</p>
-          </div>
-
-          <div className="flex-1 w-full max-w-lg">
-            <img
-              src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=700&q=80&auto=format&fit=crop"
-              alt="Bureau met stapels papieren en documenten"
-              className="w-full rounded-3xl shadow-lg object-cover aspect-[4/3]"
-            />
-          </div>
-        </div>
-
-        {/* Pijn — wat kost het je? */}
-        <div className="py-14 border-t border-gray-100">
-          <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2 text-center">Herkenbaar?</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-10">Wat kost je het als je niets doet?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            {[
-              {
-                icon: "🕐",
-                title: "Uren kwijt aan zoeken",
-                desc: "Minimaal twee keer per jaar een uur door papier spitten. Bij een uurtarief van €75 is dat €150 per jaar — alleen maar om iets terug te vinden.",
-              },
-              {
-                icon: "😬",
-                title: "Stress bij de aangifte",
-                desc: "Je boekhouder vraagt om documenten die je nu niet kunt vinden. Je belt terug met \"ik stuur het nog even op\" — en dan begint het zoeken.",
-              },
-              {
-                icon: "💸",
-                title: "Gemiste deadlines",
-                desc: "Een aanmaning die je niet hebt gezien. Een bezwaartermijn die is verlopen. Kwijtgeraakte post kost soms meer dan je denkt.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="bg-gray-50 rounded-2xl p-5">
-                <p className="text-2xl mb-3">{item.icon}</p>
-                <h3 className="font-bold text-gray-900 mb-2 text-sm">{item.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-          <p className="text-center text-sm text-gray-400 mt-8">NooitMeerPostKwijt kost je <strong className="text-gray-600">€3,99 per maand</strong> — zakelijk aftrekbaar. En je bent nooit meer iets kwijt.</p>
-        </div>
-
-        {/* Hoe het werkt */}
-        <div className="py-16 border-t border-gray-100">
-          <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2 text-center">Zo werkt het</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 text-center mb-10">Drie stappen, klaar</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {[
-              {
-                num: "01",
-                title: "Scan of forward",
-                desc: "Maak een foto van de brief, upload een PDF, of forward een e-mail met bijlage rechtstreeks naar je persoonlijke scanadres.",
-              },
-              {
-                num: "02",
-                title: "NooitMeerPostKwijt analyseert",
-                desc: "NooitMeerPostKwijt leest het document, herkent de afzender, het type en of er iets gedaan moet worden — inclusief deadline.",
-              },
-              {
-                num: "03",
-                title: "Altijd terugvindbaar",
-                desc: "Het document gaat naar de juiste map in jouw OneDrive of Dropbox. Zoek later op afzender, datum of onderwerp — in seconden.",
-              },
-            ].map((item) => (
-              <div key={item.num} className="flex gap-5">
-                <span className="text-3xl font-extrabold text-amber-200 leading-none select-none">{item.num}</span>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1.5">{item.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Interactieve demo */}
-        <DemoSection />
-
-        {/* Features */}
-        <div className="py-16 border-t border-gray-100">
-          <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2 text-center">Mogelijkheden</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-10 text-center">Alles wat je nodig hebt</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 gap-y-6 max-w-3xl mx-auto">
-            {[
-              { title: "Automatisch archiveren", desc: "Documenten gaan direct naar de juiste map in je OneDrive of Dropbox — ingedeeld per entiteit en onderwerp." },
-              { title: "Acties en deadlines bijhouden", desc: "Deadlines en openstaande acties worden automatisch herkend en bijgehouden in je actielijst." },
-              { title: "Personen én entiteiten", desc: "Koppel documenten aan jezelf, je BV, je eenmanszaak of je partner — elk in een eigen map." },
-              { title: "Doorsturen via e-mail", desc: "Forward een factuur of brief rechtstreeks naar je persoonlijke scanadres — werkt ook vanuit Gmail of Outlook.", },
-              { title: "Jouw cloud, jouw data", desc: "Documenten staan in je eigen OneDrive of Dropbox — niet op onze servers. Privé en veilig." },
-              { title: "Zoeken en terugvinden", desc: "Vind elk document terug via het archief. Zoek op afzender, onderwerp of datum — in seconden.", link: undefined },
-            ].map((f) => (
-              <div key={f.title} className="flex gap-3">
-                <span className="text-amber-400 font-bold mt-0.5 flex-shrink-0">—</span>
-                <div>
-                  <p className="font-semibold text-gray-900 text-sm mb-0.5">{f.title}</p>
-                  <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Testimonials */}
-        <div className="py-12 border-t border-gray-100">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            <blockquote className="bg-gray-50 rounded-2xl p-6 relative">
-              <span className="text-5xl text-amber-200 font-serif leading-none absolute -top-3 left-4 select-none">&ldquo;</span>
-              <p className="text-sm text-gray-700 leading-relaxed italic pt-3">
-                Mijn boekhouder vroeg om de oorspronkelijke aanslag VPB. Vroeger betekende dat een uur spitten door een stapel papier in mijn kast. Nu zoek ik het op en heb het in tien seconden.
+        {/* Founding banner */}
+        {remaining > 0 && (
+          <div className="mt-6 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 flex items-center gap-4">
+            <span className="text-2xl">🎉</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-amber-900">
+                Founding member — 6 maanden gratis
               </p>
-              <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
-                — Jeroen, eigenaar van een eenmanszaak
-              </footer>
-            </blockquote>
-
-            <blockquote className="bg-gray-50 rounded-2xl p-6 relative">
-              <span className="text-5xl text-amber-200 font-serif leading-none absolute -top-3 left-4 select-none">&ldquo;</span>
-              <p className="text-sm text-gray-700 leading-relaxed italic pt-3">
-                Ik ging mijn auto verkopen en kon de brief van het RDW met de tenaamstellingscode niet snel genoeg vinden. Uiteindelijk heb ik maar een nieuwe code aangeschaft bij het RDW. Achteraf zo zonde.
+              <div className="mt-2 h-1.5 bg-amber-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-500 rounded-full transition-all"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+              <p className="text-xs text-amber-700 mt-1.5">
+                {remaining === max
+                  ? "Nog alle 25 plekken beschikbaar"
+                  : `Nog ${remaining} van de ${max} plekken vrij`}
               </p>
-              <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
-                — Sandra, vennoot in een VOF
-              </footer>
-            </blockquote>
-          </div>
-        </div>
-
-        {/* Pricing */}
-        <div className="max-w-3xl mx-auto py-16 border-t border-gray-100 text-center">
-          <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2">Prijzen</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Minder dan één uur zoeken per jaar</h2>
-          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €3,99/maand incl. BTW. Geen creditcard nodig om te starten. Zakelijk aftrekbaar.</p>
-
-          <div className="bg-amber-500 rounded-2xl p-7 text-left text-white mb-5 relative shadow-md">
-            <span className="absolute -top-3 left-6 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full">Eerste maand gratis</span>
-            <div className="flex items-start justify-between gap-6 flex-wrap">
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-1">Maandelijks abonnement</h3>
-                <p className="text-amber-100 text-sm mb-4">€3,99/maand incl. BTW · geen creditcard nodig · opzegbaar wanneer je wil</p>
-                <div className="text-sm text-amber-50 space-y-1">
-                  <p>Onbeperkt scannen</p>
-                  <p>OneDrive &amp; Dropbox</p>
-                  <p>Personen en entiteiten koppelen</p>
-                  <p>Zakelijk aftrekbaar</p>
-                  <p>✦ 10 gratis TimeSaverTools credits per maand</p>
-                </div>
-              </div>
-              <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
-                <div>
-                  <p className="text-4xl font-extrabold">€3,99</p>
-                  <p className="text-amber-200 text-sm">/maand na proefperiode</p>
-                </div>
-                <Link href="/aanmelden" className="bg-white text-amber-600 hover:bg-amber-50 font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
-                  Gratis starten →
-                </Link>
-              </div>
             </div>
           </div>
+        )}
 
-          <p className="text-xs text-gray-400 mt-2">Betaal via iDEAL, creditcard of Bancontact · Opzegbaar wanneer je wil · Prijzen incl. BTW</p>
+        {/* Verhaal */}
+        <div className="mt-12 space-y-6 text-gray-700 leading-relaxed">
+          <h1 className="text-3xl font-extrabold text-gray-900 leading-tight">
+            Ontstaan uit frustratie. Gebouwd in de avonduren.
+          </h1>
+
+          <p>
+            Het begon met een brief van de RDW die ergens in een stapel verdween. Drie weken later: een boete. Voor iets wat volledig te voorkomen was.
+          </p>
+
+          <p>
+            Als ZZP'er is je administratie niet ingewikkeld — maar wél verspreid. Brieven op het aanrecht, facturen in je mail, polissen in een map die je al maanden niet hebt geopend. Er was geen app die gewoon deed wat nodig was: <strong>scan een document, begrijp wat erin staat, sla het op de juiste plek op.</strong>
+          </p>
+
+          <p>
+            Dus werd hij gebouwd. Sinds januari, stap voor stap, naast het gewone werk. NooitMeerPostKwijt is het resultaat.
+          </p>
+
+          <p>
+            Je maakt een foto van een brief of stuurt een PDF door. De app herkent automatisch wat het is, of er iets van je verwacht wordt en wanneer. Het document gaat naar je eigen OneDrive of Dropbox, in de juiste map. Klaar.
+          </p>
         </div>
 
-        {/* Privacy */}
-        <div className="max-w-2xl mx-auto mb-10 py-10 border-t border-gray-100">
-          <h2 className="text-xl font-extrabold text-gray-900 mb-3">Jouw documenten, alleen voor jou</h2>
-          <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-            Belastingaanslagen, contracten en facturen zijn vertrouwelijk. Daarom bewaren we niets op onze eigen servers.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Documenten opgeslagen in jouw eigen OneDrive of Dropbox</p>
-            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Scans worden tijdelijk verwerkt voor analyse, daarna verwijderd</p>
-            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Alleen de analyse (categorie, acties) wordt opgeslagen</p>
-            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Je kunt al je data op elk moment volledig verwijderen</p>
-          </div>
-        </div>
-
-        {/* Knipoog */}
-        <div className="max-w-2xl mx-auto mb-10 py-8 px-6 bg-amber-50 rounded-2xl border border-amber-100 text-center">
-          <p className="text-sm text-gray-600 leading-relaxed">
-            <span className="inline-flex items-center justify-center w-8 h-8 bg-amber-100 rounded-lg mr-2 flex-shrink-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                <polyline points="9 22 9 12 15 12 15 22"/>
-              </svg>
-            </span>
-            Overigens ook gewoon handig thuis — voor iedereen die de stapel op de keukentafel wil opruimen.
-          </p>
+        {/* Wat je krijgt */}
+        <div className="mt-12 bg-gray-50 rounded-2xl p-6 space-y-4">
+          <h2 className="font-bold text-gray-900 text-lg">Wat je krijgt als founding member</h2>
+          <ul className="space-y-3">
+            {[
+              ["🎁", "6 maanden volledig gratis", "Geen creditcard nodig. Daarna €3,99/maand — opzegbaar wanneer je wil."],
+              ["📬", "Onbeperkt scannen", "Via de app of door een document door te mailen naar je persoonlijke scanadres."],
+              ["☁️", "Automatisch opslaan in OneDrive of Dropbox", "In de juiste map, met de juiste naam."],
+              ["✅", "Actielijst met deadlines", "Documenten waarbij iets van je verwacht wordt, verschijnen automatisch in je actielijst."],
+              ["💬", "Directe lijn met de maker", "Feedback? Er wordt actief mee gebouwd."],
+            ].map(([icon, title, desc]) => (
+              <li key={title as string} className="flex gap-3">
+                <span className="text-xl flex-shrink-0">{icon}</span>
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{title as string}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{desc as string}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
 
         {/* CTA */}
-        <div className="text-center pb-20 border-t border-gray-100 pt-14">
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Stop met zoeken. Begin vandaag.</h2>
-          <p className="text-gray-500 text-sm mb-7">Maak een gratis account aan en scan je eerste document.</p>
-          <Link
-            href="/aanmelden"
-            className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold text-base px-8 py-4 rounded-xl transition-colors shadow-sm"
-          >
-            Gratis account aanmaken →
-          </Link>
-          <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · zakelijk aftrekbaar</p>
+        <div className="mt-10 text-center space-y-4">
+          {remaining > 0 ? (
+            <>
+              <Link
+                href="/aanmelden?promo=founding25"
+                className="inline-block w-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-base px-8 py-4 rounded-2xl transition-colors shadow-sm"
+              >
+                Claim jouw plek — 6 maanden gratis →
+              </Link>
+              <p className="text-xs text-gray-400">
+                Nog {remaining} {remaining === 1 ? "plek" : "plekken"} beschikbaar · geen creditcard nodig · zakelijk aftrekbaar
+              </p>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/aanmelden"
+                className="inline-block w-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-base px-8 py-4 rounded-2xl transition-colors shadow-sm"
+              >
+                Gratis proberen — eerste maand cadeau →
+              </Link>
+              <p className="text-xs text-gray-400">
+                De 25 founding-plekken zijn vergeven · eerste maand nog steeds gratis
+              </p>
+            </>
+          )}
+          <p className="text-xs text-gray-400">
+            Al een account?{" "}
+            <Link href="/inloggen" className="underline hover:text-gray-600">Inloggen</Link>
+          </p>
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 py-6 text-center text-xs text-gray-400 space-x-3">
-        <span>© {new Date().getFullYear()} NooitMeerPostKwijt · Business XL · KvK 50418041</span>
-        <span>·</span>
-        <Link href="/privacy" className="hover:text-gray-600 underline">Privacyverklaring</Link>
-        <span>·</span>
-        <Link href="/disclaimer" className="hover:text-gray-600 underline">Disclaimer</Link>
-        <span>·</span>
-        <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="hover:text-gray-600 underline">Contact</a>
-      </footer>
+        {/* Footer links */}
+        <div className="mt-16 pt-8 border-t border-gray-100 flex justify-center gap-6 text-xs text-gray-400">
+          <Link href="/privacy" className="hover:text-gray-600 transition-colors">Privacyverklaring</Link>
+          <Link href="/disclaimer" className="hover:text-gray-600 transition-colors">Disclaimer</Link>
+          <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="hover:text-gray-600 transition-colors">Contact</a>
+        </div>
+
+      </main>
     </div>
   );
 }
