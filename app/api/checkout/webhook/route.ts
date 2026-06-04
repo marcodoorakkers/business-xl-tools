@@ -169,12 +169,14 @@ export async function POST(req: NextRequest) {
 
     const status = subscription.status === "canceled"
       ? null
-      : subscription.status; // 'active', 'past_due', etc.
+      : subscription.cancel_at_period_end
+        ? "cancelling"
+        : subscription.status; // 'active', 'trialing', 'past_due', etc.
 
     // cancel_at is set when cancel_at_period_end=true; use it for period end tracking
     const periodEnd = subscription.cancel_at
       ? new Date(subscription.cancel_at * 1000).toISOString()
-      : null;
+      : new Date(subscription.current_period_end * 1000).toISOString();
 
     await supabase
       .from("profiles")
