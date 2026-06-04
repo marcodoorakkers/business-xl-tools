@@ -14,6 +14,10 @@ const steps = [
     title: "Koppel je cloudopslag",
     body: "Ga naar Instellingen en koppel OneDrive of Dropbox. Kies daarna je opslagvoorkeur. Documenten worden dan automatisch in de juiste map opgeslagen — jij hoeft er niets voor te doen.",
     cta: { label: "Naar Instellingen →", href: "/dossier/instellingen" },
+    ctaSecondary: [
+      { label: "Gratis OneDrive aanmaken →", href: "https://onedrive.live.com" },
+      { label: "Gratis Dropbox aanmaken →", href: "https://www.dropbox.com/register" },
+    ],
   },
   {
     num: "2",
@@ -104,6 +108,17 @@ export default function AanDeSlagPage() {
                 >
                   {step.cta.label}
                 </Link>
+                {"ctaSecondary" in step && step.ctaSecondary && (
+                  <div className="mt-3 pt-3 border-t border-gray-100 space-y-1">
+                    <p className="text-xs text-gray-400">Nog geen account?</p>
+                    {(step.ctaSecondary as { label: string; href: string }[]).map((s) => (
+                      <a key={s.href} href={s.href} target="_blank" rel="noopener noreferrer"
+                        className="block text-xs text-gray-400 hover:text-amber-600 transition-colors">
+                        {s.label}
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}

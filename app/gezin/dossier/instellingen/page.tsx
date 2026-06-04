@@ -308,13 +308,22 @@ function InstellingenContent() {
               </a>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
-              <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block flex-shrink-0" />
-              <span className="text-sm text-gray-600">OneDrive is nog niet gekoppeld</span>
-              <a href="/api/tools/mijn-dossier/onedrive/auth"
-                className="ml-auto bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
-                OneDrive koppelen
-              </a>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block flex-shrink-0" />
+                <span className="text-sm text-gray-600">OneDrive is nog niet gekoppeld</span>
+                <a href="/api/tools/mijn-dossier/onedrive/auth"
+                  className="ml-auto bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                  OneDrive koppelen
+                </a>
+              </div>
+              <p className="text-xs text-gray-400">
+                Nog geen OneDrive?{" "}
+                <a href="https://onedrive.live.com" target="_blank" rel="noopener noreferrer"
+                  className="underline hover:text-amber-600 transition-colors">
+                  Gratis aanmaken via Microsoft →
+                </a>
+              </p>
             </div>
           )}
           <div className="space-y-2 pt-2 border-t border-gray-100">
@@ -349,13 +358,22 @@ function InstellingenContent() {
               </a>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
-              <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block flex-shrink-0" />
-              <span className="text-sm text-gray-600">Dropbox is nog niet gekoppeld</span>
-              <a href="/api/tools/mijn-dossier/dropbox/auth"
-                className="ml-auto bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
-                Dropbox koppelen
-              </a>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block flex-shrink-0" />
+                <span className="text-sm text-gray-600">Dropbox is nog niet gekoppeld</span>
+                <a href="/api/tools/mijn-dossier/dropbox/auth"
+                  className="ml-auto bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                  Dropbox koppelen
+                </a>
+              </div>
+              <p className="text-xs text-gray-400">
+                Nog geen Dropbox?{" "}
+                <a href="https://www.dropbox.com/register" target="_blank" rel="noopener noreferrer"
+                  className="underline hover:text-amber-600 transition-colors">
+                  Gratis aanmaken →
+                </a>
+              </p>
             </div>
           )}
           <div className="space-y-2 pt-2 border-t border-gray-100">
