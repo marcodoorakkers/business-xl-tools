@@ -156,7 +156,10 @@ export default function NMMPKIdeeënPage() {
 
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-1">💡 Ideeënbord</h1>
+          <div className="flex items-center gap-2 mb-1">
+            <svg className="w-6 h-6 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.9-3.5 6.2V17a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1.8A7 7 0 0 1 5 9a7 7 0 0 1 7-7z"/></svg>
+            <h1 className="text-2xl font-extrabold text-gray-900">Ideeënbord</h1>
+          </div>
           <p className="text-gray-500 text-sm leading-relaxed">
             Wat zou NooitMeerPostKwijt nóg beter maken? Deel je idee of stem op dat van een ander.
           </p>
@@ -164,7 +167,9 @@ export default function NMMPKIdeeënPage() {
 
         {/* Incentive banner */}
         <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 mb-6 flex gap-4 items-start">
-          <span className="text-2xl flex-shrink-0">🎁</span>
+          <span className="flex-shrink-0 w-9 h-9 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </span>
           <div>
             <p className="text-sm font-semibold text-amber-900">Win een bol.com cadeaukaart van €15</p>
             <p className="text-xs text-amber-700 mt-1 leading-relaxed">
@@ -243,7 +248,11 @@ export default function NMMPKIdeeënPage() {
             <><SkeletonCard /><SkeletonCard /><SkeletonCard /></>
           ) : ideas.length === 0 ? (
             <div className="text-center py-16">
-              <div className="text-4xl mb-3">💡</div>
+              <div className="flex justify-center mb-3">
+                <span className="w-14 h-14 bg-amber-50 text-amber-400 rounded-2xl flex items-center justify-center">
+                  <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.9-3.5 6.2V17a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1.8A7 7 0 0 1 5 9a7 7 0 0 1 7-7z"/></svg>
+                </span>
+              </div>
               <p className="text-gray-600 font-semibold mb-1">Nog geen ideeën ingediend</p>
               <p className="text-gray-400 text-sm mb-5">Wees de eerste — en maak kans op de cadeaukaart.</p>
               <button
