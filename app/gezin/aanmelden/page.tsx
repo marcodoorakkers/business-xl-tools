@@ -42,7 +42,7 @@ export default function GezinRegisterPage() {
     const { error } = await createClient().auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/dossier` },
+      options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/account` },
     });
 
     if (error) {
