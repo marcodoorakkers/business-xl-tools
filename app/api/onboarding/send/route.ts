@@ -89,11 +89,17 @@ export async function POST(req: NextRequest) {
     const endDate = user.subscription_period_end
       ? new Date(user.subscription_period_end).toLocaleDateString("nl-NL", { day: "numeric", month: "long" })
       : "binnenkort";
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("promo_code")
+      .eq("id", user.id)
+      .single();
+    const isFoundingMember = profile?.promo_code === "founding25";
     await resend.emails.send({
       from: "NooitMeerPostKwijt <noreply@timesavertools.nl>",
       to: user.email,
-      subject: "Je proefperiode loopt bijna af",
-      html: trialEndingHtml(endDate),
+      subject: isFoundingMember ? "Je 6 maanden gratis lopen bijna af" : "Je proefperiode loopt bijna af",
+      html: trialEndingHtml(endDate, isFoundingMember),
     });
     await supabase.from("onboarding_emails").insert({ user_id: user.id, email_type: "trial_ending" });
     sent++;
@@ -170,8 +176,21 @@ function day3Html() {
   `);
 }
 
-function trialEndingHtml(endDate: string) {
-  return emailShell(`
+function trialEndingHtml(endDate: string, isFoundingMember = false) {
+  return emailShell(isFoundingMember ? `
+    <p style="margin:0 0 8px;color:#78716c;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Founding Member</p>
+    <h1 style="margin:0 0 16px;color:#1c1917;font-size:22px;font-weight:800;line-height:1.3;">Je 6 maanden gratis lopen af op ${endDate}</h1>
+    <p style="margin:0 0 16px;color:#57534e;font-size:15px;line-height:1.6;">
+      Als een van de eerste 25 gebruikers heb je 6 maanden gratis NooitMeerPostKwijt gebruikt. We hopen dat je er net zoveel aan hebt gehad als we hoopten.
+    </p>
+    <p style="margin:0 0 24px;color:#57534e;font-size:14px;line-height:1.6;">
+      Wil je doorgaan? Voeg dan een betaalmethode toe — daarna loopt het automatisch door voor <strong>€3,99/maand</strong>. Doe je niets, dan stopt het automatisch. Je documenten in OneDrive of Dropbox blijven altijd van jou.
+    </p>
+    <div style="background:#fef3c7;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+      <p style="margin:0;color:#92400e;font-size:14px;">✓ &nbsp;Zakelijk aftrekbaar &nbsp;·&nbsp; ✓ &nbsp;Opzegbaar wanneer je wil &nbsp;·&nbsp; ✓ &nbsp;€3,99/maand</p>
+    </div>
+    ${cta("https://nooitmeerpostkwijt.nl/account", "Betaalmethode toevoegen →")}
+  ` : `
     <p style="margin:0 0 8px;color:#78716c;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Proefperiode</p>
     <h1 style="margin:0 0 16px;color:#1c1917;font-size:22px;font-weight:800;line-height:1.3;">Je proefperiode loopt af op ${endDate}</h1>
     <p style="margin:0 0 16px;color:#57534e;font-size:15px;line-height:1.6;">
