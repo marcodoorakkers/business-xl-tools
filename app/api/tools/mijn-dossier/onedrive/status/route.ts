@@ -21,11 +21,15 @@ export async function GET() {
     .eq("user_id", user.id)
     .single();
 
-  const { data: archiveSettings } = await admin
+  const { data: archiveSettings, error: archiveErr } = await admin
     .from("archive_settings")
     .select("storage_preference, folder_structure")
     .eq("user_id", user.id)
     .single();
+
+  if (archiveErr && archiveErr.code !== "PGRST116") {
+    console.error("[status] archive_settings fetch failed:", archiveErr);
+  }
 
   const { data: members } = await admin
     .from("archive_family_members")
