@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
     // cancel_at is set when cancel_at_period_end=true; use it for period end tracking
     const periodEnd = subscription.cancel_at
       ? new Date(subscription.cancel_at * 1000).toISOString()
-      : new Date(subscription.current_period_end * 1000).toISOString();
+      : null;
 
     await supabase
       .from("profiles")
