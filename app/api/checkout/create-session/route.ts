@@ -79,6 +79,11 @@ export async function POST(req: NextRequest) {
           .update({ uses: promo.uses + 1 })
           .eq("code", promoCode)
           .eq("uses", promo.uses); // optimistic lock
+        // Sla promo code op op het profiel
+        await adminSupabase
+          .from("profiles")
+          .update({ promo_code: promoCode })
+          .eq("id", user.id);
       }
     }
 

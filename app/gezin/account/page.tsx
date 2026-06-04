@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import NMMPKLogo from "@/components/NMMPKLogo";
+import DossierNav from "@/app/gezin/dossier/components/DossierNav";
 import SubscribeButton from "@/app/account/SubscribeButton";
 import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
@@ -15,12 +14,13 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_status, subscription_period_end")
+    .select("subscription_status, subscription_period_end, promo_code")
     .eq("id", user.id)
     .single();
 
   const subscriptionStatus = profile?.subscription_status ?? null;
   const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
+  const isFoundingMember = profile?.promo_code === "founding25";
   const params = await searchParams;
   const paymentStatus = params.payment;
   const proPriceId = process.env.STRIPE_PRO_PRICE_ID!;
@@ -31,18 +31,25 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <NMMPKLogo iconOnly />
-          <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
-            ← Scannen
-          </Link>
-        </div>
-      </header>
+      <DossierNav />
 
       <main className="max-w-lg mx-auto px-6 py-8 flex flex-col gap-5">
         <h1 className="text-2xl font-extrabold text-gray-900">Account</h1>
+
+        {/* Founding member badge */}
+        {isFoundingMember && (
+          <div className="flex items-center gap-4 bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4">
+            <div className="flex-shrink-0 w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
+              <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-amber-900">Founding Member</p>
+              <p className="text-xs text-amber-700 mt-0.5">Jij was er als een van de eerste 25. Bedankt voor je vertrouwen.</p>
+            </div>
+          </div>
+        )}
 
         {/* Betaalfeedback */}
         {paymentStatus === "subscribed" && (
