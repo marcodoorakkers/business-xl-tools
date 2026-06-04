@@ -58,7 +58,9 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
         {/* Betaalfeedback */}
         {paymentStatus === "subscribed" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
-            Abonnement gestart! Je eerste maand is gratis.
+            {isFoundingMember
+              ? "Abonnement gestart! Je proefperiode van 6 maanden is actief."
+              : "Abonnement gestart! Je eerste maand is gratis."}
           </div>
         )}
         {paymentStatus === "cancelled" && (
@@ -92,7 +94,10 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <span className="text-amber-600 font-bold text-lg">✓</span>
               <h2 className="font-bold text-amber-800 text-lg">Proefperiode actief</h2>
             </div>
-            <p className="text-amber-700 text-sm">Je zit in je gratis proefmaand. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt.</p>
+            <p className="text-amber-700 text-sm">{isFoundingMember
+              ? "Je zit in je gratis proefperiode van 6 maanden. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt."
+              : "Je zit in je gratis proefmaand. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt."
+            }</p>
             <ManageSubscriptionButton />
           </div>
         )}
