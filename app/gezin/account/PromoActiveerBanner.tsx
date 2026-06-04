@@ -6,7 +6,14 @@ export default function PromoActiveerBanner() {
   const [promo, setPromo] = useState<string | null>(null);
 
   useEffect(() => {
-    setPromo(localStorage.getItem("nmpk_promo"));
+    // Promo uit URL param (via e-mailbevestigingslink) of localStorage
+    const urlPromo = new URLSearchParams(window.location.search).get("promo");
+    if (urlPromo) {
+      localStorage.setItem("nmpk_promo", urlPromo);
+      setPromo(urlPromo);
+    } else {
+      setPromo(localStorage.getItem("nmpk_promo"));
+    }
   }, []);
 
   if (promo !== "founding25") return null;

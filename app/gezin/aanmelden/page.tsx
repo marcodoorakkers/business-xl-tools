@@ -16,6 +16,7 @@ export default function GezinRegisterPage() {
   const [loading, setLoading] = useState(false);
 
   const [promoActive, setPromoActive] = useState(false);
+  const [promoCode, setPromoCode] = useState<string | null>(null);
 
   // Promo code uit URL opslaan in localStorage + banner tonen
   useEffect(() => {
@@ -23,6 +24,7 @@ export default function GezinRegisterPage() {
     if (promo) {
       localStorage.setItem("nmpk_promo", promo);
       setPromoActive(true);
+      setPromoCode(promo);
     }
   }, []);
   async function handleRegister(e: React.FormEvent) {
@@ -42,7 +44,7 @@ export default function GezinRegisterPage() {
     const { error } = await createClient().auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/account` },
+      options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/account${promoCode ? `?promo=${promoCode}` : ""}` },
     });
 
     if (error) {
