@@ -568,7 +568,14 @@ export default function GezinDossierPage() {
 
             {/* Opslaan — gebaseerd op opslagvoorkeur uit instellingen */}
             <div className="space-y-2">
-              {storagePreference !== "local" && !cloudConnected ? (
+              {storagePreference === "local" || !storagePreference ? (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                  <p className="text-sm text-amber-800 mb-2 font-medium">Kies eerst een opslaglocatie.</p>
+                  <Link href="/dossier/instellingen" className="text-sm font-semibold text-amber-600 hover:text-amber-800 underline">
+                    Naar Instellingen →
+                  </Link>
+                </div>
+              ) : !cloudConnected ? (
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
                   <p className="text-sm text-amber-800 mb-2 font-medium">{cloudLabel} is nog niet gekoppeld.</p>
                   <Link href="/dossier/instellingen" className="text-sm font-semibold text-amber-600 hover:text-amber-800 underline">
@@ -577,17 +584,19 @@ export default function GezinDossierPage() {
                 </div>
               ) : (
                 <button
-                  onClick={storagePreference === "local" ? handleSaveLocal : handleSaveCloud}
+                  onClick={handleSaveCloud}
                   className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-3.5 rounded-2xl transition-colors"
                 >
                   Opslaan in Dossier →
                 </button>
               )}
-              <p className="text-center text-xs text-gray-400">
-                Wordt opgeslagen {storagePreference === "local" ? "op dit apparaat" : `in ${cloudLabel}`}
-                {" · "}
-                <Link href="/dossier/instellingen" className="underline hover:text-gray-600">wijzigen</Link>
-              </p>
+              {storagePreference && storagePreference !== "local" && (
+                <p className="text-center text-xs text-gray-400">
+                  Wordt opgeslagen in {cloudLabel}
+                  {" · "}
+                  <Link href="/dossier/instellingen" className="underline hover:text-gray-600">wijzigen</Link>
+                </p>
+              )}
             </div>
           </div>
         )}

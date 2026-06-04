@@ -196,7 +196,6 @@ function InstellingenContent() {
   }
 
   const storageOptions = [
-    { value: "local", label: "Lokale pc", icon: "💻", connected: true },
     { value: "onedrive", label: "OneDrive", icon: "☁️", connected: status?.connected ?? false },
     { value: "dropbox", label: "Dropbox", icon: "📦", connected: status?.dropboxConnected ?? false },
   ];
@@ -237,7 +236,6 @@ function InstellingenContent() {
           <div className={`flex gap-2 transition-opacity ${storageLoaded ? "opacity-100" : "opacity-0"}`}>
             {storageOptions.map((opt) => {
               const isSelected = storagePreference === opt.value;
-              const needsConnection = opt.value !== "local" && !opt.connected;
               return (
                 <button
                   key={opt.value}
@@ -250,16 +248,19 @@ function InstellingenContent() {
                 >
                   <span className="text-xl">{opt.icon}</span>
                   <span className="text-xs">{opt.label}</span>
-                  {opt.value !== "local" && (
-                    <span className={`text-xs font-medium ${opt.connected ? "text-green-600" : "text-gray-400"}`}>
-                      {opt.connected ? "✓ Gekoppeld" : "Niet gekoppeld"}
-                    </span>
-                  )}
+                  <span className={`text-xs font-medium ${opt.connected ? "text-green-600" : "text-gray-400"}`}>
+                    {opt.connected ? "✓ Gekoppeld" : "Niet gekoppeld"}
+                  </span>
                 </button>
               );
             })}
           </div>
-          {storagePreference !== "local" && !(storagePreference === "onedrive" ? status?.connected : status?.dropboxConnected) && (
+          {storagePreference && storagePreference !== "onedrive" && storagePreference !== "dropbox" && (
+            <p className="text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2">
+              ⚠️ Kies OneDrive of Dropbox om documenten automatisch op te slaan.
+            </p>
+          )}
+          {storagePreference && (storagePreference === "onedrive" || storagePreference === "dropbox") && !(storagePreference === "onedrive" ? status?.connected : status?.dropboxConnected) && (
             <p className="text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2">
               ⚠️ {storagePreference === "onedrive" ? "OneDrive" : "Dropbox"} is nog niet gekoppeld — koppel hieronder om te kunnen opslaan.
             </p>
