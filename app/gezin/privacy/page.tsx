@@ -61,7 +61,7 @@ export default function GezinPrivacyPage() {
                   <li>Niet permanent opgeslagen op onze servers na verwerking</li>
                 </ul>
                 <p className="text-sm text-gray-500 mt-2">Als je documenten doorstuurt via e-mail, verwerken wij tijdelijk het afzenderadres van die e-mail om de analyse te kunnen uitvoeren. Dit adres wordt niet opgeslagen na verwerking.</p>
-                <p className="text-sm text-gray-500 mt-1">Documenten die jij zelf opslaat in OneDrive, Dropbox of lokaal worden door jou beheerd — niet door ons.</p>
+                <p className="text-sm text-gray-500 mt-1">Documenten die jij zelf opslaat in OneDrive of Dropbox worden door jou beheerd — niet door ons.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.4 Acties en instellingen</h3>
