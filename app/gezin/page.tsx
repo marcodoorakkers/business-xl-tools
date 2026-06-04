@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 import DemoSection from "./components/DemoSection";
@@ -9,13 +10,34 @@ export const metadata = {
   description: "Scan je zakelijke post en vind elk document terug in seconden. NooitMeerPostKwijt herkent wat het is, wat er moet gebeuren en bewaart het automatisch in jouw OneDrive of Dropbox.",
 };
 
+export const revalidate = 60;
+
 export default async function GezinLandingPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect("/dossier");
 
+  const admin = createAdminClient();
+  const { data: promo } = await admin
+    .from("promo_codes")
+    .select("uses, max_uses")
+    .eq("code", "founding25")
+    .single();
+
+  const remaining = Math.max(0, (promo?.max_uses ?? 25) - (promo?.uses ?? 0));
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Launch banner */}
+      {remaining > 0 && (
+        <div className="bg-amber-500 text-white text-sm text-center px-4 py-2.5 font-medium">
+          🎉 Founding members krijgen 6 maanden gratis —{" "}
+          <Link href="/launch" className="underline font-semibold hover:text-amber-100 transition-colors">
+            nog {remaining} van de 25 plekken vrij →
+          </Link>
+        </div>
+      )}
+
       {/* Nav */}
       <nav className="flex items-center justify-between px-5 py-4 max-w-5xl mx-auto">
         <NMMPKLogo href="/" size="lg" />
