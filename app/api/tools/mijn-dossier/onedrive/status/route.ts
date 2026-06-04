@@ -80,14 +80,12 @@ export async function POST(req: NextRequest) {
     if (!valid.includes(body.storagePreference)) {
       return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
     }
-    const { error: upsertErr } = await admin.from("archive_settings").upsert({
-      user_id: user.id,
-      storage_preference: body.storagePreference,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: "user_id" });
-    if (upsertErr) {
-      console.error("[status] storagePreference upsert failed:", upsertErr);
-      return NextResponse.json({ error: upsertErr.message }, { status: 500 });
+    const { count } = await admin.from("archive_settings")
+      .update({ storage_preference: body.storagePreference, updated_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .select("user_id", { count: "exact", head: true });
+    if (!count) {
+      await admin.from("archive_settings").insert({ user_id: user.id, storage_preference: body.storagePreference });
     }
     return NextResponse.json({ ok: true });
   }
@@ -97,11 +95,13 @@ export async function POST(req: NextRequest) {
     if (!valid.includes(body.folderStructure)) {
       return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
     }
-    await admin.from("archive_settings").upsert({
-      user_id: user.id,
-      folder_structure: body.folderStructure,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: "user_id" });
+    const { count } = await admin.from("archive_settings")
+      .update({ folder_structure: body.folderStructure, updated_at: new Date().toISOString() })
+      .eq("user_id", user.id)
+      .select("user_id", { count: "exact", head: true });
+    if (!count) {
+      await admin.from("archive_settings").insert({ user_id: user.id, folder_structure: body.folderStructure });
+    }
     return NextResponse.json({ ok: true });
   }
 
