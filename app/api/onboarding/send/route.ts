@@ -30,11 +30,17 @@ export async function POST(req: NextRequest) {
 
   for (const user of newUsers ?? []) {
     if (!user.email) continue;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("promo_code")
+      .eq("id", user.id)
+      .single();
+    const isFoundingMember = profile?.promo_code === "founding25";
     await resend.emails.send({
       from: "NooitMeerPostKwijt <noreply@timesavertools.nl>",
       to: user.email,
-      subject: "Welkom bij NooitMeerPostKwijt 👋",
-      html: welcomeHtml(),
+      subject: isFoundingMember ? "Welkom, Founding Member! 🎉" : "Welkom bij NooitMeerPostKwijt 👋",
+      html: isFoundingMember ? welcomeFoundingHtml() : welcomeHtml(),
     });
     await supabase.from("onboarding_emails").insert({ user_id: user.id, email_type: "welcome" });
     sent++;
@@ -137,6 +143,44 @@ function emailShell(content: string) {
 
 function cta(href: string, label: string) {
   return `<a href="${href}" style="display:inline-block;background:#f59e0b;color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;margin-top:8px;">${label}</a>`;
+}
+
+function welcomeFoundingHtml() {
+  return emailShell(`
+    <div style="background:#fef3c7;border-radius:12px;padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:20px;">⭐</span>
+      <p style="margin:0;color:#92400e;font-size:14px;font-weight:700;">Jij bent een van de eerste 25 — Founding Member</p>
+    </div>
+    <h1 style="margin:0 0 16px;color:#1c1917;font-size:22px;font-weight:800;line-height:1.3;">Welkom! Je krijgt 6 maanden gratis.</h1>
+    <p style="margin:0 0 16px;color:#57534e;font-size:15px;line-height:1.6;">
+      Goed dat je erbij bent. Als founding member krijg je <strong>6 maanden gratis</strong> toegang tot NooitMeerPostKwijt — geen creditcard nodig.
+    </p>
+    <p style="margin:0 0 16px;color:#57534e;font-size:15px;line-height:1.6;">
+      NooitMeerPostKwijt werkt simpel: scan een brief of factuur, en wij regelen de rest — analyse, archivering en deadlines bijhouden.
+    </p>
+
+    <p style="margin:0 0 8px;color:#1c1917;font-size:14px;font-weight:700;">Zo begin je in 3 stappen:</p>
+    <ol style="margin:0 0 24px;padding-left:20px;color:#57534e;font-size:14px;line-height:2;">
+      <li>Koppel je OneDrive of Dropbox in <a href="https://nooitmeerpostkwijt.nl/dossier/instellingen" style="color:#d97706;">Instellingen</a></li>
+      <li>Maak een foto of upload een PDF via het Dossier</li>
+      <li>Bekijk de analyse — NooitMeerPostKwijt vertelt je wat het is en wat je moet doen</li>
+    </ol>
+
+    <div style="background:#f0fdf4;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+      <p style="margin:0 0 6px;color:#166534;font-size:14px;font-weight:700;">Over je proefperiode</p>
+      <p style="margin:0;color:#166534;font-size:13px;line-height:1.6;">
+        Je 6 maanden starten zodra je op <a href="https://nooitmeerpostkwijt.nl/account" style="color:#166534;font-weight:700;">Account</a> op <strong>"Abonnement starten"</strong> klikt — dit is gratis en vereist geen creditcard.
+        <br><br>
+        Wil je daarna doorgaan? Voeg dan een betaalmethode toe. Doe je niets, dan stopt het abonnement automatisch na 6 maanden. Je documenten in OneDrive of Dropbox blijven altijd van jou.
+      </p>
+    </div>
+
+    <p style="margin:0 0 24px;color:#57534e;font-size:14px;line-height:1.6;">
+      💡 <strong>Tip:</strong> Heb je Gmail? Je kunt facturen en brieven direct doorsturen naar je persoonlijke scanadres — te vinden in Instellingen.
+    </p>
+    ${cta("https://nooitmeerpostkwijt.nl/account", "Activeer je 6 maanden gratis →")}
+    <p style="margin:16px 0 0;font-size:13px;color:#a8a29e;text-align:center;">Of ga direct naar <a href="https://nooitmeerpostkwijt.nl/dossier/aan-de-slag" style="color:#d97706;">Aan de slag</a></p>
+  `);
 }
 
 function welcomeHtml() {
