@@ -180,13 +180,15 @@ supabase/migrations/
 
 ## Storage (NMMPK)
 
-- Voorkeur opgeslagen in `archive_settings.storage_preference` ("local" | "onedrive" | "dropbox")
+- Voorkeur opgeslagen in `archive_settings.storage_preference` ("onedrive" | "dropbox")
+- "local" bestaat nog in de DB maar is verwijderd uit de UI — gebruikers met "local" krijgen een prompt naar Instellingen
 - Default mapnaam: "MijnDossier"
 - OAuth redirect URIs zijn hardcoded voor productiedomein (nooitmeerpostkwijt.nl) — nooit dynamisch
-- Status-fetch in dossier page gebruikt `cache: "no-store"` om verouderde instelling te voorkomen
-- Opslaan via UPDATE + INSERT (niet upsert) — upsert vereist unique constraint die mogelijk ontbreekt
+- Opslaan via upsert met `onConflict: "user_id"` (primary key = geldige unique constraint)
+- `folder_structure` kolom toegevoegd via `add_folder_structure.sql` — SELECT faalt als kolom ontbreekt, waardoor storagePreference altijd "local" lijkt
 - Opslagknop in scan pagina heet altijd "Opslaan in Dossier →", locatie als hint eronder
 - Documenten paginering: 20 per keer, "Meer laden" knop, offset via API param
+- Instellingenpagina toont opslagknoppen pas na API-response (state start op null, niet "local")
 
 ## Backlog
 
