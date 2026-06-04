@@ -190,6 +190,53 @@ supabase/migrations/
 - Documenten paginering: 20 per keer, "Meer laden" knop, offset via API param
 - Instellingenpagina toont opslagknoppen pas na API-response (state start op null, niet "local")
 
+## Founding members (NMMPK)
+
+- Promo code `founding25` — 25x 180 dagen trial, cap van 25 gebruikers
+- `promo_code` kolom op `profiles` — wordt ingevuld bij checkout als promo geldig is
+- Teller op homepage en launch pagina gebaseerd op `profiles.promo_code = 'founding25'` (NIET op `promo_codes.uses` — die kan afwijken)
+- Founding member badge op accountpagina als `promo_code = 'founding25'`
+- Aparte welkomstmail met uitleg 6 maanden + activatie instructie
+- Aparte trial-ending mail na ~6 maanden met persoonlijke toon
+- Proefperiode tekst op accountpagina past zich aan voor founding members
+- `PromoActiveerBanner` op accountpagina — leest promo uit URL param (via bevestigingsmail) én localStorage
+- Bevestigingsmail redirect naar `/account` (niet `/dossier`) zodat activatie direct zichtbaar is
+- Promo code wordt meegegeven in de bevestigingsmail URL (`?promo=founding25`) zodat hij werkt in elke browser
+
+## Navigatie (NMMPK)
+
+- Gedeelde `DossierNav` component op alle dossier-pagina's: `dossier/components/DossierNav.tsx`
+- Actieve pagina licht op in amber via `usePathname()`
+- Links: Acties, Documenten, 💡 (Ideeën), ?, ⚙, account-icoon, Feedback, Uitloggen
+- Landingspagina (`/`) redirect ingelogde gebruikers naar `/dossier`
+
+## Launch pagina (NMMPK)
+
+- `/launch` — persoonlijk verhaal (RDW tenaamstellingscode), live founding25 teller, CTA schakelt automatisch
+- `/` — originele landingspagina met demo en features + amber banner met live teller bovenaan
+- Beide tellers gebaseerd op `profiles.promo_code` count
+
+## Ideeënbord (NMMPK)
+
+- `/ideeen` — eigen pagina met amber stijl, bol.com cadeaukaart incentive (€15/maand)
+- Aparte API op `/api/gezin/ideas` gefilterd op `product = 'nmmpk'`
+- `product` kolom toegevoegd aan `ideas` tabel via `add_product_to_ideas.sql`
+- Stemmen via bestaande `/api/ideas/[id]/vote` route (gedeeld met TST)
+
+## Admin (NMMPK)
+
+- `/admin` — gebruikersoverzicht alleen toegankelijk voor `ADMIN_EMAIL`
+- API op `/api/admin/nmmpk-users` — toont subscription_status, promo_code, storage, doc count
+- `/api/admin/test-email` — stuurt testmails naar ADMIN_EMAIL (type: `welcome_founding` of `trial_ending`)
+
+## Stripe (NMMPK)
+
+- Stripe Tax aangezet — BTW-facturen worden automatisch gegenereerd
+- Customer Portal ingesteld: amber branding, omleidingslink `/account`, privacy/voorwaarden URLs
+- BTW-nummer en KvK ingevuld bij Openbare bedrijfsgegevens
+- Bankafschrift omschrijving: `NOOITMEERPOSTKWIJT/BXL`
+- Oude facturen (vóór Stripe Tax) hebben geen BTW-regel — alleen nieuwe facturen zijn correct
+
 ## Backlog
 
 Zie `docs/BACKLOG.md` voor uitgestelde features.
