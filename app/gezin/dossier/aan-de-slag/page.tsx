@@ -1,5 +1,5 @@
 import Link from "next/link";
-import NMMPKLogo from "@/components/NMMPKLogo";
+import DossierNav from "../components/DossierNav";
 
 export const metadata = { title: "Aan de slag — NooitMeerPostKwijt" };
 
@@ -73,14 +73,7 @@ const tips = [
 export default function AanDeSlagPage() {
   return (
     <div className="min-h-screen bg-white">
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <NMMPKLogo iconOnly />
-          <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
-            ← Scannen
-          </Link>
-        </div>
-      </header>
+      <DossierNav />
 
       <main className="max-w-2xl mx-auto px-6 py-10 space-y-10">
 

@@ -37,7 +37,7 @@ export default function GezinDisclaimerPage() {
           <section>
             <h2 className="text-lg font-bold text-gray-900 mb-2">Jouw documenten zijn van jou</h2>
             <p>
-              Wij slaan de inhoud van jouw documenten niet permanent op op onze servers. Foto&apos;s en PDF&apos;s worden uitsluitend tijdelijk verwerkt voor de AI-analyse. Jij bepaalt zelf waar het document wordt opgeslagen — op je eigen computer, in OneDrive of in Dropbox.
+              Wij slaan de inhoud van jouw documenten niet permanent op op onze servers. Foto&apos;s en PDF&apos;s worden uitsluitend tijdelijk verwerkt voor de AI-analyse. Jij bepaalt zelf waar het document wordt opgeslagen — in OneDrive of in Dropbox.
             </p>
           </section>
 
