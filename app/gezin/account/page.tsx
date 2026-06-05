@@ -22,6 +22,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
   const subscriptionStatus = profile?.subscription_status ?? null;
   const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
   const isFoundingMember = profile?.promo_code === "founding25";
+  const isVriend = profile?.promo_code === "vriendenvan";
   const params = await searchParams;
   const paymentStatus = params.payment;
   const proPriceId = process.env.STRIPE_PRO_PRICE_ID!;
@@ -52,13 +53,29 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           </div>
         )}
 
+        {/* Vriend van badge */}
+        {isVriend && (
+          <div className="flex items-center gap-4 bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4">
+            <div className="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+              <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-bold text-blue-900">Vriend van NooitMeerPostKwijt</p>
+              <p className="text-xs text-blue-700 mt-0.5">Je geniet 6 maanden gratis toegang. Welkom!</p>
+            </div>
+          </div>
+        )}
+
         {/* Auto checkout als promo in URL of localStorage — alleen als nog geen abonnement */}
         {!subscriptionStatus && <AutoCheckoutWrapper priceId={proPriceId} />}
 
         {/* Betaalfeedback */}
         {paymentStatus === "subscribed" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
-            {isFoundingMember
+            {(isFoundingMember || isVriend)
               ? "Abonnement gestart! Je proefperiode van 6 maanden is actief."
               : "Abonnement gestart! Je eerste maand is gratis."}
           </div>
@@ -94,7 +111,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <span className="text-amber-600 font-bold text-lg">✓</span>
               <h2 className="font-bold text-amber-800 text-lg">Proefperiode actief</h2>
             </div>
-            <p className="text-amber-700 text-sm">{isFoundingMember
+            <p className="text-amber-700 text-sm">{(isFoundingMember || isVriend)
               ? "Je zit in je gratis proefperiode van 6 maanden. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt."
               : "Je zit in je gratis proefmaand. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt."
             }</p>
