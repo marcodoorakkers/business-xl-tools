@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
 Formaat:
 {
   "type": "type document (brief/factuur/polisblad/bankafschrift/contract/garantiebewijs/medisch/overig)",
-  "afzender": "naam van de organisatie of persoon",
+  "afzender": "officiële naam van de organisatie of persoon. Gebruik altijd de gestandaardiseerde naam: 'Belastingdienst' (nooit 'De Belastingdienst' of 'Belasting'), 'DUO' (nooit 'Dienst Uitvoering Onderwijs'), 'UWV' (nooit 'Uitvoeringsinstituut Werknemersverzekeringen'), 'CAK', 'SVB' (nooit 'Sociale Verzekeringsbank'), 'RDW' (nooit 'Rijksdienst voor het Wegverkeer'), 'RVO' (nooit 'Rijksdienst voor Ondernemend Nederland'). Voor gemeenten: 'Gemeente [Naam]'. Voor banken: gebruik de handelsnaam zoals 'ING', 'Rabobank', 'ABN AMRO', 'SNS'.",
   "datum": "YYYY-MM-DD of null als onbekend",
   "onderwerp": "max 4 woorden",
   "mappad": "altijd exact dit formaat: Afzender/Onderwerp/Jaartal — bijv. Belastingdienst/Omzetbelasting/2026 of Gemeente Amsterdam/Parkeervergunning/2025. Gebruik de officiële naam van de afzender, een kort onderwerp (max 2 woorden), en het jaar van het document.",
