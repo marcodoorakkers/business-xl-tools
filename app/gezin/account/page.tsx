@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DossierNav from "@/app/gezin/dossier/components/DossierNav";
-import PromoActiveerBanner from "./PromoActiveerBanner";
+import AutoCheckoutWrapper from "./AutoCheckoutWrapper";
 import SubscribeButton from "@/app/account/SubscribeButton";
 import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
@@ -52,8 +52,8 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           </div>
         )}
 
-        {/* Promo activeer banner — alleen als nog geen abonnement */}
-        {!subscriptionStatus && <PromoActiveerBanner />}
+        {/* Auto checkout als promo in URL of localStorage — alleen als nog geen abonnement */}
+        {!subscriptionStatus && <AutoCheckoutWrapper priceId={proPriceId} />}
 
         {/* Betaalfeedback */}
         {paymentStatus === "subscribed" && (
