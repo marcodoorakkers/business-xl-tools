@@ -19,13 +19,29 @@ export default function GezinLoginPage() {
     setLoading(true);
     setError("");
 
-    const { error } = await createClient().auth.signInWithPassword({ email, password });
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       setError("E-mailadres of wachtwoord is onjuist.");
       setLoading(false);
     } else {
-      router.push("/dossier");
+      // Check of er al een abonnement actief is
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("subscription_status")
+          .eq("id", user.id)
+          .single();
+        if (!profile?.subscription_status) {
+          router.push("/account");
+        } else {
+          router.push("/dossier");
+        }
+      } else {
+        router.push("/dossier");
+      }
     }
   }
 
