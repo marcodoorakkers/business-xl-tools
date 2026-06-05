@@ -142,9 +142,12 @@ supabase/migrations/
 ## Mapstructuur (NMMPK)
 
 - Instelling `folder_structure` in `archive_settings`: `by_subject` (standaard) of `by_person`
-- **Per onderwerp**: `{archiveRoot}/{mappad}/{bestand}` — geadresseerde alleen als label
-- **Per geadresseerde**: `{archiveRoot}/{geadresseerde}/{mappad}/{bestand}` — ideaal voor per-persoon maptoegang in OneDrive/Dropbox
+- **Mappad formaat**: altijd `Afzender/Onderwerp/Jaartal` — bijv. `Belastingdienst/Omzetbelasting/2026`
+- **Per onderwerp**: `{archiveRoot}/{Afzender}/{Onderwerp}/{Jaar}/{bestand}`
+- **Per geadresseerde**: `{archiveRoot}/{geadresseerde}/{Afzender}/{Onderwerp}/{Jaar}/{bestand}`
 - Onbekende geadresseerde → `Gemeenschappelijk/`
+- `gezinslid` veld zit in de AI JSON response — ontbreekt dit, dan werkt de geadresseerde map niet
+- Gestandaardiseerde afzendernamen in prompt: Belastingdienst, DUO, UWV, CAK, SVB, RDW, RVO, Gemeente [Naam], banken op handelsnaam
 
 ## Onboarding e-mailsequentie (NMMPK)
 
@@ -236,6 +239,29 @@ supabase/migrations/
 - BTW-nummer en KvK ingevuld bij Openbare bedrijfsgegevens
 - Bankafschrift omschrijving: `NOOITMEERPOSTKWIJT/BXL`
 - Oude facturen (vóór Stripe Tax) hebben geen BTW-regel — alleen nieuwe facturen zijn correct
+
+## Vriend van (NMMPK)
+
+- Promo code `vriendenvan` — onbeperkt gebruik (max_uses: 9999), 180 dagen trial
+- Zelfde flow als founding25 maar zonder cap — link: `/aanmelden?promo=vriendenvan`
+- Blauwe "Vriend van NooitMeerPostKwijt" badge op accountpagina
+- Eigen welkomstmail (`welcomeVriendHtml`) en trial-ending mail
+- Beheer via `/admin` — schakelaar om link aan/uit te zetten, overzicht wie zich aangemeld heeft
+
+## Auto-checkout (NMMPK)
+
+- `AutoCheckout.tsx` — start Stripe checkout automatisch als promo in URL of localStorage
+- `AutoCheckoutWrapper.tsx` — client wrapper die checkt of promo aanwezig is
+- Na 10s timeout: handmatige "Abonnement starten →" knop als fallback
+- Na inloggen: redirect naar `/account` als geen abonnement actief, anders `/dossier`
+- Promo zit in bevestigingsmail URL (`?promo=...`) zodat het op elk apparaat werkt
+- Probleem: promo in localStorage van PC werkt niet op telefoon → altijd via URL delen
+
+## Stripe webhooks
+
+- `cancel_at_period_end = true` → status wordt `cancelling` (niet `active`)
+- `canceled` → status wordt `null`
+- `subscription_period_end` wordt bijgewerkt bij elke webhook
 
 ## Backlog
 
