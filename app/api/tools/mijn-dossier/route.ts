@@ -130,7 +130,8 @@ Formaat:
   "samenvatting": "één zin die het document beschrijft",
   "actie": "concrete actie die ondernomen moet worden, bijv. 'Betaal €156 aan gemeente' of 'Reageer vóór de deadline' — null als er geen actie vereist is",
   "actie_deadline": "YYYY-MM-DD van de uiterste datum voor de actie, of null",
-  "actie_type": "betaling/reageren/aanvragen/registreren/overig — of null als er geen actie is"
+  "actie_type": "betaling/reageren/aanvragen/registreren/overig — of null als er geen actie is",
+  "gezinslid": "roepnaam van de geadresseerde als die overeenkomt met een bekende geadresseerde, anders null"
 }${senderInstruction}${familyInstruction}`,
             },
           ],
