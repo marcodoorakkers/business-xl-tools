@@ -40,6 +40,8 @@ export default function NMMPKAdminPage() {
   const [users, setUsers] = useState<NMUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [vriendActive, setVriendActive] = useState<boolean | null>(null);
+  const [togglingVriend, setTogglingVriend] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/nmmpk-users")
@@ -50,9 +52,26 @@ export default function NMMPKAdminPage() {
       .then((d) => setUsers(d.users ?? []))
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
+
+    fetch("/api/admin/promo")
+      .then((r) => r.json())
+      .then((d) => setVriendActive(d.promo?.active ?? false));
   }, []);
 
+  async function toggleVriend() {
+    setTogglingVriend(true);
+    const res = await fetch("/api/admin/promo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ active: !vriendActive }),
+    });
+    const d = await res.json();
+    setVriendActive(d.active);
+    setTogglingVriend(false);
+  }
+
   const founding = users.filter((u) => u.promo_code === "founding25");
+  const vrienden = users.filter((u) => u.promo_code === "vriendenvan");
   const trialing = users.filter((u) => u.subscription_status === "trialing");
   const active   = users.filter((u) => u.subscription_status === "active");
 
@@ -160,6 +179,61 @@ export default function NMMPKAdminPage() {
             <p className="text-xs text-amber-600 mt-3">{25 - founding.length} plekken nog vrij</p>
           </div>
         )}
+
+        {/* Vriend van */}
+        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-blue-900 flex items-center gap-2">
+              <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              Vriend van ({vrienden.length})
+            </h2>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-blue-600 font-medium">
+                {vriendActive === null ? "…" : vriendActive ? "Link actief" : "Link uitgeschakeld"}
+              </span>
+              <button
+                onClick={toggleVriend}
+                disabled={togglingVriend || vriendActive === null}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${
+                  vriendActive ? "bg-blue-500" : "bg-gray-300"
+                }`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  vriendActive ? "translate-x-6" : "translate-x-1"
+                }`} />
+              </button>
+            </div>
+          </div>
+
+          {!vriendActive && (
+            <p className="text-xs text-blue-700 bg-blue-100 rounded-xl px-3 py-2 mb-3">
+              ⚠️ De uitnodigingslink is uitgeschakeld — nieuwe aanmeldingen via <code>?promo=vriendenvan</code> krijgen geen 6 maanden gratis.
+            </p>
+          )}
+
+          <p className="text-xs text-blue-600 mb-3 font-mono select-all">
+            nooitmeerpostkwijt.nl/aanmelden?promo=vriendenvan
+          </p>
+
+          {vrienden.length === 0 ? (
+            <p className="text-xs text-blue-400 italic">Nog niemand via deze link aangemeld.</p>
+          ) : (
+            <div className="space-y-2">
+              {vrienden.map((u) => (
+                <div key={u.id} className="flex items-center justify-between text-sm">
+                  <span className="text-blue-800 font-medium">{u.email}</span>
+                  <div className="flex items-center gap-3 text-xs text-blue-500">
+                    <span>{formatDate(u.created_at)}</span>
+                    <span>tot {formatDate(u.subscription_period_end)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
