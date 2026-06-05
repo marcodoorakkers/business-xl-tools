@@ -135,7 +135,7 @@ Formaat:
   "afzender": "naam van de organisatie of persoon",
   "datum": "YYYY-MM-DD of null als onbekend",
   "onderwerp": "max 4 woorden",
-  "mappad": "logisch archief-mappad in het Nederlands, bijv. Financiën/Belasting/2024 of Woning/Hypotheek",
+  "mappad": "altijd exact dit formaat: Afzender/Onderwerp/Jaartal — bijv. Belastingdienst/Omzetbelasting/2026 of Gemeente Amsterdam/Parkeervergunning/2025. Gebruik de officiële naam van de afzender, een kort onderwerp (max 2 woorden), en het jaar van het document.",
   "bestandsnaam": "bestandsnaam zonder extensie, formaat: YYYY-MM-DD_onderwerp_afzender (alles lowercase, spaties als koppelteken)",
   "samenvatting": "één zin die het document beschrijft",
   "actie": "concrete actie die ondernomen moet worden — null als er geen actie vereist is",
