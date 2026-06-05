@@ -85,8 +85,17 @@ export default function GezinRegisterPage() {
           <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-4 mb-4 flex items-start gap-3">
             <span className="text-amber-500 text-lg flex-shrink-0">✦</span>
             <div>
-              <p className="text-sm font-semibold text-amber-800">Je maakt gebruik van de Founding 25 actie</p>
-              <p className="text-xs text-amber-700 mt-0.5">Maak een account aan en start je abonnement — je krijgt <strong>6 maanden gratis</strong> in plaats van 1 maand.</p>
+              {promoCode === "vriendenvan" ? (
+                <>
+                  <p className="text-sm font-semibold text-amber-800">Je hebt een uitnodiging gekregen</p>
+                  <p className="text-xs text-amber-700 mt-0.5">Maak een account aan — je krijgt <strong>6 maanden gratis</strong> toegang.</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-semibold text-amber-800">Je maakt gebruik van de Founding 25 actie</p>
+                  <p className="text-xs text-amber-700 mt-0.5">Maak een account aan en start je abonnement — je krijgt <strong>6 maanden gratis</strong> in plaats van 1 maand.</p>
+                </>
+              )}
             </div>
           </div>
         )}
