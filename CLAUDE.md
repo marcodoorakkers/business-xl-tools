@@ -145,7 +145,8 @@ supabase/migrations/
 
 - Vroeger "Gezinsleden" — hernoemd naar "Geadresseerden" in de UI (personen én entiteiten zoals BV/eenmanszaak)
 - Opgeslagen in `archive_family_members` (user_id, name, full_name)
-- `full_name` optioneel — gebruikt voor herkenning van initialen/achternamen op documenten
+- `full_name` optioneel — alleen relevant voor personen, gebruikt voor herkenning van initialen/achternamen op documenten; voor entiteiten volstaat alleen `name`
+- Instellingenpagina toont duidelijke uitleg: personen (bijv. Anna) én entiteiten (bijv. je BV) kunnen worden toegevoegd; `full_name` is enkel voor personen
 - Gedeeltelijke naamkoppeling: als Claude "Xavi" teruggeeft maar de opgeslagen naam "Xavi (X.M. Doorakkers)" is, wordt de volledige naam gebruikt
 - Herkenning gebruikt (in volgorde): naam op document → e-mailonderwerp → historische afzender→geadresseerde koppeling
 
