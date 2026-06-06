@@ -421,7 +421,7 @@ function InstellingenContent() {
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
           <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Geadresseerden</h2>
           <p className="text-xs text-gray-500">
-            Voeg personen of entiteiten toe zodat documenten automatisch aan de juiste naam worden gekoppeld.
+            Voeg personen (Anna, Thomas) of entiteiten (bijv. je BV of eenmanszaak) toe zodat documenten automatisch aan de juiste naam worden gekoppeld.
           </p>
           <ul className="space-y-2">
             {familyMembers.map((m) => (
@@ -476,7 +476,7 @@ function InstellingenContent() {
                 onChange={(e) => setNewMemberName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") addMember(); }}
                 className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-                placeholder="Roepnaam (bijv. Jan)" />
+                placeholder="Naam (bijv. Jan of Business XL)" />
               <button onClick={addMember} disabled={addingMember || !newMemberName.trim()}
                 className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
                 {addingMember ? "Toevoegen…" : "Toevoegen"}
@@ -485,7 +485,10 @@ function InstellingenContent() {
             <input type="text" value={newMemberFullName}
               onChange={(e) => setNewMemberFullName(e.target.value)}
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-              placeholder="Volledige naam optioneel (bijv. J. de Vries)" />
+              placeholder="Volledige naam (alleen voor personen, bijv. J. de Vries)" />
+            <p className="text-xs text-gray-400">
+              Voor personen helpt een volledige naam bij het herkennen van initialen op documenten. Voor organisaties is alleen de naam voldoende.
+            </p>
           </div>
         </div>
       </main>
