@@ -421,7 +421,7 @@ function InstellingenContent() {
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
           <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Geadresseerden</h2>
           <p className="text-xs text-gray-500">
-            Voeg personen (Jan, Luca) of entiteiten (Business XL, Gemeente Rotterdam) toe zodat documenten automatisch aan de juiste naam worden gekoppeld.
+            Voeg personen (Anna, Thomas) of entiteiten (Mijn BV, Gemeente Rotterdam) toe zodat documenten automatisch aan de juiste naam worden gekoppeld.
           </p>
           <ul className="space-y-2">
             {familyMembers.map((m) => (
