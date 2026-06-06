@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DossierNav from "../components/DossierNav";
 
@@ -201,6 +201,9 @@ function ArchiefContent() {
   const [treeData, setTreeData] = useState<TreeNode | null>(null);
   const [treeLoading, setTreeLoading] = useState(false);
   const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
+  const [autoMappingLoading, setAutoMappingLoading] = useState(false);
+  const [autoMappingDone, setAutoMappingDone] = useState<number | null>(null);
+  const treeLoadingRef = useRef(false);
 
   // Filters in URL bijhouden
   const updateUrl = useCallback((q: string, gezinslid: string, type: string) => {
@@ -252,18 +255,24 @@ function ArchiefContent() {
   }, [query, filterGezinslid, filterType, offset]);
 
   const loadTree = useCallback(async () => {
-    if (treeData) return;
+    if (treeLoadingRef.current) return;
+    treeLoadingRef.current = true;
     setTreeLoading(true);
     try {
       const res = await fetch("/api/tools/mijn-dossier/documents?all=1");
       const data = await res.json();
       const tree = buildTree(data.documents ?? []);
       setTreeData(tree);
-      // Eerste niveau direct opengooien
-      setOpenFolders(new Set(Object.values(tree.children).map((n) => n.path)));
+      setOpenFolders((prev) => {
+        const topLevel = new Set(Object.values(tree.children).map((n) => n.path));
+        return prev.size === 0 ? topLevel : new Set([...prev, ...topLevel]);
+      });
     } catch { /* stil */ }
-    finally { setTreeLoading(false); }
-  }, [treeData]);
+    finally {
+      setTreeLoading(false);
+      treeLoadingRef.current = false;
+    }
+  }, []);
 
   const toggleFolder = useCallback((path: string) => {
     setOpenFolders((prev) => {
@@ -274,13 +283,32 @@ function ArchiefContent() {
     });
   }, []);
 
+  const autoMappad = useCallback(async () => {
+    setAutoMappingLoading(true);
+    setAutoMappingDone(null);
+    try {
+      const res = await fetch("/api/tools/mijn-dossier/auto-mappad", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const data = await res.json();
+      if (data.updated > 0) {
+        setAutoMappingDone(data.updated);
+        setTreeData(null);
+        setOpenFolders(new Set());
+      }
+    } catch { /* stil */ }
+    finally { setAutoMappingLoading(false); }
+  }, []);
+
   useEffect(() => {
     fetchDocuments();
   }, [fetchDocuments]);
 
   useEffect(() => {
-    if (viewMode === "tree") loadTree();
-  }, [viewMode, loadTree]);
+    if (viewMode === "tree" && !treeData) loadTree();
+  }, [viewMode, treeData, loadTree]);
 
   // Haal gezinsleden op voor filter
   useEffect(() => {
@@ -518,19 +546,42 @@ function ArchiefContent() {
                   ))}
                 {/* Documenten zonder mappad */}
                 {treeData.documents.length > 0 && (
-                  <FolderNode
-                    node={{
-                      name: "Overig",
-                      path: "__overig__",
-                      children: {},
-                      documents: treeData.documents,
-                      totalCount: treeData.documents.length,
-                    }}
-                    openFolders={openFolders}
-                    toggleFolder={toggleFolder}
-                    onDelete={deleteDocument}
-                    deletingId={deletingId}
-                  />
+                  <div className="mx-3 mt-2">
+                    {autoMappingDone !== null && (
+                      <p className="text-xs text-green-600 font-medium mb-2 px-1">
+                        ✓ {autoMappingDone} {autoMappingDone === 1 ? "document" : "documenten"} ingedeeld
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 mb-1">
+                      <p className="text-sm text-amber-800">
+                        <span className="font-semibold">{treeData.documents.length}</span>{" "}
+                        {treeData.documents.length === 1 ? "document" : "documenten"} zonder map
+                      </p>
+                      <button
+                        onClick={autoMappad}
+                        disabled={autoMappingLoading}
+                        className="text-xs font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1.5 whitespace-nowrap"
+                      >
+                        {autoMappingLoading && (
+                          <span className="w-3 h-3 border border-amber-500 border-t-transparent rounded-full animate-spin inline-block" />
+                        )}
+                        {autoMappingLoading ? "Bezig…" : "Automatisch indelen →"}
+                      </button>
+                    </div>
+                    <FolderNode
+                      node={{
+                        name: "Overig",
+                        path: "__overig__",
+                        children: {},
+                        documents: treeData.documents,
+                        totalCount: treeData.documents.length,
+                      }}
+                      openFolders={openFolders}
+                      toggleFolder={toggleFolder}
+                      onDelete={deleteDocument}
+                      deletingId={deletingId}
+                    />
+                  </div>
                 )}
               </div>
             )}
