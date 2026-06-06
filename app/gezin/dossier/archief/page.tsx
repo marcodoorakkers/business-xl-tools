@@ -17,6 +17,8 @@ interface Document {
   file_url: string | null;
   storage: string | null;
   created_at: string;
+  actie: string | null;
+  actie_gedaan: boolean;
 }
 
 interface TreeNode {
@@ -226,6 +228,15 @@ function ArchiefContent() {
         setGezinsleden((data.familyMembers ?? []).map((m) => m.name));
       })
       .catch(() => {});
+  }, []);
+
+  const toggleActieGedaan = useCallback(async (id: string, gedaan: boolean) => {
+    setDocuments((prev) => prev.map((d) => d.id === id ? { ...d, actie_gedaan: gedaan } : d));
+    await fetch(`/api/tools/mijn-dossier/documents?id=${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ actie_gedaan: gedaan }),
+    });
   }, []);
 
   const startEdit = useCallback((doc: Document) => {
@@ -457,6 +468,27 @@ function ArchiefContent() {
                       </div>
                     </div>
 
+                    {/* Actie afvinken */}
+                    {doc.actie && (
+                      <button
+                        onClick={() => toggleActieGedaan(doc.id, !doc.actie_gedaan)}
+                        className="mt-2 flex items-center gap-2 w-full text-left group/actie"
+                      >
+                        <span className={`w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
+                          doc.actie_gedaan ? "bg-green-500 border-green-500" : "border-gray-300 group-hover/actie:border-amber-400"
+                        }`}>
+                          {doc.actie_gedaan && (
+                            <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </span>
+                        <span className={`text-xs flex-1 ${doc.actie_gedaan ? "line-through text-gray-400" : "text-gray-600"}`}>
+                          {doc.actie}
+                        </span>
+                      </button>
+                    )}
+
                     {/* Inline mappad editor */}
                     {editingId === doc.id && (
                       <div className="mt-2 flex gap-2">
@@ -560,6 +592,25 @@ function ArchiefContent() {
                             </p>
                             {doc.datum && (
                               <p className="text-xs text-gray-400">{formatDate(doc.datum)}</p>
+                            )}
+                            {doc.actie && (
+                              <button
+                                onClick={() => toggleActieGedaan(doc.id, !doc.actie_gedaan)}
+                                className="flex items-center gap-1.5 mt-0.5 group/actie"
+                              >
+                                <span className={`w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors ${
+                                  doc.actie_gedaan ? "bg-green-500 border-green-500" : "border-gray-300 group-hover/actie:border-amber-400"
+                                }`}>
+                                  {doc.actie_gedaan && (
+                                    <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  )}
+                                </span>
+                                <span className={`text-xs truncate max-w-[140px] ${doc.actie_gedaan ? "line-through text-gray-400" : "text-gray-500"}`}>
+                                  {doc.actie}
+                                </span>
+                              </button>
                             )}
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
