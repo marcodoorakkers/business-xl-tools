@@ -66,7 +66,7 @@ function formatDate(dateStr: string | null): string {
   }
 }
 
-function buildTree(documents: Document[]): TreeNode {
+function buildTree(documents: Document[], folderStructure: "by_subject" | "by_person"): TreeNode {
   const root: TreeNode = { name: "root", path: "", children: {}, documents: [], totalCount: 0 };
   for (const doc of documents) {
     root.totalCount++;
@@ -74,11 +74,14 @@ function buildTree(documents: Document[]): TreeNode {
       root.documents.push(doc);
       continue;
     }
-    const parts = doc.mappad.split("/").filter(Boolean);
+    const mapParts = doc.mappad.split("/").filter(Boolean);
+    const allParts = folderStructure === "by_person"
+      ? [doc.gezinslid || "Gemeenschappelijk", ...mapParts]
+      : mapParts;
     let current = root;
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      const nodePath = parts.slice(0, i + 1).join("/");
+    for (let i = 0; i < allParts.length; i++) {
+      const part = allParts[i];
+      const nodePath = allParts.slice(0, i + 1).join("/");
       if (!current.children[part]) {
         current.children[part] = { name: part, path: nodePath, children: {}, documents: [], totalCount: 0 };
       }
@@ -124,6 +127,8 @@ function ArchiefContent() {
   const [viewMode, setViewMode] = useState<"list" | "tree">("list");
   const [treeData, setTreeData] = useState<TreeNode | null>(null);
   const [treeLoading, setTreeLoading] = useState(false);
+  const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
+  const [archiveRoot, setArchiveRoot] = useState("MijnDossier");
   const [drillPath, setDrillPath] = useState<string[]>([]);
   const [autoMappingLoading, setAutoMappingLoading] = useState(false);
   const [autoMappingDone, setAutoMappingDone] = useState<number | null>(null);
@@ -190,13 +195,13 @@ function ArchiefContent() {
     try {
       const res = await fetch("/api/tools/mijn-dossier/documents?all=1");
       const data = await res.json();
-      setTreeData(buildTree(data.documents ?? []));
+      setTreeData(buildTree(data.documents ?? [], folderStructure));
     } catch { /* stil */ }
     finally {
       setTreeLoading(false);
       treeLoadingRef.current = false;
     }
-  }, []);
+  }, [folderStructure]);
 
   const autoMappad = useCallback(async () => {
     setAutoMappingLoading(true);
@@ -230,6 +235,15 @@ function ArchiefContent() {
       .then((r) => r.json())
       .then((data: { familyMembers: { id: string; name: string }[] }) => {
         setGezinsleden((data.familyMembers ?? []).map((m) => m.name));
+      })
+      .catch(() => {});
+    fetch("/api/tools/mijn-dossier/onedrive/status")
+      .then((r) => r.json())
+      .then((data: { folderStructure?: string; archiveRoot?: string }) => {
+        if (data.folderStructure === "by_person" || data.folderStructure === "by_subject") {
+          setFolderStructure(data.folderStructure);
+        }
+        if (data.archiveRoot) setArchiveRoot(data.archiveRoot);
       })
       .catch(() => {});
   }, []);
@@ -556,6 +570,14 @@ function ArchiefContent() {
               </div>
             ) : (
               <>
+                {/* Archiveroot label */}
+                {isRoot && (
+                  <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
+                    <span className="text-base">📁</span>
+                    <span className="text-sm font-semibold text-gray-700">{archiveRoot}</span>
+                  </div>
+                )}
+
                 {/* Terug-navigatie */}
                 {!isRoot && (
                   <div className="border-b border-gray-100">
@@ -568,7 +590,7 @@ function ArchiefContent() {
                     </button>
                     {drillPath.length > 1 && (
                       <p className="text-xs text-gray-400 px-4 pb-2.5 -mt-1 truncate">
-                        {drillPath.join(" › ")}
+                        {archiveRoot} › {drillPath.join(" › ")}
                       </p>
                     )}
                   </div>
