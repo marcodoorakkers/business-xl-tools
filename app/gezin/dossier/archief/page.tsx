@@ -88,95 +88,16 @@ function buildTree(documents: Document[]): TreeNode {
   return root;
 }
 
-function FolderNode({
-  node,
-  openFolders,
-  toggleFolder,
-  onDelete,
-  deletingId,
-  depth = 0,
-}: {
-  node: TreeNode;
-  openFolders: Set<string>;
-  toggleFolder: (path: string) => void;
-  onDelete: (id: string) => void;
-  deletingId: string | null;
-  depth?: number;
-}) {
-  const isOpen = openFolders.has(node.path);
-  const hasChildren = Object.keys(node.children).length > 0;
-  const hasDocuments = node.documents.length > 0;
-
-  return (
-    <div>
-      <button
-        onClick={() => toggleFolder(node.path)}
-        className="flex items-center gap-2 w-full text-left py-2 px-3 rounded-xl hover:bg-amber-50 transition-colors"
-        style={{ paddingLeft: `${12 + depth * 20}px` }}
-      >
-        <span className="text-base flex-shrink-0">{isOpen ? "📂" : "📁"}</span>
-        <span className="font-medium text-sm text-gray-800 flex-1 truncate">{node.name}</span>
-        <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2 py-0.5 flex-shrink-0">{node.totalCount}</span>
-        <span className="text-xs text-gray-400 flex-shrink-0">{isOpen ? "▾" : "▸"}</span>
-      </button>
-
-      {isOpen && (
-        <div>
-          {Object.values(node.children)
-            .sort((a, b) => a.name.localeCompare(b.name, "nl"))
-            .map((child) => (
-              <FolderNode
-                key={child.path}
-                node={child}
-                openFolders={openFolders}
-                toggleFolder={toggleFolder}
-                onDelete={onDelete}
-                deletingId={deletingId}
-                depth={depth + 1}
-              />
-            ))}
-          {hasDocuments &&
-            node.documents.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex items-center gap-3 py-2 px-3 group"
-                style={{ paddingLeft: `${12 + (depth + 1) * 20}px` }}
-              >
-                <span className="text-base flex-shrink-0">{TYPE_ICONS[doc.type ?? ""] ?? "📄"}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-700 truncate">
-                    {doc.afzender ?? doc.bestandsnaam}
-                  </p>
-                  {doc.datum && (
-                    <p className="text-xs text-gray-400">{formatDate(doc.datum)}</p>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {doc.file_url && (
-                    <a
-                      href={doc.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-amber-600 hover:text-amber-800 font-medium whitespace-nowrap"
-                    >
-                      Openen →
-                    </a>
-                  )}
-                  <button
-                    onClick={() => onDelete(doc.id)}
-                    disabled={deletingId === doc.id}
-                    className="text-xs text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                    aria-label="Verwijder"
-                  >
-                    {deletingId === doc.id ? "…" : "✕"}
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
-    </div>
-  );
+function getNodeAtPath(tree: TreeNode, path: string[]): TreeNode | null {
+  if (path[0] === "__overig__") {
+    return { name: "Overig", path: "__overig__", children: {}, documents: tree.documents, totalCount: tree.documents.length };
+  }
+  let current = tree;
+  for (const segment of path) {
+    if (!current.children[segment]) return null;
+    current = current.children[segment];
+  }
+  return current;
 }
 
 function ArchiefContent() {
@@ -200,12 +121,11 @@ function ArchiefContent() {
   const [viewMode, setViewMode] = useState<"list" | "tree">("list");
   const [treeData, setTreeData] = useState<TreeNode | null>(null);
   const [treeLoading, setTreeLoading] = useState(false);
-  const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
+  const [drillPath, setDrillPath] = useState<string[]>([]);
   const [autoMappingLoading, setAutoMappingLoading] = useState(false);
   const [autoMappingDone, setAutoMappingDone] = useState<number | null>(null);
   const treeLoadingRef = useRef(false);
 
-  // Filters in URL bijhouden
   const updateUrl = useCallback((q: string, gezinslid: string, type: string) => {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
@@ -261,26 +181,12 @@ function ArchiefContent() {
     try {
       const res = await fetch("/api/tools/mijn-dossier/documents?all=1");
       const data = await res.json();
-      const tree = buildTree(data.documents ?? []);
-      setTreeData(tree);
-      setOpenFolders((prev) => {
-        const topLevel = new Set(Object.values(tree.children).map((n) => n.path));
-        return prev.size === 0 ? topLevel : new Set([...prev, ...topLevel]);
-      });
+      setTreeData(buildTree(data.documents ?? []));
     } catch { /* stil */ }
     finally {
       setTreeLoading(false);
       treeLoadingRef.current = false;
     }
-  }, []);
-
-  const toggleFolder = useCallback((path: string) => {
-    setOpenFolders((prev) => {
-      const next = new Set(prev);
-      if (next.has(path)) next.delete(path);
-      else next.add(path);
-      return next;
-    });
   }, []);
 
   const autoMappad = useCallback(async () => {
@@ -296,7 +202,7 @@ function ArchiefContent() {
       if (data.updated > 0) {
         setAutoMappingDone(data.updated);
         setTreeData(null);
-        setOpenFolders(new Set());
+        setDrillPath([]);
       }
     } catch { /* stil */ }
     finally { setAutoMappingLoading(false); }
@@ -310,7 +216,6 @@ function ArchiefContent() {
     if (viewMode === "tree" && !treeData) loadTree();
   }, [viewMode, treeData, loadTree]);
 
-  // Haal gezinsleden op voor filter
   useEffect(() => {
     fetch("/api/tools/mijn-dossier/onedrive/family")
       .then((r) => r.json())
@@ -326,14 +231,19 @@ function ArchiefContent() {
     try {
       await fetch(`/api/tools/mijn-dossier/documents?id=${id}`, { method: "DELETE" });
       setDocuments((prev) => prev.filter((d) => d.id !== id));
-      // Verwijder ook uit tree cache zodat hij herlaadt bij volgende switch
       setTreeData(null);
+      setDrillPath([]);
     } finally {
       setDeletingId(null);
     }
   }
 
   const uniqueTypes = Array.from(new Set(documents.map((d) => d.type).filter(Boolean))) as string[];
+
+  // Huidige node in de drilldown
+  const currentNode = treeData ? getNodeAtPath(treeData, drillPath) : null;
+  const isRoot = drillPath.length === 0;
+  const parentLabel = drillPath.length === 1 ? "Mappen" : drillPath[drillPath.length - 2];
 
   return (
     <div className="min-h-screen bg-white">
@@ -345,7 +255,6 @@ function ArchiefContent() {
             <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Documenten</h1>
             <p className="text-sm text-gray-500">Alle gescande en opgeslagen documenten.</p>
           </div>
-          {/* View toggle */}
           <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 flex-shrink-0 mt-1">
             <button
               onClick={() => setViewMode("list")}
@@ -435,7 +344,6 @@ function ArchiefContent() {
                       <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-xl flex-shrink-0 mt-0.5">
                         {TYPE_ICONS[doc.type ?? ""] ?? "📄"}
                       </div>
-
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
                           <div className="min-w-0">
@@ -450,11 +358,9 @@ function ArchiefContent() {
                             {formatDate(doc.datum ?? doc.created_at)}
                           </p>
                         </div>
-
                         {doc.samenvatting && (
                           <p className="text-xs text-gray-600 leading-relaxed mb-2 line-clamp-2">{doc.samenvatting}</p>
                         )}
-
                         <div className="flex items-center gap-2 flex-wrap">
                           {doc.type && (
                             <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
@@ -478,7 +384,6 @@ function ArchiefContent() {
                           )}
                         </div>
                       </div>
-
                       <div className="flex flex-col gap-1.5 flex-shrink-0">
                         {doc.file_url && (
                           <a
@@ -518,7 +423,7 @@ function ArchiefContent() {
             )}
           </>
         ) : (
-          /* Mappen view */
+          /* Mappen view — drilldown navigatie */
           <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             {treeLoading ? (
               <div className="flex items-center justify-center py-16 text-gray-400 text-sm gap-2">
@@ -531,22 +436,90 @@ function ArchiefContent() {
                 <p className="text-sm text-gray-400">Scan een document om het hier te zien.</p>
               </div>
             ) : (
-              <div className="py-2">
-                {Object.values(treeData.children)
-                  .sort((a, b) => a.name.localeCompare(b.name, "nl"))
-                  .map((node) => (
-                    <FolderNode
-                      key={node.path}
-                      node={node}
-                      openFolders={openFolders}
-                      toggleFolder={toggleFolder}
-                      onDelete={deleteDocument}
-                      deletingId={deletingId}
-                    />
-                  ))}
-                {/* Documenten zonder mappad */}
-                {treeData.documents.length > 0 && (
-                  <div className="mx-3 mt-2">
+              <>
+                {/* Terug-navigatie */}
+                {!isRoot && (
+                  <div className="border-b border-gray-100">
+                    <button
+                      onClick={() => setDrillPath((p) => p.slice(0, -1))}
+                      className="flex items-center gap-2 w-full px-4 py-3.5 text-sm font-medium text-amber-700 hover:bg-amber-50 active:bg-amber-100 transition-colors text-left"
+                    >
+                      <span className="text-base">‹</span>
+                      <span>{parentLabel}</span>
+                    </button>
+                    {drillPath.length > 1 && (
+                      <p className="text-xs text-gray-400 px-4 pb-2.5 -mt-1 truncate">
+                        {drillPath.join(" › ")}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Submappen */}
+                {currentNode && Object.keys(currentNode.children).length > 0 && (
+                  <div>
+                    {Object.values(currentNode.children)
+                      .sort((a, b) => a.name.localeCompare(b.name, "nl"))
+                      .map((child) => (
+                        <button
+                          key={child.path}
+                          onClick={() => setDrillPath((p) => [...p, child.name])}
+                          className="flex items-center gap-3 w-full px-4 py-3.5 hover:bg-gray-50 active:bg-gray-100 transition-colors border-b border-gray-50 text-left"
+                        >
+                          <span className="text-xl flex-shrink-0">📁</span>
+                          <span className="flex-1 font-medium text-sm text-gray-800 truncate">{child.name}</span>
+                          <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2 py-0.5 flex-shrink-0">{child.totalCount}</span>
+                          <span className="text-gray-300 flex-shrink-0 ml-1">›</span>
+                        </button>
+                      ))}
+                  </div>
+                )}
+
+                {/* Documenten op huidig niveau */}
+                {currentNode && currentNode.documents.length > 0 && (
+                  <div>
+                    {currentNode.documents.map((doc) => (
+                      <div
+                        key={doc.id}
+                        className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 group"
+                      >
+                        <span className="text-xl flex-shrink-0">{TYPE_ICONS[doc.type ?? ""] ?? "📄"}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-700 truncate">
+                            {doc.afzender ?? doc.bestandsnaam}
+                          </p>
+                          {doc.datum && (
+                            <p className="text-xs text-gray-400">{formatDate(doc.datum)}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {doc.file_url && (
+                            <a
+                              href={doc.file_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-amber-600 hover:text-amber-800 font-medium whitespace-nowrap"
+                            >
+                              Openen →
+                            </a>
+                          )}
+                          <button
+                            onClick={() => deleteDocument(doc.id)}
+                            disabled={deletingId === doc.id}
+                            className="text-xs text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                            aria-label="Verwijder"
+                          >
+                            {deletingId === doc.id ? "…" : "✕"}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Auto-mappad banner + Overig (alleen op rootniveau) */}
+                {isRoot && treeData.documents.length > 0 && (
+                  <div className="p-3 border-t border-gray-50">
                     {autoMappingDone !== null && (
                       <p className="text-xs text-green-600 font-medium mb-2 px-1">
                         ✓ {autoMappingDone} {autoMappingDone === 1 ? "document" : "documenten"} ingedeeld
@@ -568,22 +541,18 @@ function ArchiefContent() {
                         {autoMappingLoading ? "Bezig…" : "Automatisch indelen →"}
                       </button>
                     </div>
-                    <FolderNode
-                      node={{
-                        name: "Overig",
-                        path: "__overig__",
-                        children: {},
-                        documents: treeData.documents,
-                        totalCount: treeData.documents.length,
-                      }}
-                      openFolders={openFolders}
-                      toggleFolder={toggleFolder}
-                      onDelete={deleteDocument}
-                      deletingId={deletingId}
-                    />
+                    <button
+                      onClick={() => setDrillPath(["__overig__"])}
+                      className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors rounded-xl text-left"
+                    >
+                      <span className="text-xl flex-shrink-0">📂</span>
+                      <span className="flex-1 font-medium text-sm text-gray-500">Overig</span>
+                      <span className="text-xs text-gray-400 bg-gray-100 rounded-full px-2 py-0.5 flex-shrink-0">{treeData.documents.length}</span>
+                      <span className="text-gray-300 flex-shrink-0 ml-1">›</span>
+                    </button>
                   </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         )}
