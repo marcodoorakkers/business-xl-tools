@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   const q = searchParams.get("q")?.trim() ?? "";
   const gezinslid = searchParams.get("gezinslid")?.trim() ?? "";
   const type = searchParams.get("type")?.trim() ?? "";
+  const jaar = searchParams.get("jaar")?.trim() ?? "";
   const allDocs = searchParams.get("all") === "1";
   const offset = parseInt(searchParams.get("offset") ?? "0", 10);
   const PAGE_SIZE = 20;
@@ -35,6 +36,9 @@ export async function GET(req: NextRequest) {
   }
   if (type) {
     query = query.eq("type", type);
+  }
+  if (jaar) {
+    query = query.gte("datum", `${jaar}-01-01`).lte("datum", `${jaar}-12-31`);
   }
 
   const { data, error } = await query;
