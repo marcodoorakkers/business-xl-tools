@@ -77,9 +77,11 @@ app/
     layout.tsx                   — NMMPK layout (eigen manifest link)
     manifest.ts                  — NMMPK PWA manifest (amber thema, gezin-icoon)
     account/page.tsx             — NMMPK account (abonnement beheren)
+    acties/page.tsx              — actielijst (open/gedaan/overgeslagen, deadline, afvinken)
     dossier/page.tsx             — NMMPK scan-interface (client component)
+    dossier/components/DossierNav.tsx — gedeelde nav met acties-badge
     dossier/instellingen/page.tsx — opslag, geadresseerden, mapstructuur, scan-e-mailadres
-    dossier/archief/page.tsx     — zoeken en filteren, filters bewaard in URL, paginering (20 per keer)
+    dossier/archief/page.tsx     — documentenpagina: lijst + mappenview (drilldown)
     dossier/aan-de-slag/page.tsx — onboarding pagina nieuwe gebruikers (4 stappen + tips)
     aanmelden/page.tsx           — NMMPK registratie
     inloggen/page.tsx            — NMMPK login
@@ -96,6 +98,10 @@ app/
       onedrive/family/route.ts   — geadresseerden CRUD (GET/POST/PATCH/DELETE) incl. full_name
       onedrive/status/route.ts   — verbindingsstatus + geadresseerden + opslagvoorkeur + mapstructuur
       sync-actielijst/route.ts   — actielijst als Markdown naar OneDrive/Dropbox
+      auto-mappad/route.ts       — retroactief mappaden toewijzen via AI (Haiku, geen credits)
+      acties/route.ts            — document_actions CRUD (GET/POST)
+      acties/[id]/route.ts       — PATCH status (open/gedaan/overgeslagen), DELETE
+      documents/route.ts         — GET (lijst + ?all=1 + ?jaar=), POST, PATCH (mappad/actie_gedaan), DELETE
 cloudflare/
   email-worker/                  — Cloudflare Email Worker (postal-mime, wrangler)
     index.js                     — MIME-parser, stuurt bijlage als base64 naar webhook
@@ -112,6 +118,10 @@ supabase/migrations/
   add_folder_structure.sql       — folder_structure kolom op archive_settings (ALTER TABLE)
   add_demo_rate_limits.sql       — demo_rate_limits tabel (IP-hash, count, window_start)
   add_promo_codes.sql            — promo_codes tabel + founding25 (25x 180 dagen trial)
+  add_product_to_ideas.sql       — product kolom op ideas tabel (nmmpk/tst)
+  add_promo_code_to_profiles.sql — promo_code kolom op profiles
+  add_reminder_sent_at.sql       — reminder_sent_at kolom op document_actions
+  add_actie_to_documents.sql     — actie en actie_gedaan kolommen op documents
 ```
 
 ## PWA (NMMPK)
@@ -190,7 +200,6 @@ supabase/migrations/
 - Opslaan via upsert met `onConflict: "user_id"` (primary key = geldige unique constraint)
 - `folder_structure` kolom toegevoegd via `add_folder_structure.sql` — SELECT faalt als kolom ontbreekt, waardoor storagePreference altijd "local" lijkt
 - Opslagknop in scan pagina heet altijd "Opslaan in Dossier →", locatie als hint eronder
-- Documenten paginering: 20 per keer, "Meer laden" knop, offset via API param
 - Instellingenpagina toont opslagknoppen pas na API-response (state start op null, niet "local")
 
 ## Founding members (NMMPK)
@@ -211,7 +220,49 @@ supabase/migrations/
 - Gedeelde `DossierNav` component op alle dossier-pagina's: `dossier/components/DossierNav.tsx`
 - Actieve pagina licht op in amber via `usePathname()`
 - Links: Acties, Documenten, 💡 (Ideeën), ?, ⚙, account-icoon, Feedback, Uitloggen
+- **Acties-badge**: telt openstaande acties via `/api/tools/mijn-dossier/acties`; rood bij verlopen deadlines, amber anders; ververst bij elke paginawisseling
 - Landingspagina (`/`) redirect ingelogde gebruikers naar `/dossier`
+
+## Documenten pagina (NMMPK)
+
+Route: `dossier/archief/page.tsx` — API: `documents/route.ts`
+
+### Lijstview
+- Zoekbalk (afzender, onderwerp, samenvatting, mappad, bestandsnaam)
+- Filters: geadresseerde (dropdown), type (dropdown), jaar (knopjes — toggle, bewaard in URL)
+- Paginering: 20 per keer, "Meer laden" knop, offset via `?offset=`
+- Per document: type-icoon, afzender, onderwerp, datum, samenvatting (2 regels), badges (type, geadresseerde, mappad, opslag)
+- **Mappad bewerken**: klik op het mappad-badge of `+ map` → inline invoerveld → PATCH `?id=`
+- **Actie afvinken**: ○/✓ knop als `documents.actie` gevuld is → PATCH `actie_gedaan`; doorgestreept bij gedaan
+- **Verwijder-bevestiging**: klik ✕ → inline "Ja / Nee" (geen browser `confirm()`)
+- Alle filters bewaard in URL-params
+
+### Mappenview (drilldown)
+- Toggle "Lijst / Mappen" rechtsboven
+- Boomstructuur opgebouwd client-side uit `mappad` veld (`Afzender/Onderwerp/Jaar`)
+- **Drilldown**: tap op map → volledig scherm met inhoud; terug-knop toont naam bovenliggende map
+- Breadcrumb bij meer dan één niveau diep
+- Per document: type-icoon, afzender, onderwerp, datum, actie-toggle, ✏️ (mappad), ✕
+- Geladen via `?all=1` (geen paginering); cache reset na verwijderen of mappad-wijziging
+- **Auto-mappad banner**: als er documenten zonder mappad zijn (Overig), verschijnt amber banner met "Automatisch indelen →" — roept `/api/tools/mijn-dossier/auto-mappad` aan (Claude Haiku, geen credits)
+- "Overig" is ook een klikbare map voor documenten zonder mappad
+
+### Documents API
+- `GET ?q=&gezinslid=&type=&jaar=&offset=` — gefilterde lijst, 20+1 voor hasMore detectie
+- `GET ?all=1` — alle documenten zonder paginering (voor mappenview)
+- `POST` — nieuw document; accepteert ook `actie` veld
+- `PATCH ?id=` — body mag `mappad` en/of `actie_gedaan` bevatten
+- `DELETE ?id=` — verwijdert document
+
+## Acties (NMMPK)
+
+- Pagina: `gezin/acties/page.tsx` — drie tabs: Open, Gedaan, Overgeslagen
+- Data: `document_actions` tabel (id, user_id, actie, deadline, actie_type, document_naam, afzender, mappad, file_url, status, created_at)
+- `documents` tabel heeft ook `actie text` en `actie_gedaan boolean DEFAULT false` — gevuld bij opslaan scan als gebruiker "Actie toevoegen" had aangevinkt
+- Deadline-badge toont lopende teller ("X dagen te laat") alleen in tab Open; in Gedaan/Overgeslagen altijd statische datum
+- Afvinken vanuit documenten-pagina via PATCH op `documents.actie_gedaan` (los van `document_actions`)
+- Actielijst sync naar OneDrive/Dropbox via `/api/tools/mijn-dossier/sync-actielijst` (Markdown met checkboxes)
+- Reminder-emails: open acties met deadline 1–3 dagen vooruit, bijgehouden via `reminder_sent_at`
 
 ## Launch pagina (NMMPK)
 
