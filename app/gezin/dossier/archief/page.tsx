@@ -129,6 +129,7 @@ function ArchiefContent() {
   const [treeLoading, setTreeLoading] = useState(false);
   const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
   const [archiveRoot, setArchiveRoot] = useState("MijnDossier");
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [drillPath, setDrillPath] = useState<string[]>([]);
   const [autoMappingLoading, setAutoMappingLoading] = useState(false);
   const [autoMappingDone, setAutoMappingDone] = useState<number | null>(null);
@@ -227,8 +228,14 @@ function ArchiefContent() {
   }, [fetchDocuments]);
 
   useEffect(() => {
-    if (viewMode === "tree" && !treeData) loadTree();
-  }, [viewMode, treeData, loadTree]);
+    if (viewMode === "tree" && !treeData && settingsLoaded) loadTree();
+  }, [viewMode, treeData, loadTree, settingsLoaded]);
+
+  // Herlaad de boom als folderStructure wijzigt
+  useEffect(() => {
+    setTreeData(null);
+    setDrillPath([]);
+  }, [folderStructure]);
 
   useEffect(() => {
     fetch("/api/tools/mijn-dossier/onedrive/family")
@@ -245,7 +252,8 @@ function ArchiefContent() {
         }
         if (data.archiveRoot) setArchiveRoot(data.archiveRoot);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setSettingsLoaded(true));
   }, []);
 
   const toggleActieGedaan = useCallback(async (id: string, gedaan: boolean) => {
