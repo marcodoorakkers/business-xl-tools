@@ -116,6 +116,7 @@ function ArchiefContent() {
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [filterGezinslid, setFilterGezinslid] = useState(() => searchParams.get("gezinslid") ?? "");
   const [filterType, setFilterType] = useState(() => searchParams.get("type") ?? "");
+  const [filterJaar, setFilterJaar] = useState(() => searchParams.get("jaar") ?? "");
   const [gezinsleden, setGezinsleden] = useState<string[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -131,11 +132,12 @@ function ArchiefContent() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const treeLoadingRef = useRef(false);
 
-  const updateUrl = useCallback((q: string, gezinslid: string, type: string) => {
+  const updateUrl = useCallback((q: string, gezinslid: string, type: string, jaar: string) => {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (gezinslid) params.set("gezinslid", gezinslid);
     if (type) params.set("type", type);
+    if (jaar) params.set("jaar", jaar);
     const qs = params.toString();
     router.replace(qs ? `/dossier/archief?${qs}` : "/dossier/archief", { scroll: false });
   }, [router]);
@@ -149,6 +151,7 @@ function ArchiefContent() {
       if (query) params.set("q", query);
       if (filterGezinslid) params.set("gezinslid", filterGezinslid);
       if (filterType) params.set("type", filterType);
+      if (filterJaar) params.set("jaar", filterJaar);
       const res = await fetch(`/api/tools/mijn-dossier/documents?${params}`);
       const data = await res.json();
       setDocuments(data.documents ?? []);
@@ -159,7 +162,7 @@ function ArchiefContent() {
     } finally {
       setLoading(false);
     }
-  }, [query, filterGezinslid, filterType]);
+  }, [query, filterGezinslid, filterType, filterJaar]);
 
   const loadMore = useCallback(async () => {
     setLoadingMore(true);
@@ -169,6 +172,7 @@ function ArchiefContent() {
       if (query) params.set("q", query);
       if (filterGezinslid) params.set("gezinslid", filterGezinslid);
       if (filterType) params.set("type", filterType);
+      if (filterJaar) params.set("jaar", filterJaar);
       params.set("offset", String(newOffset));
       const res = await fetch(`/api/tools/mijn-dossier/documents?${params}`);
       const data = await res.json();
@@ -177,7 +181,7 @@ function ArchiefContent() {
       setOffset(newOffset);
     } catch { /* stil falen */ }
     finally { setLoadingMore(false); }
-  }, [query, filterGezinslid, filterType, offset]);
+  }, [query, filterGezinslid, filterType, filterJaar, offset]);
 
   const loadTree = useCallback(async () => {
     if (treeLoadingRef.current) return;
@@ -318,7 +322,7 @@ function ArchiefContent() {
                 <input
                   type="text"
                   value={query}
-                  onChange={(e) => { setQuery(e.target.value); updateUrl(e.target.value, filterGezinslid, filterType); }}
+                  onChange={(e) => { setQuery(e.target.value); updateUrl(e.target.value, filterGezinslid, filterType, filterJaar); }}
                   placeholder="Zoek op afzender, onderwerp of omschrijving..."
                   className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-300"
                 />
@@ -327,7 +331,7 @@ function ArchiefContent() {
               <div className="flex gap-2 flex-wrap">
                 <select
                   value={filterGezinslid}
-                  onChange={(e) => { setFilterGezinslid(e.target.value); updateUrl(query, e.target.value, filterType); }}
+                  onChange={(e) => { setFilterGezinslid(e.target.value); updateUrl(query, e.target.value, filterType, filterJaar); }}
                   className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
                 >
                   <option value="">Alle geadresseerden</option>
@@ -338,7 +342,7 @@ function ArchiefContent() {
                 {uniqueTypes.length > 0 && (
                   <select
                     value={filterType}
-                    onChange={(e) => { setFilterType(e.target.value); updateUrl(query, filterGezinslid, e.target.value); }}
+                    onChange={(e) => { setFilterType(e.target.value); updateUrl(query, filterGezinslid, e.target.value, filterJaar); }}
                     className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
                   >
                     <option value="">Alle types</option>
@@ -347,9 +351,20 @@ function ArchiefContent() {
                     ))}
                   </select>
                 )}
-                {(query || filterGezinslid || filterType) && (
+                {[String(new Date().getFullYear()), String(new Date().getFullYear() - 1)].map((jaar) => (
                   <button
-                    onClick={() => { setQuery(""); setFilterGezinslid(""); setFilterType(""); setHasSearched(false); setDocuments([]); updateUrl("", "", ""); }}
+                    key={jaar}
+                    onClick={() => { const v = filterJaar === jaar ? "" : jaar; setFilterJaar(v); updateUrl(query, filterGezinslid, filterType, v); }}
+                    className={`text-xs px-3 py-2 rounded-xl border font-medium transition-colors ${
+                      filterJaar === jaar ? "bg-amber-500 text-white border-amber-500" : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {jaar}
+                  </button>
+                ))}
+                {(query || filterGezinslid || filterType || filterJaar) && (
+                  <button
+                    onClick={() => { setQuery(""); setFilterGezinslid(""); setFilterType(""); setFilterJaar(""); setHasSearched(false); setDocuments([]); updateUrl("", "", "", ""); }}
                     className="text-xs text-amber-600 hover:text-amber-800 font-medium px-3 py-2 rounded-xl border border-amber-200 transition-colors"
                   >
                     Wis filters
@@ -590,6 +605,9 @@ function ArchiefContent() {
                             <p className="text-sm font-medium text-gray-700 truncate">
                               {doc.afzender ?? doc.bestandsnaam}
                             </p>
+                            {doc.onderwerp && (
+                              <p className="text-xs text-gray-500 truncate">{doc.onderwerp}</p>
+                            )}
                             {doc.datum && (
                               <p className="text-xs text-gray-400">{formatDate(doc.datum)}</p>
                             )}
