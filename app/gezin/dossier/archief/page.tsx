@@ -126,6 +126,7 @@ function ArchiefContent() {
   const [autoMappingDone, setAutoMappingDone] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const treeLoadingRef = useRef(false);
 
   const updateUrl = useCallback((q: string, gezinslid: string, type: string) => {
@@ -248,7 +249,7 @@ function ArchiefContent() {
   }, [editValue]);
 
   async function deleteDocument(id: string) {
-    if (!confirm("Dit document verwijderen uit het archief?")) return;
+    setConfirmDeleteId(null);
     setDeletingId(id);
     try {
       await fetch(`/api/tools/mijn-dossier/documents?id=${id}`, { method: "DELETE" });
@@ -417,7 +418,7 @@ function ArchiefContent() {
                           )}
                         </div>
                       </div>
-                      <div className="flex flex-col gap-1.5 flex-shrink-0">
+                      <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                         {doc.file_url && (
                           <a
                             href={doc.file_url}
@@ -428,14 +429,31 @@ function ArchiefContent() {
                             Openen →
                           </a>
                         )}
-                        <button
-                          onClick={() => deleteDocument(doc.id)}
-                          disabled={deletingId === doc.id}
-                          className="text-xs text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                          aria-label="Verwijder"
-                        >
-                          {deletingId === doc.id ? "…" : "✕"}
-                        </button>
+                        {confirmDeleteId === doc.id ? (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => deleteDocument(doc.id)}
+                              disabled={deletingId === doc.id}
+                              className="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-0.5 rounded-md font-medium transition-colors"
+                            >
+                              {deletingId === doc.id ? "…" : "Ja"}
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                              Nee
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(doc.id)}
+                            className="text-xs text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                            aria-label="Verwijder"
+                          >
+                            ✕
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -562,14 +580,31 @@ function ArchiefContent() {
                             >
                               ✏️
                             </button>
-                            <button
-                              onClick={() => deleteDocument(doc.id)}
-                              disabled={deletingId === doc.id}
-                              className="text-xs text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                              aria-label="Verwijder"
-                            >
-                              {deletingId === doc.id ? "…" : "✕"}
-                            </button>
+                            {confirmDeleteId === doc.id ? (
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  onClick={() => deleteDocument(doc.id)}
+                                  disabled={deletingId === doc.id}
+                                  className="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-0.5 rounded-md font-medium transition-colors"
+                                >
+                                  {deletingId === doc.id ? "…" : "Ja"}
+                                </button>
+                                <button
+                                  onClick={() => setConfirmDeleteId(null)}
+                                  className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                  Nee
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setConfirmDeleteId(doc.id)}
+                                className="text-xs text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                                aria-label="Verwijder"
+                              >
+                                ✕
+                              </button>
+                            )}
                           </div>
                         </div>
                         {editingId === doc.id && (
