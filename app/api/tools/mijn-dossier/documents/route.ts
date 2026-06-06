@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-// GET /api/tools/mijn-dossier/documents?q=...&gezinslid=...&type=...
+// GET /api/tools/mijn-dossier/documents?q=...&gezinslid=...&type=...&all=1
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   const q = searchParams.get("q")?.trim() ?? "";
   const gezinslid = searchParams.get("gezinslid")?.trim() ?? "";
   const type = searchParams.get("type")?.trim() ?? "";
+  const allDocs = searchParams.get("all") === "1";
   const offset = parseInt(searchParams.get("offset") ?? "0", 10);
   const PAGE_SIZE = 20;
 
@@ -18,8 +19,11 @@ export async function GET(req: NextRequest) {
     .from("documents")
     .select("*")
     .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .range(offset, offset + PAGE_SIZE); // fetch PAGE_SIZE+1 to detect hasMore
+    .order("created_at", { ascending: false });
+
+  if (!allDocs) {
+    query = query.range(offset, offset + PAGE_SIZE);
+  }
 
   if (q) {
     query = query.or(
@@ -35,6 +39,10 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  if (allDocs) {
+    return NextResponse.json({ documents: data ?? [], hasMore: false });
+  }
 
   const all = data ?? [];
   const hasMore = all.length > PAGE_SIZE;
