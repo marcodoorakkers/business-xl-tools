@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import NMMPKLogo from "@/components/NMMPKLogo";
@@ -8,6 +9,23 @@ import { createClient } from "@/lib/supabase/client";
 export default function DossierNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const [openCount, setOpenCount] = useState(0);
+  const [hasOverdue, setHasOverdue] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/tools/mijn-dossier/acties")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!Array.isArray(data)) return;
+        const open = data.filter((a: { status: string }) => a.status === "open");
+        setOpenCount(open.length);
+        setHasOverdue(open.some((a: { deadline: string | null }) => {
+          if (!a.deadline) return false;
+          return new Date(a.deadline).getTime() < Date.now();
+        }));
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   const navLink = (href: string, label: string) => {
     const active = pathname === href || pathname.startsWith(href + "/");
@@ -41,7 +59,21 @@ export default function DossierNav() {
       <div className="max-w-lg mx-auto flex items-center justify-between">
         <NMMPKLogo iconOnly />
         <div className="flex items-center gap-4">
-          {navLink("/acties", "Acties")}
+          <Link
+            href="/acties"
+            className={`text-sm font-medium transition-colors flex items-center gap-1 ${
+              pathname === "/acties" ? "text-amber-600" : "text-gray-500 hover:text-amber-500"
+            }`}
+          >
+            Acties
+            {openCount > 0 && (
+              <span className={`inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold rounded-full ${
+                hasOverdue ? "bg-red-500 text-white" : "bg-amber-400 text-white"
+              }`}>
+                {openCount > 9 ? "9+" : openCount}
+              </span>
+            )}
+          </Link>
           {navLink("/dossier/archief", "Documenten")}
           {iconLink("/ideeen", "Ideeën",
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 7 7c0 2.6-1.4 4.9-3.5 6.2V17a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-1.8A7 7 0 0 1 5 9a7 7 0 0 1 7-7z"/></svg>
