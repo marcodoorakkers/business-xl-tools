@@ -218,8 +218,12 @@ export default function ActiesPage() {
                         )}
                         <div className="flex items-center gap-2 flex-wrap mt-2">
                           {action.deadline && (
-                            <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${URGENCY_STYLES[dl.urgency]}`}>
-                              {dl.label}
+                            <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${
+                              filter === "open" ? URGENCY_STYLES[dl.urgency] : "bg-gray-50 border-gray-200 text-gray-500"
+                            }`}>
+                              {filter === "open"
+                                ? dl.label
+                                : new Date(action.deadline).toLocaleDateString("nl-NL", { day: "numeric", month: "long" })}
                             </span>
                           )}
                           {action.mappad && (
