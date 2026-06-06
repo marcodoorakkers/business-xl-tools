@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
   const body = await req.json();
-  const { bestandsnaam, type, afzender, datum, onderwerp, mappad, gezinslid, samenvatting, file_url, storage } = body;
+  const { bestandsnaam, type, afzender, datum, onderwerp, mappad, gezinslid, samenvatting, file_url, storage, actie } = body;
 
   if (!bestandsnaam) return NextResponse.json({ error: "Bestandsnaam vereist" }, { status: 400 });
 
@@ -74,6 +74,8 @@ export async function POST(req: NextRequest) {
       samenvatting: samenvatting ?? null,
       file_url: file_url ?? null,
       storage: storage ?? "local",
+      actie: actie ?? null,
+      actie_gedaan: false,
     })
     .select()
     .single();
@@ -94,11 +96,14 @@ export async function PATCH(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "ID vereist" }, { status: 400 });
 
   const body = await req.json();
-  if (!("mappad" in body)) return NextResponse.json({ error: "mappad vereist" }, { status: 400 });
+  const updates: Record<string, unknown> = {};
+  if ("mappad" in body) updates.mappad = body.mappad || null;
+  if ("actie_gedaan" in body) updates.actie_gedaan = Boolean(body.actie_gedaan);
+  if (Object.keys(updates).length === 0) return NextResponse.json({ error: "Geen wijzigingen" }, { status: 400 });
 
   const { error } = await supabase
     .from("documents")
-    .update({ mappad: body.mappad || null })
+    .update(updates)
     .eq("id", id)
     .eq("user_id", user.id);
 

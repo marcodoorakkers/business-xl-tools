@@ -252,6 +252,7 @@ export default function GezinDossierPage() {
           samenvatting: analysis.samenvatting ?? null,
           file_url: fileUrl ?? null,
           storage: storage ?? "local",
+          actie: includeActie ? (analysis.actie ?? null) : null,
         }),
       });
     } catch {
