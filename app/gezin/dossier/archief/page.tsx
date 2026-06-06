@@ -124,6 +124,8 @@ function ArchiefContent() {
   const [drillPath, setDrillPath] = useState<string[]>([]);
   const [autoMappingLoading, setAutoMappingLoading] = useState(false);
   const [autoMappingDone, setAutoMappingDone] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
   const treeLoadingRef = useRef(false);
 
   const updateUrl = useCallback((q: string, gezinslid: string, type: string) => {
@@ -224,6 +226,26 @@ function ArchiefContent() {
       })
       .catch(() => {});
   }, []);
+
+  const startEdit = useCallback((doc: Document) => {
+    setEditingId(doc.id);
+    setEditValue(doc.mappad ?? "");
+  }, []);
+
+  const saveMappad = useCallback(async (id: string) => {
+    const newMappad = editValue.trim() || null;
+    try {
+      await fetch(`/api/tools/mijn-dossier/documents?id=${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mappad: newMappad }),
+      });
+      setDocuments((prev) => prev.map((d) => d.id === id ? { ...d, mappad: newMappad } : d));
+      setTreeData(null);
+      setDrillPath([]);
+    } catch { /* stil */ }
+    finally { setEditingId(null); }
+  }, [editValue]);
 
   async function deleteDocument(id: string) {
     if (!confirm("Dit document verwijderen uit het archief?")) return;
@@ -372,10 +394,21 @@ function ArchiefContent() {
                               👤 {doc.gezinslid}
                             </span>
                           )}
-                          {doc.mappad && (
-                            <span className="text-xs text-gray-400 truncate max-w-[140px]">
+                          {doc.mappad && editingId !== doc.id && (
+                            <button
+                              onClick={() => startEdit(doc)}
+                              className="text-xs text-gray-400 hover:text-amber-600 truncate max-w-[140px] text-left transition-colors"
+                            >
                               📁 {doc.mappad}
-                            </span>
+                            </button>
+                          )}
+                          {!doc.mappad && editingId !== doc.id && (
+                            <button
+                              onClick={() => startEdit(doc)}
+                              className="text-xs text-gray-300 hover:text-amber-500 transition-colors"
+                            >
+                              + map
+                            </button>
                           )}
                           {doc.storage && doc.storage !== "local" && (
                             <span className="text-xs text-gray-400">
@@ -405,7 +438,28 @@ function ArchiefContent() {
                         </button>
                       </div>
                     </div>
-                  ))}
+
+                    {/* Inline mappad editor */}
+                    {editingId === doc.id && (
+                      <div className="mt-2 flex gap-2">
+                        <input
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === "Enter") saveMappad(doc.id); if (e.key === "Escape") setEditingId(null); }}
+                          placeholder="Afzender/Onderwerp/Jaar"
+                          className="flex-1 text-xs border border-amber-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                          autoFocus
+                        />
+                        <button onClick={() => saveMappad(doc.id)} className="text-xs text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded-lg font-medium transition-colors">
+                          Opslaan
+                        </button>
+                        <button onClick={() => setEditingId(null)} className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1.5 transition-colors">
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
                 </div>
 
                 {hasMore && (
@@ -479,39 +533,63 @@ function ArchiefContent() {
                 {currentNode && currentNode.documents.length > 0 && (
                   <div>
                     {currentNode.documents.map((doc) => (
-                      <div
-                        key={doc.id}
-                        className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-50 group"
-                      >
-                        <span className="text-xl flex-shrink-0">{TYPE_ICONS[doc.type ?? ""] ?? "📄"}</span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-700 truncate">
-                            {doc.afzender ?? doc.bestandsnaam}
-                          </p>
-                          {doc.datum && (
-                            <p className="text-xs text-gray-400">{formatDate(doc.datum)}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          {doc.file_url && (
-                            <a
-                              href={doc.file_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-amber-600 hover:text-amber-800 font-medium whitespace-nowrap"
+                      <div key={doc.id} className="border-b border-gray-50">
+                        <div className="flex items-center gap-3 px-4 py-3.5 group">
+                          <span className="text-xl flex-shrink-0">{TYPE_ICONS[doc.type ?? ""] ?? "📄"}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-700 truncate">
+                              {doc.afzender ?? doc.bestandsnaam}
+                            </p>
+                            {doc.datum && (
+                              <p className="text-xs text-gray-400">{formatDate(doc.datum)}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {doc.file_url && (
+                              <a
+                                href={doc.file_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-amber-600 hover:text-amber-800 font-medium whitespace-nowrap"
+                              >
+                                Openen →
+                              </a>
+                            )}
+                            <button
+                              onClick={() => startEdit(doc)}
+                              className="text-xs text-gray-300 hover:text-amber-500 transition-colors"
+                              aria-label="Mappad bewerken"
                             >
-                              Openen →
-                            </a>
-                          )}
-                          <button
-                            onClick={() => deleteDocument(doc.id)}
-                            disabled={deletingId === doc.id}
-                            className="text-xs text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                            aria-label="Verwijder"
-                          >
-                            {deletingId === doc.id ? "…" : "✕"}
-                          </button>
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => deleteDocument(doc.id)}
+                              disabled={deletingId === doc.id}
+                              className="text-xs text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                              aria-label="Verwijder"
+                            >
+                              {deletingId === doc.id ? "…" : "✕"}
+                            </button>
+                          </div>
                         </div>
+                        {editingId === doc.id && (
+                          <div className="flex gap-2 px-4 pb-3">
+                            <input
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onKeyDown={(e) => { if (e.key === "Enter") saveMappad(doc.id); if (e.key === "Escape") setEditingId(null); }}
+                              placeholder="Afzender/Onderwerp/Jaar"
+                              className="flex-1 text-xs border border-amber-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                              autoFocus
+                            />
+                            <button onClick={() => saveMappad(doc.id)} className="text-xs text-white bg-amber-500 hover:bg-amber-600 px-3 py-1.5 rounded-lg font-medium transition-colors">
+                              Opslaan
+                            </button>
+                            <button onClick={() => setEditingId(null)} className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1.5 transition-colors">
+                              ✕
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
