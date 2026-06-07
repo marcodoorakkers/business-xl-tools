@@ -1,5 +1,5 @@
 import Link from "next/link";
-import DossierNav from "../components/DossierNav";
+import BottomNav from "../components/BottomNav";
 
 export const metadata = { title: "Aan de slag — NooitMeerPostKwijt" };
 
@@ -77,9 +77,7 @@ const tips = [
 export default function AanDeSlagPage() {
   return (
     <div className="min-h-screen bg-white">
-      <DossierNav />
-
-      <main className="max-w-2xl mx-auto px-6 py-10 space-y-10">
+      <main className="max-w-2xl mx-auto px-6 py-10 pb-24 space-y-10">
 
         {/* Intro */}
         <div>
@@ -153,6 +151,7 @@ export default function AanDeSlagPage() {
         </div>
 
       </main>
+      <BottomNav />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
-import NMMPKLogo from "@/components/NMMPKLogo";
+import BottomNav from "@/app/gezin/dossier/components/BottomNav";
 
 function googleCalendarUrl(actie: string, deadline: string, afzender: string | null) {
   const d = deadline.replace(/-/g, "");
@@ -195,17 +195,7 @@ export default function GezinActiesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
-          <NMMPKLogo />
-          <Link href="/dossier" className="text-sm text-gray-500 hover:text-gray-800 font-medium transition-colors">
-            ← Scannen
-          </Link>
-        </div>
-      </header>
-
-      <main className="max-w-lg mx-auto px-6 py-8">
+      <main className="max-w-lg mx-auto px-6 py-8 pb-24">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Acties</h1>
@@ -377,6 +367,7 @@ export default function GezinActiesPage() {
           </div>
         )}
       </main>
+      <BottomNav />
     </div>
   );
 }

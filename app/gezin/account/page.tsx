@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import DossierNav from "@/app/gezin/dossier/components/DossierNav";
+import BottomNav from "@/app/gezin/dossier/components/BottomNav";
 import AutoCheckoutWrapper from "./AutoCheckoutWrapper";
 import SubscribeButton from "@/app/account/SubscribeButton";
 import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
@@ -33,9 +33,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
 
   return (
     <div className="min-h-screen bg-white">
-      <DossierNav />
-
-      <main className="max-w-lg mx-auto px-6 py-8 flex flex-col gap-5">
+      <main className="max-w-lg mx-auto px-6 py-8 pb-24 flex flex-col gap-5">
         <h1 className="text-2xl font-extrabold text-gray-900">Account</h1>
 
         {/* Founding member badge */}
@@ -176,6 +174,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           <DeleteAccountButton />
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 }

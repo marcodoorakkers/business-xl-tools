@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
-import DossierNav from "../dossier/components/DossierNav";
+import BottomNav from "../dossier/components/BottomNav";
 
 interface NMUser {
   id: string;
@@ -106,9 +106,7 @@ export default function NMMPKAdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DossierNav />
-
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 pb-24">
         <div className="mb-6">
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Admin — NooitMeerPostKwijt</h1>
           <p className="text-gray-500 text-sm">Alleen zichtbaar voor jou.</p>
@@ -291,6 +289,7 @@ export default function NMMPKAdminPage() {
           )}
         </div>
       </div>
+      <BottomNav />
     </div>
   );
 }

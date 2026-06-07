@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import DossierNav from "../components/DossierNav";
+import BottomNav from "../components/BottomNav";
 
 interface StatusData {
   connected: boolean;
@@ -212,9 +212,7 @@ function InstellingenContent() {
         </div>
       )}
 
-      <DossierNav />
-
-      <main className="max-w-lg mx-auto px-6 py-8 space-y-5">
+      <main className="max-w-lg mx-auto px-6 py-8 pb-24 space-y-5">
         <div className="mb-2">
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Instellingen</h1>
           <p className="text-gray-500 text-sm">Beheer je opslagvoorkeur, koppelingen en geadresseerden.</p>
@@ -492,6 +490,7 @@ function InstellingenContent() {
           </div>
         </div>
       </main>
+      <BottomNav />
     </div>
   );
 }

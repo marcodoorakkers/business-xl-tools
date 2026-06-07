@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import DossierNav from "../dossier/components/DossierNav";
+import BottomNav from "../dossier/components/BottomNav";
 
 interface Idea {
   id: string;
@@ -150,9 +150,7 @@ export default function NMMPKIdeeënPage() {
         </div>
       )}
 
-      <DossierNav />
-
-      <div className="max-w-lg mx-auto px-4 py-8">
+      <div className="max-w-lg mx-auto px-4 py-8 pb-24">
 
         {/* Header */}
         <div className="mb-6">
@@ -304,6 +302,7 @@ export default function NMMPKIdeeënPage() {
           )}
         </div>
       </div>
+      <BottomNav />
     </div>
   );
 }
