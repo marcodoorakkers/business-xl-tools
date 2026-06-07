@@ -151,7 +151,6 @@ export default function NMMPKAdminPage() {
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Opslag</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Docs</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Founding</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-gray-500">Testdata</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
@@ -205,28 +204,6 @@ export default function NMMPKAdminPage() {
                             <span className="text-xs font-medium text-amber-700">Founding</span>
                           </span>
                         ) : <span className="text-xs text-gray-400">—</span>}
-                      </td>
-                      <td className="px-4 py-3">
-                        {confirmResetId === u.id ? (
-                          <div className="flex items-center gap-1.5 whitespace-nowrap">
-                            <button
-                              onClick={() => resetUserData(u.id)}
-                              disabled={resetting}
-                              className="text-xs bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-2 py-0.5 rounded font-medium"
-                            >
-                              {resetting ? "…" : "Ja"}
-                            </button>
-                            <button onClick={() => setConfirmResetId(null)} className="text-xs text-gray-400 hover:text-gray-600">Nee</button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => { setConfirmResetId(u.id); setResetResult(null); }}
-                            disabled={u.doc_count === 0}
-                            className="text-xs text-red-500 hover:text-red-700 font-medium disabled:text-gray-300 disabled:cursor-not-allowed"
-                          >
-                            Wis
-                          </button>
-                        )}
                       </td>
                     </tr>
                   ))}
