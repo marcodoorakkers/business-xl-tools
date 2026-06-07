@@ -13,6 +13,16 @@ interface User {
   total_usage: number;
 }
 
+interface NmmpkUser {
+  id: string;
+  email: string;
+  created_at: string;
+  subscription_status: string | null;
+  promo_code: string | null;
+  storage_preference: string | null;
+  doc_count: number;
+}
+
 interface Idea {
   id: string;
   title: string;
@@ -65,7 +75,7 @@ const STATUS_STYLES: Record<Status, { label: string; bg: string; color: string }
 };
 
 export default function AdminPage() {
-  const [tab, setTab] = useState<"users" | "ideas" | "stats">("users");
+  const [tab, setTab] = useState<"users" | "ideas" | "stats" | "testdata">("users");
 
   // — Users state —
   const [users, setUsers] = useState<User[]>([]);
@@ -84,6 +94,13 @@ export default function AdminPage() {
   // — Stats state —
   const [stats, setStats] = useState<Stats | null>(null);
   const [loadingStats, setLoadingStats] = useState(false);
+
+  // — Testdata state —
+  const [nmmpkUsers, setNmmpkUsers] = useState<NmmpkUser[]>([]);
+  const [loadingNmmpk, setLoadingNmmpk] = useState(false);
+  const [confirmResetId, setConfirmResetId] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+  const [resetResult, setResetResult] = useState<{ userId: string; docsDeleted: number; actiesDeleted: number } | null>(null);
 
   const [error, setError] = useState("");
 
@@ -114,9 +131,39 @@ export default function AdminPage() {
     setLoadingStats(false);
   }
 
+  async function loadNmmpkUsers() {
+    setLoadingNmmpk(true);
+    const res = await fetch("/api/admin/nmmpk-users");
+    if (res.status === 401) { setError("Geen toegang."); setLoadingNmmpk(false); return; }
+    const data = await res.json();
+    setNmmpkUsers(data.users ?? []);
+    setLoadingNmmpk(false);
+  }
+
+  async function resetUserData(userId: string) {
+    setResetting(true);
+    try {
+      const res = await fetch("/api/admin/reset-user-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(`Fout: ${data.error}`); return; }
+      setResetResult({ userId, docsDeleted: data.docsDeleted, actiesDeleted: data.actiesDeleted });
+      setNmmpkUsers((prev) => prev.map((u) => u.id === userId ? { ...u, doc_count: 0 } : u));
+      setConfirmResetId(null);
+    } catch {
+      setError("Netwerkfout bij wissen.");
+    } finally {
+      setResetting(false);
+    }
+  }
+
   useEffect(() => { loadUsers(); }, []);
   useEffect(() => { if (tab === "ideas" && ideas.length === 0) loadIdeas(); }, [tab]);
   useEffect(() => { if (tab === "stats" && !stats) loadStats(); }, [tab]);
+  useEffect(() => { if (tab === "testdata" && nmmpkUsers.length === 0) loadNmmpkUsers(); }, [tab]);
 
   async function saveCredits(userId: string) {
     setSaving(true);
@@ -209,6 +256,16 @@ export default function AdminPage() {
             }`}
           >
             📊 Rapportage
+          </button>
+          <button
+            onClick={() => setTab("testdata")}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold transition-colors ${
+              tab === "testdata"
+                ? "bg-red-600 text-white shadow"
+                : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            🧹 Testdata
           </button>
         </div>
 
@@ -500,6 +557,101 @@ export default function AdminPage() {
                 })}
                 {ideas.length === 0 && (
                   <p className="text-center text-gray-400 py-12 text-sm">Nog geen ideeën ingediend.</p>
+                )}
+              </div>
+            )}
+          </>
+        )}
+        {/* ── Testdata tab ── */}
+        {tab === "testdata" && (
+          <>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Testdata wissen</h1>
+                <p className="text-sm text-gray-500 mt-1">Verwijdert alle documenten en acties van een gebruiker. Alleen voor testdoeleinden.</p>
+              </div>
+              <button
+                onClick={loadNmmpkUsers}
+                className="text-xs text-gray-500 hover:text-gray-800 border border-gray-200 rounded-lg px-3 py-1.5 bg-white"
+              >
+                ↻ Verversen
+              </button>
+            </div>
+
+            {resetResult && (
+              <div className="bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 mb-6 text-sm flex items-center justify-between">
+                <span>✓ Gewist: {resetResult.docsDeleted} documenten, {resetResult.actiesDeleted} acties</span>
+                <button onClick={() => setResetResult(null)} className="text-green-500 hover:text-green-700 text-xs">✕</button>
+              </div>
+            )}
+
+            <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6 text-sm text-red-700">
+              ⚠️ Deze actie is onomkeerbaar. Gebruik alleen op testaccounts.
+            </div>
+
+            {loadingNmmpk ? (
+              <div className="flex justify-center py-12">
+                <div className="w-8 h-8 border-4 border-red-400 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="text-left px-4 py-3 font-medium text-gray-600">E-mail</th>
+                      <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+                      <th className="text-center px-4 py-3 font-medium text-gray-600">Docs</th>
+                      <th className="text-right px-4 py-3 font-medium text-gray-600">Actie</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {nmmpkUsers.map((u) => (
+                      <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3 text-gray-900">{u.email}</td>
+                        <td className="px-4 py-3">
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                            u.subscription_status === "active" ? "bg-green-100 text-green-700" :
+                            u.subscription_status === "trialing" ? "bg-amber-100 text-amber-700" :
+                            "bg-gray-100 text-gray-500"
+                          }`}>
+                            {u.subscription_status ?? "geen"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center text-gray-700 font-medium">{u.doc_count}</td>
+                        <td className="px-4 py-3 text-right">
+                          {confirmResetId === u.id ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <span className="text-xs text-gray-600">Zeker weten?</span>
+                              <button
+                                onClick={() => resetUserData(u.id)}
+                                disabled={resetting}
+                                className="text-xs bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-3 py-1 rounded-lg font-medium"
+                              >
+                                {resetting ? "Bezig…" : "Ja, wis alles"}
+                              </button>
+                              <button
+                                onClick={() => setConfirmResetId(null)}
+                                className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
+                              >
+                                Annuleer
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => { setConfirmResetId(u.id); setResetResult(null); }}
+                              disabled={u.doc_count === 0}
+                              className="text-xs text-red-600 hover:text-red-800 font-medium disabled:text-gray-300 disabled:cursor-not-allowed"
+                            >
+                              Wis testdata
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {nmmpkUsers.length === 0 && (
+                  <p className="text-center text-gray-400 py-8 text-sm">Geen NMMPK-gebruikers gevonden.</p>
                 )}
               </div>
             )}
