@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import DossierNav from "../components/DossierNav";
+import BottomNav from "../components/BottomNav";
 
 interface Document {
   id: string;
@@ -307,9 +307,7 @@ function ArchiefContent() {
 
   return (
     <div className="min-h-screen bg-white">
-      <DossierNav />
-
-      <main className="max-w-2xl mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-4 py-8 pb-24">
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Documenten</h1>
@@ -770,6 +768,7 @@ function ArchiefContent() {
           </div>
         )}
       </main>
+      <BottomNav />
     </div>
   );
 }

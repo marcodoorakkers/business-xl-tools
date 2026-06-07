@@ -6,7 +6,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import DossierNav from "./components/DossierNav";
+import BottomNav from "./components/BottomNav";
 
 type Step = "idle" | "staging" | "analyzing" | "suggestion" | "saving" | "done" | "error";
 
@@ -336,10 +336,7 @@ export default function GezinDossierPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <DossierNav />
-
-      <main className="max-w-lg mx-auto px-6 py-8">
+      <main className="max-w-lg mx-auto px-6 py-8 pb-24">
 
         {/* IDLE — upload zone */}
         {step === "idle" && (
@@ -627,6 +624,7 @@ export default function GezinDossierPage() {
           </div>
         )}
       </main>
+      <BottomNav />
     </div>
   );
 }
