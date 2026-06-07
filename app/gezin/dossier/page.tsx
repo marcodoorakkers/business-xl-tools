@@ -358,7 +358,12 @@ export default function GezinDossierPage() {
                 addFiles(Array.from(e.dataTransfer.files));
               }}
             >
-              <div className="text-5xl mb-3">📸</div>
+              <div className="flex justify-center mb-4">
+                <svg className="w-14 h-14 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
               <p className="font-semibold text-gray-700 mb-1">Tik om een foto te maken of te uploaden</p>
               <p className="text-xs text-gray-400">JPG, PNG of PDF • Meerdere pagina&apos;s mogelijk</p>
               <input
