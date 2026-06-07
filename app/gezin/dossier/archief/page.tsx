@@ -411,7 +411,8 @@ function ArchiefContent() {
                 <p className="text-xs text-gray-400 mb-3">{documents.length} document{documents.length !== 1 ? "en" : ""} gevonden</p>
                 <div className="flex flex-col gap-3">
                   {documents.map((doc) => (
-                    <div key={doc.id} className="bg-white border border-gray-100 rounded-2xl p-4 flex items-start gap-3 group">
+                    <div key={doc.id}>
+                    <div className="bg-white border border-gray-100 rounded-2xl p-4 flex items-start gap-3 group">
                       <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-xl flex-shrink-0 mt-0.5">
                         {TYPE_ICONS[doc.type ?? ""] ?? "📄"}
                       </div>
