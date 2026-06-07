@@ -42,6 +42,9 @@ export default function NMMPKAdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [vriendActive, setVriendActive] = useState<boolean | null>(null);
   const [togglingVriend, setTogglingVriend] = useState(false);
+  const [confirmResetId, setConfirmResetId] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+  const [resetResult, setResetResult] = useState<{ userId: string; docsDeleted: number } | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/nmmpk-users")
@@ -57,6 +60,26 @@ export default function NMMPKAdminPage() {
       .then((r) => r.json())
       .then((d) => setVriendActive(d.promo?.active ?? false));
   }, []);
+
+  async function resetUserData(userId: string) {
+    setResetting(true);
+    try {
+      const res = await fetch("/api/admin/reset-user-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error); return; }
+      setResetResult({ userId, docsDeleted: data.docsDeleted });
+      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, doc_count: 0 } : u));
+      setConfirmResetId(null);
+    } catch {
+      setError("Netwerkfout bij wissen.");
+    } finally {
+      setResetting(false);
+    }
+  }
 
   async function toggleVriend() {
     setTogglingVriend(true);
@@ -130,9 +153,18 @@ export default function NMMPKAdminPage() {
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Opslag</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Docs</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Founding</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500">Testdata</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
+                  {resetResult && (
+                    <tr>
+                      <td colSpan={8} className="px-5 py-2 bg-green-50 text-green-700 text-xs font-medium">
+                        ✓ {resetResult.docsDeleted} documenten gewist
+                        <button onClick={() => setResetResult(null)} className="ml-3 text-green-500 hover:text-green-700">✕</button>
+                      </td>
+                    </tr>
+                  )}
                   {users.map((u) => (
                     <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3 text-gray-800 font-medium max-w-[200px] truncate">{u.email}</td>
@@ -150,6 +182,28 @@ export default function NMMPKAdminPage() {
                             <span className="text-xs font-medium text-amber-700">Founding</span>
                           </span>
                         ) : <span className="text-xs text-gray-400">—</span>}
+                      </td>
+                      <td className="px-4 py-3">
+                        {confirmResetId === u.id ? (
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            <button
+                              onClick={() => resetUserData(u.id)}
+                              disabled={resetting}
+                              className="text-xs bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white px-2 py-0.5 rounded font-medium"
+                            >
+                              {resetting ? "…" : "Ja"}
+                            </button>
+                            <button onClick={() => setConfirmResetId(null)} className="text-xs text-gray-400 hover:text-gray-600">Nee</button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => { setConfirmResetId(u.id); setResetResult(null); }}
+                            disabled={u.doc_count === 0}
+                            className="text-xs text-red-500 hover:text-red-700 font-medium disabled:text-gray-300 disabled:cursor-not-allowed"
+                          >
+                            Wis
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
