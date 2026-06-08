@@ -91,8 +91,8 @@ export default function GezinPrivacyPage() {
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-3">4. Gebruik van kunstmatige intelligentie</h2>
             <p className="mb-2">NooitMeerPostKwijt maakt gebruik van AI-technologie van Anthropic (Claude). De door jou geüploade documenten worden via een beveiligde verbinding naar Anthropic verzonden voor analyse.</p>
-            <p className="mb-2">Anthropic treedt op als verwerker; NooitMeerPostKwijt is de verwerkingsverantwoordelijke. Anthropic verwerkt gegevens conform hun standaard API-voorwaarden en privacybeleid, die van toepassing zijn op alle API-gebruikers. Documenten die via de API worden verwerkt, worden door Anthropic niet gebruikt voor modeltraining.</p>
-            <p>Meer informatie: <a href="https://www.anthropic.com/privacy" className="text-amber-600 hover:underline" target="_blank" rel="noopener noreferrer">www.anthropic.com/privacy</a></p>
+            <p className="mb-2">NooitMeerPostKwijt is de verwerkingsverantwoordelijke; Anthropic treedt op als verwerker ten behoeve van NooitMeerPostKwijt. Het consumentenprivacybeleid van Anthropic is niet van toepassing — Anthropic verwerkt de gegevens uitsluitend in opdracht van NooitMeerPostKwijt conform hun API-gebruiksvoorwaarden. Documenten die via de API worden verwerkt, worden door Anthropic niet gebruikt voor modeltraining.</p>
+            <p>Meer informatie: <a href="https://www.anthropic.com/legal" className="text-amber-600 hover:underline" target="_blank" rel="noopener noreferrer">www.anthropic.com/legal</a></p>
           </section>
 
           <section>
