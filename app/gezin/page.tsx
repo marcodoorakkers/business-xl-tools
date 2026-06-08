@@ -295,6 +295,8 @@ export default async function GezinLandingPage() {
         <span>·</span>
         <Link href="/privacy" className="hover:text-gray-600 underline">Privacyverklaring</Link>
         <span>·</span>
+        <Link href="/veiligheid" className="hover:text-gray-600 underline">Veiligheid &amp; Privacy FAQ</Link>
+        <span>·</span>
         <Link href="/disclaimer" className="hover:text-gray-600 underline">Disclaimer</Link>
         <span>·</span>
         <Link href="/voorwaarden" className="hover:text-gray-600 underline">Algemene Voorwaarden</Link>
