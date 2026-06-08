@@ -6,6 +6,25 @@ Functies die bewust zijn uitgesteld. Elke entry bevat de motivatie en wat er nod
 
 ## Gemiddelde prioriteit
 
+### Instelbare agenda-reminders voor acties
+**Wat:** Gebruiker kiest per actie (of als standaard instelling) hoeveel dagen vóór de deadline hij een herinnering wil ontvangen — bijv. 3 dagen van tevoren. De herinnering kan worden verstuurd als e-mail, of als kalenderafspraak met ingebouwde VALARM (via ICS).
+
+**Wat er al is:**
+- Reminder-e-mails worden al verstuurd 1–3 dagen voor de deadline (via dagelijkse cron op `/api/onboarding/send`), bijgehouden via `reminder_sent_at` op `document_actions`
+- Google Calendar-link en ICS-download staan al in de actiepagina (handmatig, op verzoek van gebruiker)
+
+**Wat er nog ontbreekt:**
+- Instelbare reminderperiode per gebruiker of per actie (bijv. 1, 3, 7 dagen)
+- VALARM in de gegenereerde ICS zodat de agenda zelf ook een herinnering geeft
+- Optioneel: automatisch een kalenderafspraak aanmaken via Google Calendar API / CalDAV (complex, vereist OAuth)
+
+**Aanbevolen aanpak (lichtgewicht):**
+1. `reminder_days` voorkeur toevoegen aan `archive_settings` (default: 3)
+2. Cron gebruikt `reminder_days` i.p.v. hardcoded 1–3
+3. ICS-download krijgt een `VALARM` component met de gekozen periode
+
+---
+
 ### Gezinsbeheer met gedeelde inbox
 **Wat:** Meerdere accounts koppelen aan één gezin. Gedeelde actielijst, notificatie als iemand anders een document scant.
 
