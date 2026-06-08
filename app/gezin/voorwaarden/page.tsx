@@ -63,7 +63,7 @@ export default function GezinVoorwaardenPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">5.1 Proefperiode</h3>
-                <p className="text-sm text-gray-600">Na aanmelding ontvang je een gratis proefperiode van 30 dagen. Tijdens de proefperiode is geen betaling vereist en hoef je geen betaalgegevens in te voeren. Na afloop van de proefperiode wordt het abonnement automatisch omgezet naar een betaald abonnement, mits je een betaalmethode heeft ingesteld.</p>
+                <p className="text-sm text-gray-600">Na aanmelding ontvang je een gratis proefperiode van 30 dagen. Tijdens de proefperiode is geen betaling vereist en hoef je geen betaalgegevens in te voeren. Betaling gaat pas in nadat je zelf een betaalmethode hebt toegevoegd. Doe je dat niet, dan eindigt de toegang na de proefperiode automatisch zonder kosten.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">5.2 Tarief</h3>
@@ -95,7 +95,7 @@ export default function GezinVoorwaardenPage() {
 
           <section>
             <h2 className="text-lg font-bold text-gray-900 mb-3">7. Herroepingsrecht</h2>
-            <p className="text-sm text-gray-600">Als consument heb je wettelijk het recht om binnen 14 dagen na aanmelding de overeenkomst zonder opgave van redenen te herroepen. Omdat wij een gratis proefperiode van 30 dagen hanteren zonder betalingsverplichting, kun je gedurende de volledige proefperiode kosteloos opzeggen via je accountpagina — dat is ruimer dan het wettelijke minimum. Een formeel herroepingsverzoek is daarvoor niet nodig.</p>
+            <p className="text-sm text-gray-600">Als consument heb je wettelijk het recht om binnen 14 dagen na aanmelding de overeenkomst zonder opgave van redenen te herroepen. Omdat wij een gratis proefperiode van 30 dagen hanteren zonder betalingsverplichting — en betaling pas ingaat nadat je zelf betaalgegevens hebt toegevoegd — kun je gedurende de volledige proefperiode kosteloos opzeggen via je accountpagina. Dat is ruimer dan het wettelijke minimum. Een formeel herroepingsverzoek is daarvoor niet nodig.</p>
           </section>
 
           <section>
