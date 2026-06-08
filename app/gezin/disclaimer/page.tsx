@@ -75,7 +75,7 @@ export default function GezinDisclaimerPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-10">
-          © {new Date().getFullYear()} NooitMeerPostKwijt · Business XL (Marco Doorakkers) · KvK 50418041
+          © {new Date().getFullYear()} NooitMeerPostKwijt · Business XL · KvK 50418041
         </p>
       </main>
     </div>

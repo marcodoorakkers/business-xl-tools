@@ -25,7 +25,6 @@ export default function GezinPrivacyPage() {
             <div className="mt-3 bg-amber-50 rounded-xl p-4 text-sm space-y-1">
               <p><span className="font-medium">Handelsnaam:</span> NooitMeerPostKwijt</p>
               <p><span className="font-medium">Bedrijf:</span> Business XL</p>
-              <p><span className="font-medium">Eigenaar:</span> Marco Doorakkers</p>
               <p><span className="font-medium">Adres:</span> Bosscheweg 44, 5056 KC Berkel-Enschot, Nederland</p>
               <p><span className="font-medium">KvK-nummer:</span> 50418041</p>
               <p><span className="font-medium">E-mail:</span> <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a></p>
@@ -206,7 +205,7 @@ export default function GezinPrivacyPage() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-10">
-          © {new Date().getFullYear()} NooitMeerPostKwijt · Business XL (Marco Doorakkers) · KvK 50418041 · <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="underline hover:text-gray-600">nooitmeerpostkwijt@business-xl.nl</a>
+          © {new Date().getFullYear()} NooitMeerPostKwijt · Business XL · KvK 50418041 · <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="underline hover:text-gray-600">nooitmeerpostkwijt@business-xl.nl</a>
         </p>
       </main>
     </div>

@@ -173,6 +173,19 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           <p className="text-sm text-gray-500 mb-4">Dit verwijdert je account en alle bijbehorende data permanent.</p>
           <DeleteAccountButton />
         </div>
+
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 pt-2 pb-2">
+          <a href="/privacy" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Privacyverklaring</a>
+          <span className="text-xs text-gray-300">·</span>
+          <a href="/voorwaarden" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Algemene Voorwaarden</a>
+          <span className="text-xs text-gray-300">·</span>
+          <a href="/veiligheid" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Veiligheid &amp; Privacy FAQ</a>
+          <span className="text-xs text-gray-300">·</span>
+          <a href="/disclaimer" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Disclaimer</a>
+          <span className="text-xs text-gray-300">·</span>
+          <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">Contact</a>
+        </div>
+        <p className="text-center text-xs text-gray-300">© {new Date().getFullYear()} NooitMeerPostKwijt · Business XL</p>
       </main>
       <BottomNav />
     </div>
