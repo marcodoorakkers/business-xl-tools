@@ -25,7 +25,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Nee. Documenten die via de API worden ingediend — wat wij doen — worden niet standaard gebruikt voor modeltraining door Anthropic. Meer informatie vind je op{" "}
-        <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">anthropic.com/privacy</a>.
+        <a href="https://www.anthropic.com/legal" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">anthropic.com/legal</a>.
       </>
     ),
   },
