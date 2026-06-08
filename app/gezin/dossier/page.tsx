@@ -592,6 +592,34 @@ export default function GezinDossierPage() {
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 text-left">
                 <p className="text-xs font-semibold text-amber-700 mb-1">Actie opgeslagen</p>
                 <p className="text-sm text-gray-700">{analysis.actie}</p>
+                {analysis.actie_deadline && (
+                  <a
+                    href={(() => {
+                      const d = analysis.actie_deadline!.replace(/-/g, "");
+                      const next = analysis.actie_deadline!.replace(/-/g, "").slice(0, 6) +
+                        String(Number(analysis.actie_deadline!.slice(8, 10)) + 1).padStart(2, "0");
+                      const parts = [
+                        analysis.afzender ? `Van: ${analysis.afzender}` : "",
+                        savedInfo?.url ?? "",
+                      ].filter(Boolean);
+                      return `https://calendar.google.com/calendar/render?${new URLSearchParams({
+                        action: "TEMPLATE",
+                        text: analysis.actie!,
+                        dates: `${d}/${next}`,
+                        details: parts.join("\n"),
+                        sf: "true",
+                      })}`;
+                    })()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex items-center gap-1.5 text-xs font-medium text-amber-700 hover:text-amber-900 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <rect x="3" y="4" width="18" height="18" rx="2"/><path strokeLinecap="round" d="M16 2v4M8 2v4M3 10h18"/>
+                    </svg>
+                    Voeg toe aan agenda →
+                  </a>
+                )}
               </div>
             )}
             <div className="flex flex-col gap-3">
