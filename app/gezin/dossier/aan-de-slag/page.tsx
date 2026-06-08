@@ -76,7 +76,7 @@ const tips = [
 
 export default function AanDeSlagPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white md:pt-14">
       <main className="max-w-2xl mx-auto px-6 py-10 pb-24 space-y-10">
 
         {/* Intro */}

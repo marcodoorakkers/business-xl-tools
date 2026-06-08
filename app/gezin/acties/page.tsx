@@ -194,7 +194,7 @@ export default function GezinActiesPage() {
   const openCount = actions.filter(a => a.status === "open").length;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white md:pt-14">
       <main className="max-w-lg mx-auto px-6 py-8 pb-24">
         {/* Header */}
         <div className="mb-6">

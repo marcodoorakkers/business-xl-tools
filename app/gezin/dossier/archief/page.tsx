@@ -306,7 +306,7 @@ function ArchiefContent() {
   const parentLabel = drillPath.length === 1 ? "Mappen" : drillPath[drillPath.length - 2];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white md:pt-14">
       <main className="max-w-2xl mx-auto px-4 py-8 pb-24">
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>

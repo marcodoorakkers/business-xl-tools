@@ -71,7 +71,7 @@ export default function BottomNav() {
       {/* ══════════════════════════════
           DESKTOP — sticky top nav
           ══════════════════════════════ */}
-      <header className="hidden md:block sticky top-0 z-40 bg-white border-b border-gray-100">
+      <header className="hidden md:block fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-8 h-14 flex items-center gap-8">
 
           <NMMPKLogo href="/dossier" />
