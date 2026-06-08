@@ -31,6 +31,8 @@ Functies die bewust zijn uitgesteld. Elke entry bevat de motivatie en wat er nod
 ### Gezinsbeheer met gedeelde inbox
 **Wat:** Meerdere accounts koppelen aan één gezin. Gedeelde actielijst, notificatie als iemand anders een document scant.
 
+**Concrete trigger:** Twee gebruikers (bijv. partners) koppelen dezelfde OneDrive — documenten komen al op dezelfde plek terecht via `by_person` mapstructuur, maar acties zijn strikt per `user_id` en dus niet voor elkaar zichtbaar.
+
 **Waarom uitgesteld:** Significante omvang — vereist nieuwe datastructuur (gezinstabel, uitnodigingsflow, gedeelde RLS-policies). Niet te bouwen als losse feature.
 
 **Wat er nodig is om op te pakken:**
