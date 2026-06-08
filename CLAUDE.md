@@ -79,7 +79,7 @@ app/
     account/page.tsx             — NMMPK account (abonnement beheren)
     acties/page.tsx              — actielijst (open/gedaan/overgeslagen, deadline, afvinken)
     dossier/page.tsx             — NMMPK scan-interface (client component)
-    dossier/components/DossierNav.tsx — gedeelde nav met acties-badge
+    dossier/components/BottomNav.tsx  — responsieve nav: bottom tabs (mobiel) + topnav (desktop)
     dossier/instellingen/page.tsx — opslag, geadresseerden, mapstructuur, scan-e-mailadres
     dossier/archief/page.tsx     — documentenpagina: lijst + mappenview (drilldown)
     dossier/aan-de-slag/page.tsx — onboarding pagina nieuwe gebruikers (4 stappen + tips)
@@ -218,10 +218,15 @@ supabase/migrations/
 
 ## Navigatie (NMMPK)
 
-- Gedeelde `DossierNav` component op alle dossier-pagina's: `dossier/components/DossierNav.tsx`
-- Actieve pagina licht op in amber via `usePathname()`
-- Links: Acties, Documenten, 💡 (Ideeën), ?, ⚙, account-icoon, Feedback, Uitloggen
+- Gedeelde `BottomNav` component op alle NMMPK-pagina's (incl. acties): `dossier/components/BottomNav.tsx`
+- **Mobiel** (`< md`): vaste bottom nav met 4 tabs — Scannen, Documenten, Acties, Meer
+  - "Meer" opent een bottom sheet: Ideeën, Instellingen, Account, Feedback, Uitloggen
+  - iPhone safe-area inset via `env(safe-area-inset-bottom)`
+- **Desktop** (`≥ md`): sticky topnav — logo links, primaire links midden (Scannen · Documenten · Acties · Ideeën), iconen + Uitloggen rechts
 - **Acties-badge**: telt openstaande acties via `/api/tools/mijn-dossier/acties`; rood bij verlopen deadlines, amber anders; ververst bij elke paginawisseling
+- Actieve pagina licht op in amber via `usePathname()`
+- Alle pagina's gebruiken `pb-24` op de content om overlap met de bottom nav te voorkomen
+- `DossierNav.tsx` bestaat nog maar wordt nergens meer gebruikt
 - Landingspagina (`/`) redirect ingelogde gebruikers naar `/dossier`
 
 ## Documenten pagina (NMMPK)
@@ -280,8 +285,9 @@ Route: `dossier/archief/page.tsx` — API: `documents/route.ts`
 
 ## Admin (NMMPK)
 
-- `/admin` — gebruikersoverzicht alleen toegankelijk voor `ADMIN_EMAIL`
+- `/gezin/admin` en `/admin` (TST admin, "Testdata" tab) — alleen toegankelijk voor `ADMIN_EMAIL`
 - API op `/api/admin/nmmpk-users` — toont subscription_status, promo_code, storage, doc count
+- `/api/admin/reset-user-data` — wist alle documenten + document_actions voor een userId (POST, admin-only)
 - `/api/admin/test-email` — stuurt testmails naar ADMIN_EMAIL (type: `welcome_founding` of `trial_ending`)
 
 ## Stripe (NMMPK)
