@@ -33,6 +33,11 @@ function downloadIcs(actie: string, deadline: string, afzender: string | null) {
     `DTEND;VALUE=DATE:${next}`,
     `SUMMARY:${actie.replace(/\n/g, "\\n")}`,
     description ? `DESCRIPTION:${description}` : "",
+    "BEGIN:VALARM",
+    "TRIGGER:-P1D",
+    "ACTION:DISPLAY",
+    `DESCRIPTION:Herinnering: ${actie.replace(/\n/g, "\\n")}`,
+    "END:VALARM",
     "END:VEVENT",
     "END:VCALENDAR",
   ].filter(Boolean).join("\r\n");
