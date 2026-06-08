@@ -16,33 +16,32 @@ export default function PrivacyPage() {
       <main className="max-w-3xl mx-auto px-6 py-14">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Privacyverklaring</h1>
-          <p className="text-gray-500">Versie 1.0 · Ingangsdatum: 27 mei 2026</p>
+          <p className="text-sm text-gray-500">Versie 1.0 · Ingangsdatum: 27 mei 2026</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col gap-10 text-gray-700 leading-relaxed">
+        <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col gap-10 text-sm text-gray-600 leading-relaxed">
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">1. Wie zijn wij</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">1. Wie zijn wij</h2>
             <p>TimeSaverTools is een handelsnaam van Business XL, gevestigd in Nederland en ingeschreven bij de Kamer van Koophandel.</p>
-            <div className="mt-3 bg-gray-50 rounded-xl p-4 text-sm space-y-1">
-              <p><span className="font-medium">Handelsnaam:</span> TimeSaverTools</p>
-              <p><span className="font-medium">Bedrijf:</span> Business XL</p>
-              <p><span className="font-medium">Eigenaar:</span> Marco Doorakkers</p>
-              <p><span className="font-medium">Adres:</span> Bosscheweg 44, 5056 KC Berkel-Enschot, Nederland</p>
-              <p><span className="font-medium">KvK-nummer:</span> 50418041</p>
-              <p><span className="font-medium">E-mail:</span> <a href="mailto:info@timesavertools.nl" className="text-blue-600 hover:underline">info@timesavertools.nl</a></p>
-              <p><span className="font-medium">Website:</span> <a href="https://www.timesavertools.nl" className="text-blue-600 hover:underline">www.timesavertools.nl</a></p>
+            <div className="mt-3 bg-gray-50 rounded-xl p-4 space-y-1">
+              <p><span className="font-medium text-gray-800">Handelsnaam:</span> TimeSaverTools</p>
+              <p><span className="font-medium text-gray-800">Bedrijf:</span> Business XL</p>
+              <p><span className="font-medium text-gray-800">Adres:</span> Bosscheweg 44, 5056 KC Berkel-Enschot, Nederland</p>
+              <p><span className="font-medium text-gray-800">KvK-nummer:</span> 50418041</p>
+              <p><span className="font-medium text-gray-800">E-mail:</span> <a href="mailto:info@timesavertools.nl" className="text-blue-600 hover:underline">info@timesavertools.nl</a></p>
+              <p><span className="font-medium text-gray-800">Website:</span> <a href="https://www.timesavertools.nl" className="text-blue-600 hover:underline">www.timesavertools.nl</a></p>
             </div>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">2. Welke persoonsgegevens verwerken wij</h2>
-            <p className="mb-3">Wij verwerken alleen gegevens die strikt noodzakelijk zijn voor het leveren van onze diensten. Afhankelijk van de tool die je gebruikt, gaat het om:</p>
+            <h2 className="text-base font-bold text-gray-900 mb-3">2. Welke persoonsgegevens verwerken wij</h2>
+            <p className="mb-4">Wij verwerken alleen gegevens die strikt noodzakelijk zijn voor het leveren van onze diensten. Afhankelijk van de tool die je gebruikt, gaat het om:</p>
 
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.1 Accountgegevens</h3>
-                <ul className="list-disc list-inside text-sm space-y-0.5 text-gray-600">
+                <ul className="list-disc list-inside space-y-0.5">
                   <li>Naam</li>
                   <li>E-mailadres</li>
                   <li>Wachtwoord (versleuteld opgeslagen)</li>
@@ -51,7 +50,7 @@ export default function PrivacyPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.2 Gebruiksgegevens</h3>
-                <ul className="list-disc list-inside text-sm space-y-0.5 text-gray-600">
+                <ul className="list-disc list-inside space-y-0.5">
                   <li>Welke tools je gebruikt</li>
                   <li>Aantal en verbruik van credits</li>
                   <li>Tijdstip van gebruik</li>
@@ -59,21 +58,21 @@ export default function PrivacyPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.3 Door jou ingevoerde inhoud</h3>
-                <p className="text-sm text-gray-600 mb-1">Om onze AI-tools te laten werken, verwerken wij tijdelijk content die jij aanlevert. Denk aan:</p>
-                <ul className="list-disc list-inside text-sm space-y-0.5 text-gray-600">
+                <p className="mb-2">Om onze AI-tools te laten werken, verwerken wij tijdelijk content die jij aanlevert. Denk aan:</p>
+                <ul className="list-disc list-inside space-y-0.5 mb-2">
                   <li>Tekst die je invoert (zoals e-mailinhoud of presentatieonderwerp)</li>
                   <li>Geüploade bestanden (zoals een CV als PDF of een Word-document)</li>
                   <li>Audio-opnames (bij tools als Voice Mail Draft en Meeting Memo)</li>
                 </ul>
-                <p className="text-sm text-gray-600 mt-1">Deze inhoud wordt uitsluitend gebruikt om jouw resultaat te genereren. Wij slaan deze inhoud niet op na verwerking.</p>
+                <p>Deze inhoud wordt uitsluitend gebruikt om jouw resultaat te genereren. Wij slaan deze inhoud niet op na verwerking.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.4 Betalingsgegevens</h3>
-                <p className="text-sm text-gray-600">Betalingen worden verwerkt via Stripe. Wij ontvangen geen volledige betaalgegevens zoals creditcardnummers. Wij bewaren wel de betalingsbevestiging en het bijbehorende creditverbruik.</p>
+                <p>Betalingen worden verwerkt via Stripe. Wij ontvangen geen volledige betaalgegevens zoals creditcardnummers. Wij bewaren wel de betalingsbevestiging en het bijbehorende creditverbruik.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.5 Technische gegevens</h3>
-                <ul className="list-disc list-inside text-sm space-y-0.5 text-gray-600">
+                <ul className="list-disc list-inside space-y-0.5">
                   <li>IP-adres</li>
                   <li>Browsertype en -versie</li>
                   <li>Apparaatinformatie</li>
@@ -84,9 +83,9 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">3. Op welke grondslag verwerken wij jouw gegevens</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">3. Op welke grondslag verwerken wij jouw gegevens</h2>
             <p className="mb-3">Wij verwerken jouw persoonsgegevens op basis van de volgende grondslagen (AVG artikel 6):</p>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <ul className="space-y-2">
               <li><span className="font-medium text-gray-800">Uitvoering van de overeenkomst:</span> om je account te beheren en de tools beschikbaar te stellen.</li>
               <li><span className="font-medium text-gray-800">Gerechtvaardigd belang:</span> voor beveiliging, fraudepreventie en verbetering van de dienst.</li>
               <li><span className="font-medium text-gray-800">Wettelijke verplichting:</span> voor het bewaren van administratieve gegevens (fiscale bewaarplicht).</li>
@@ -94,27 +93,27 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">4. Gebruik van kunstmatige intelligentie</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">4. Gebruik van kunstmatige intelligentie</h2>
             <p className="mb-2">De tools op TimeSaverTools maken gebruik van AI-technologie van Anthropic (Claude). De door jou ingevoerde inhoud wordt via een beveiligde verbinding naar Anthropic verzonden om het resultaat te genereren.</p>
-            <p className="mb-2">In het kader van deze samenwerking treedt Anthropic op als verwerker en is TimeSaverTools de verwerkingsverantwoordelijke. Dit betekent dat wij bepalen waarvoor jouw gegevens worden gebruikt en dat wij verantwoording aan jou afleggen. Met Anthropic is een verwerkersovereenkomst (Data Processing Agreement) gesloten conform de vereisten van de AVG.</p>
-            <p className="text-sm text-gray-500">Meer informatie over het privacybeleid van Anthropic: <a href="https://www.anthropic.com/privacy" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">www.anthropic.com/privacy</a></p>
+            <p className="mb-2">TimeSaverTools is de verwerkingsverantwoordelijke; Anthropic treedt op als verwerker ten behoeve van TimeSaverTools. Het consumentenprivacybeleid van Anthropic is niet van toepassing — Anthropic verwerkt de gegevens uitsluitend in opdracht van TimeSaverTools conform hun API-gebruiksvoorwaarden. Inhoud die via de API wordt verwerkt, wordt door Anthropic niet gebruikt voor modeltraining.</p>
+            <p>Meer informatie: <a href="https://www.anthropic.com/legal" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">www.anthropic.com/legal</a></p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">5. Cookies</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">5. Cookies</h2>
             <p className="mb-2">Wij maken gebruik van functionele cookies die noodzakelijk zijn voor het goed functioneren van de website, zoals:</p>
-            <ul className="list-disc list-inside text-sm space-y-0.5 text-gray-600 mb-2">
+            <ul className="list-disc list-inside space-y-0.5 mb-2">
               <li>Inlogcookies (sessiebeheer)</li>
               <li>Voorkeursinstellingen</li>
             </ul>
-            <p className="text-sm text-gray-600">Wij maken geen gebruik van tracking- of advertentiecookies. Je kunt cookies altijd uitschakelen via je browserinstellingen, al kan dit invloed hebben op de werking van de site.</p>
+            <p>Wij maken geen gebruik van tracking- of advertentiecookies. Je kunt cookies altijd uitschakelen via je browserinstellingen, al kan dit invloed hebben op de werking van de site.</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">6. Bewaartermijnen</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">6. Bewaartermijnen</h2>
             <p className="mb-3">Wij bewaren jouw gegevens niet langer dan noodzakelijk:</p>
             <div className="overflow-hidden rounded-xl border border-gray-100">
-              <table className="w-full text-sm">
+              <table className="w-full">
                 <tbody>
                   {[
                     ["Accountgegevens", "Zolang je account actief is, plus 12 maanden na verwijdering"],
@@ -124,7 +123,7 @@ export default function PrivacyPage() {
                   ].map(([type, period], i) => (
                     <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
                       <td className="px-4 py-3 font-medium text-gray-800 w-1/2">{type}</td>
-                      <td className="px-4 py-3 text-gray-600">{period}</td>
+                      <td className="px-4 py-3">{period}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -133,10 +132,10 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">7. Delen met derden</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">7. Delen met derden</h2>
             <p className="mb-3">Wij verkopen jouw gegevens nooit aan derden. Wij werken uitsluitend samen met partijen die noodzakelijk zijn voor het leveren van onze diensten:</p>
             <div className="overflow-hidden rounded-xl border border-gray-100">
-              <table className="w-full text-sm">
+              <table className="w-full">
                 <thead>
                   <tr className="bg-gray-100 text-gray-700">
                     <th className="px-4 py-2 text-left font-semibold">Partij</th>
@@ -155,19 +154,19 @@ export default function PrivacyPage() {
                   ].map(([party, purpose], i) => (
                     <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
                       <td className="px-4 py-3 font-medium text-gray-800">{party}</td>
-                      <td className="px-4 py-3 text-gray-600">{purpose}</td>
+                      <td className="px-4 py-3">{purpose}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-sm text-gray-500 mt-3">Al deze partijen verwerken jouw gegevens uitsluitend op onze instructie en conform de AVG.</p>
+            <p className="mt-3">Al deze partijen verwerken jouw gegevens uitsluitend op onze instructie en conform de AVG.</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">8. Jouw rechten</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">8. Jouw rechten</h2>
             <p className="mb-3">Op basis van de AVG heb jij de volgende rechten:</p>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <ul className="space-y-2">
               {[
                 ["Recht op inzage", "je kunt opvragen welke gegevens wij van je bewaren."],
                 ["Recht op rectificatie", "je kunt onjuiste gegevens laten corrigeren."],
@@ -179,13 +178,13 @@ export default function PrivacyPage() {
                 <li key={right}><span className="font-medium text-gray-800">{right}:</span> {desc}</li>
               ))}
             </ul>
-            <p className="mt-3 text-sm">Stuur een verzoek naar <a href="mailto:info@timesavertools.nl" className="text-blue-600 hover:underline">info@timesavertools.nl</a>. Wij reageren binnen 30 dagen.</p>
+            <p className="mt-3">Stuur een verzoek naar <a href="mailto:info@timesavertools.nl" className="text-blue-600 hover:underline">info@timesavertools.nl</a>. Wij reageren binnen 30 dagen.</p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">9. Beveiliging</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">9. Beveiliging</h2>
             <p className="mb-2">Wij nemen passende technische en organisatorische maatregelen om jouw gegevens te beschermen:</p>
-            <ul className="list-disc list-inside text-sm space-y-0.5 text-gray-600">
+            <ul className="list-disc list-inside space-y-0.5">
               <li>Versleutelde verbindingen (HTTPS/TLS)</li>
               <li>Versleutelde opslag van wachtwoorden</li>
               <li>Beperkte toegang tot persoonsgegevens</li>
@@ -193,23 +192,23 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">10. Klacht indienen</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">10. Klacht indienen</h2>
             <p className="mb-2">Ben je niet tevreden over hoe wij met jouw gegevens omgaan? Neem dan eerst contact met ons op via <a href="mailto:info@timesavertools.nl" className="text-blue-600 hover:underline">info@timesavertools.nl</a>.</p>
-            <p className="text-sm text-gray-600">Je hebt ook het recht om een klacht in te dienen bij de Autoriteit Persoonsgegevens:<br />
+            <p>Je hebt ook het recht om een klacht in te dienen bij de Autoriteit Persoonsgegevens:<br />
               Website: <a href="https://www.autoriteitpersoonsgegevens.nl" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">www.autoriteitpersoonsgegevens.nl</a><br />
               Telefoon: 088 - 1805 250
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-gray-900 mb-3">11. Wijzigingen</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">11. Wijzigingen</h2>
             <p>Wij kunnen deze privacyverklaring aanpassen. Bij wezenlijke wijzigingen ontvang je een melding via e-mail of via de website. De meest actuele versie is altijd te vinden op <a href="https://www.timesavertools.nl/privacy" className="text-blue-600 hover:underline">www.timesavertools.nl/privacy</a>.</p>
           </section>
 
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-10">
-          © 2026 TimeSaverTools · Business XL (Marco Doorakkers) · <a href="mailto:info@timesavertools.nl" className="underline hover:text-gray-600">info@timesavertools.nl</a>
+          © {new Date().getFullYear()} TimeSaverTools · Business XL · KvK 50418041 · <a href="mailto:info@timesavertools.nl" className="underline hover:text-gray-600">info@timesavertools.nl</a>
         </p>
       </main>
     </div>
