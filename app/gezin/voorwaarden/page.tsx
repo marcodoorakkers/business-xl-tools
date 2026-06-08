@@ -28,7 +28,7 @@ export default function GezinVoorwaardenPage() {
               <p><span className="font-medium">Eigenaar:</span> Marco Doorakkers</p>
               <p><span className="font-medium">Adres:</span> Bosscheweg 44, 5056 KC Berkel-Enschot, Nederland</p>
               <p><span className="font-medium">KvK-nummer:</span> 50418041</p>
-              <p><span className="font-medium">Btw-nummer:</span> NL002152836B77</p>
+              <p><span className="font-medium">Btw-nummer:</span> NL822754435B01</p>
               <p><span className="font-medium">E-mail:</span> <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a></p>
             </div>
           </section>
