@@ -97,6 +97,7 @@ export default function GezinDossierPage() {
   const [gezinslid, setGezinslid] = useState("");
   const [familyMembers, setFamilyMembers] = useState<string[]>([]);
   const [familyMemberDetails, setFamilyMemberDetails] = useState<{ name: string; full_name?: string | null }[]>([]);
+  const [membersLoaded, setMembersLoaded] = useState(false);
   const [includeActie, setIncludeActie] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [savedInfo, setSavedInfo] = useState<{ pad: string; url?: string } | null>(null);
@@ -128,6 +129,7 @@ export default function GezinDossierPage() {
         setArchiveRoot(data.archiveRoot ?? "Archief");
         setFamilyMembers(data.familyMembers ?? []);
         setFamilyMemberDetails(data.familyMemberDetails ?? []);
+        setMembersLoaded(true);
         setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox");
         setFolderStructure((data.folderStructure ?? "by_subject") as "by_subject" | "by_person");
       })
@@ -376,7 +378,7 @@ export default function GezinDossierPage() {
               />
             </div>
 
-            {familyMembers.length === 0 && (
+            {membersLoaded && familyMembers.length === 0 && (
               <div className="mt-4 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-600">
                 Voeg personen toe in de{" "}
                 <Link href="/dossier/instellingen" className="underline font-medium text-amber-600">instellingen</Link>{" "}
