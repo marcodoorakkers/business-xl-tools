@@ -95,7 +95,7 @@ export default function GezinVoorwaardenPage() {
 
           <section>
             <h2 className="text-lg font-bold text-gray-900 mb-3">7. Herroepingsrecht</h2>
-            <p className="text-sm text-gray-600">Als consument heb je het recht om binnen 14 dagen na aanmelding de overeenkomst zonder opgave van redenen te herroepen. Omdat de dienst onmiddellijk na aanmelding beschikbaar is, vervalt het herroepingsrecht zodra je de dienst actief hebt gebruikt (bijv. een document hebt gescand), tenzij anders overeengekomen. Tijdens de proefperiode kun je altijd kosteloos opzeggen.</p>
+            <p className="text-sm text-gray-600">Als consument heb je wettelijk het recht om binnen 14 dagen na aanmelding de overeenkomst zonder opgave van redenen te herroepen. Omdat wij een gratis proefperiode van 30 dagen hanteren zonder betalingsverplichting, kun je gedurende de volledige proefperiode kosteloos opzeggen via je accountpagina — dat is ruimer dan het wettelijke minimum. Een formeel herroepingsverzoek is daarvoor niet nodig.</p>
           </section>
 
           <section>
