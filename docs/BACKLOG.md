@@ -4,28 +4,6 @@ Functies die bewust zijn uitgesteld. Elke entry bevat de motivatie en wat er nod
 
 ---
 
-## Hoge prioriteit
-
-### Scan via e-mail
-**Wat:** Elke gebruiker krijgt een uniek e-mailadres (`{token}@scan.nooitmeerpostkwijt.nl`). Een doorgestuurde e-mail met PDF-bijlage wordt automatisch geanalyseerd en toegevoegd aan het dossier.
-
-**Waarom uitgesteld:** Vereist een inbound e-maildienst. Resend (al in gebruik) ondersteunt geen inbound e-mail. Mailgun is een extra dienst die beheerd moet worden. Cloudflare Email Workers vereist DNS-migratie naar Cloudflare.
-
-**Code is klaar:** De webhook-endpoint, token-API en UI in instellingen zijn gebouwd (`app/api/tools/mijn-dossier/email-scan/route.ts`). Alleen de externe dienst en DNS-records ontbreken nog.
-
-**Aanbevolen aanpak: Cloudflare Email Workers (gratis)**
-- Domein `nooitmeerpostkwijt.nl` toevoegen aan Cloudflare (nameservers wijzigen bij TransIP)
-- Email Routing activeren in Cloudflare dashboard
-- Route aanmaken: `*@scan.nooitmeerpostkwijt.nl` → Worker `nmmrk-email-scanner`
-- Worker deployen vanuit `cloudflare/email-worker/`: `npm install && npx wrangler deploy`
-- Secret instellen: `npx wrangler secret put WEBHOOK_SECRET`
-- Zelfde secret toevoegen als `CLOUDFLARE_WEBHOOK_SECRET` in Vercel
-- SQL-migratie uitvoeren: `supabase/migrations/add_scan_email_token.sql`
-
-**Alternatief: Mailgun** — werkt zonder DNS-migratie, maar wordt betaald na 3 maanden proefperiode. Code is compatibel gemaakt met Cloudflare-formaat (JSON + shared secret i.p.v. HMAC multipart).
-
----
-
 ## Gemiddelde prioriteit
 
 ### Gezinsbeheer met gedeelde inbox
