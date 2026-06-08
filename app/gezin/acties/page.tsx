@@ -4,26 +4,27 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import BottomNav from "@/app/gezin/dossier/components/BottomNav";
 
-function googleCalendarUrl(actie: string, deadline: string, afzender: string | null) {
+function googleCalendarUrl(actie: string, deadline: string, afzender: string | null, fileUrl: string | null) {
   const d = deadline.replace(/-/g, "");
   const next = deadline.replace(/-/g, "").slice(0, 6) +
     String(Number(deadline.slice(8, 10)) + 1).padStart(2, "0");
-  const details = afzender ? `Van: ${afzender}` : "";
+  const parts = [afzender ? `Van: ${afzender}` : "", fileUrl ?? ""].filter(Boolean);
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: actie,
     dates: `${d}/${next}`,
-    details,
+    details: parts.join("\n"),
     sf: "true",
   });
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
-function downloadIcs(actie: string, deadline: string, afzender: string | null) {
+function downloadIcs(actie: string, deadline: string, afzender: string | null, fileUrl: string | null) {
   const d = deadline.replace(/-/g, "");
   const next = deadline.replace(/-/g, "").slice(0, 6) +
     String(Number(deadline.slice(8, 10)) + 1).padStart(2, "0");
-  const description = afzender ? `Van: ${afzender}` : "";
+  const parts = [afzender ? `Van: ${afzender}` : "", fileUrl ?? ""].filter(Boolean);
+  const description = parts.join("\\n");
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -51,7 +52,7 @@ function downloadIcs(actie: string, deadline: string, afzender: string | null) {
   URL.revokeObjectURL(url);
 }
 
-function CalendarButton({ actie, deadline, afzender }: { actie: string; deadline: string; afzender: string | null }) {
+function CalendarButton({ actie, deadline, afzender, fileUrl }: { actie: string; deadline: string; afzender: string | null; fileUrl: string | null }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -79,7 +80,7 @@ function CalendarButton({ actie, deadline, afzender }: { actie: string; deadline
       {open && (
         <div className="absolute left-0 bottom-full mb-1.5 z-10 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden min-w-[160px]">
           <a
-            href={googleCalendarUrl(actie, deadline, afzender)}
+            href={googleCalendarUrl(actie, deadline, afzender, fileUrl)}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => setOpen(false)}
@@ -91,7 +92,7 @@ function CalendarButton({ actie, deadline, afzender }: { actie: string; deadline
             Google Agenda
           </a>
           <button
-            onClick={() => { downloadIcs(actie, deadline, afzender); setOpen(false); }}
+            onClick={() => { downloadIcs(actie, deadline, afzender, fileUrl); setOpen(false); }}
             className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-colors border-t border-gray-100"
           >
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -323,6 +324,7 @@ export default function GezinActiesPage() {
                               actie={action.actie}
                               deadline={action.deadline}
                               afzender={action.afzender}
+                              fileUrl={action.file_url ?? null}
                             />
                           )}
                         </div>
