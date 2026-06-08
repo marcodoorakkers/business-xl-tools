@@ -14,7 +14,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Gaan mijn documenten naar de Verenigde Staten?",
-    a: "Tijdelijk, ja. Voor de AI-analyse worden documenten via een beveiligde verbinding (HTTPS/TLS) doorgestuurd naar Anthropic, een Amerikaans bedrijf. Dit is onvermijdelijk zolang we AI gebruiken voor de analyse. Met Anthropic is een verwerkersovereenkomst (DPA) gesloten conform de vereisten van de AVG, inclusief waarborgen voor doorgifte naar derde landen.",
+    a: "Tijdelijk, ja. Voor de AI-analyse worden documenten via een beveiligde verbinding (HTTPS/TLS) doorgestuurd naar Anthropic, een Amerikaans bedrijf. Dit is onvermijdelijk zolang we AI gebruiken voor de analyse. Anthropic verwerkt de gegevens uitsluitend in onze opdracht conform hun API-gebruiksvoorwaarden — NooitMeerPostKwijt is de verwerkingsverantwoordelijke, niet Anthropic.",
   },
   {
     q: "Wat doet Anthropic met mijn documenten?",
@@ -25,7 +25,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Nee. Documenten die via de API worden ingediend — wat wij doen — worden niet standaard gebruikt voor modeltraining door Anthropic. Meer informatie vind je op{" "}
-        <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">anthropic.com/privacy</a>.
+        <a href="https://www.anthropic.com/legal" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">anthropic.com/legal</a>.
       </>
     ),
   },
@@ -39,7 +39,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Staat mijn data in Europa?",
-    a: "Onze database draait op Supabase in een EU-datacenterregio. Anthropic (AI-verwerking) en Resend (e-mail) zijn Amerikaanse bedrijven — daarvoor zijn contractuele waarborgen getroffen via DPA's conform de AVG.",
+    a: "Onze database draait op Supabase in een EU-datacenterregio. Anthropic (AI-verwerking) en Resend (e-mail) zijn Amerikaanse bedrijven. Zij verwerken gegevens uitsluitend in onze opdracht conform hun API-voorwaarden.",
   },
   {
     q: "Wat is de CLOUD Act en is mijn data hierdoor kwetsbaar?",
@@ -50,7 +50,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     a: (
       <>
         Ja. We verwerken alleen gegevens die noodzakelijk zijn voor de dienst, op geldige grondslagen (uitvoering overeenkomst, gerechtvaardigd belang). We hebben een{" "}
-        <Link href="/privacy" className="text-amber-600 hover:underline">privacyverklaring</Link> gepubliceerd, DPA&apos;s gesloten met verwerkers, en passende technische maatregelen getroffen zoals versleutelde verbindingen en row-level security.
+        <Link href="/privacy" className="text-amber-600 hover:underline">privacyverklaring</Link> gepubliceerd, afspraken gemaakt met verwerkers over verantwoord datagebruik, en passende technische maatregelen getroffen zoals versleutelde verbindingen en row-level security.
       </>
     ),
   },

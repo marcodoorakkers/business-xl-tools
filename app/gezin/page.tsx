@@ -62,7 +62,7 @@ export default async function GezinLandingPage() {
           <div className="flex-1 max-w-xl">
             <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Voor ZZP&apos;ers en kleine ondernemers</p>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-5 leading-tight">
-              Nooit meer<br />een deadline<br />missen.
+              Nooit meer<br />een document<br />kwijt.
             </h1>
             <p className="text-lg text-gray-500 mb-6 leading-relaxed">
               Scan een brief, factuur of aanslag. NooitMeerPostKwijt herkent automatisch wat je moet doen en wanneer — van belastingaanslagen tot contractverlengingen. De deadline staat direct in je actielijst.
