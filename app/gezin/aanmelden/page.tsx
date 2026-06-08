@@ -147,6 +147,12 @@ export default function GezinRegisterPage() {
               Al een account?{" "}
               <Link href="/inloggen" className="text-amber-600 hover:underline">Inloggen</Link>
             </p>
+            <p className="text-center text-xs text-gray-400">
+              Door een account aan te maken ga je akkoord met onze{" "}
+              <Link href="/voorwaarden" className="hover:underline">Algemene Voorwaarden</Link>{" "}
+              en{" "}
+              <Link href="/privacy" className="hover:underline">Privacyverklaring</Link>.
+            </p>
           </form>
         </div>
       </div>

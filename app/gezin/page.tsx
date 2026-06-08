@@ -297,6 +297,8 @@ export default async function GezinLandingPage() {
         <span>·</span>
         <Link href="/disclaimer" className="hover:text-gray-600 underline">Disclaimer</Link>
         <span>·</span>
+        <Link href="/voorwaarden" className="hover:text-gray-600 underline">Algemene Voorwaarden</Link>
+        <span>·</span>
         <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="hover:text-gray-600 underline">Contact</a>
       </footer>
     </div>
