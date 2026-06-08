@@ -63,6 +63,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(redirectTo, request.url));
   }
 
+  // Subscription check: dossier en acties vereisen een actief abonnement
+  const isGezinSubscriptionProtected =
+    effectivePath.startsWith("/gezin/dossier") ||
+    effectivePath.startsWith("/gezin/acties");
+
+  if (isGezinSubscriptionProtected && user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("subscription_status")
+      .eq("id", user.id)
+      .single();
+
+    if (!profile?.subscription_status) {
+      const redirectTo = isFamilySite ? "/account" : "/gezin/account";
+      return NextResponse.redirect(new URL(redirectTo, request.url));
+    }
+  }
+
   // Standaard timesavertools.nl auth-checks
   const isAuthPage = originalPath.startsWith("/auth");
   const isProtected =
