@@ -143,7 +143,7 @@ export default function NMMPKIdeeënPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 md:pt-14">
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-green-600 text-white text-sm font-medium px-5 py-3 rounded-2xl shadow-lg">
           {toast}

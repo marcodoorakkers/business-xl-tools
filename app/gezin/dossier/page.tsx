@@ -335,7 +335,7 @@ export default function GezinDossierPage() {
   const cloudLabel = storagePreference === "dropbox" ? "Dropbox" : "OneDrive";
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white md:pt-14">
       <main className="max-w-lg mx-auto px-6 py-8 pb-24">
 
         {/* IDLE — upload zone */}

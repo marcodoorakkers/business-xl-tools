@@ -32,7 +32,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
     : null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white md:pt-14">
       <main className="max-w-lg mx-auto px-6 py-8 pb-24 flex flex-col gap-5">
         <h1 className="text-2xl font-extrabold text-gray-900">Account</h1>
 
