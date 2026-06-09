@@ -11,6 +11,8 @@ interface StatusData {
   familyMembers: string[];
   dropboxConnected: boolean;
   dropboxArchiveRoot: string;
+  googleDriveConnected: boolean;
+  googleDriveArchiveRoot: string;
   storagePreference: string;
   folderStructure: string;
 }
@@ -27,6 +29,8 @@ function InstellingenContent() {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [archiveRoot, setArchiveRoot] = useState("Archief");
   const [dropboxArchiveRoot, setDropboxArchiveRoot] = useState("Archief");
+  const [googleDriveArchiveRoot, setGoogleDriveArchiveRoot] = useState("MijnDossier");
+  const [savingGoogleDriveRoot, setSavingGoogleDriveRoot] = useState(false);
   const [storagePreference, setStoragePreference] = useState<string | null>(null);
   const [folderStructure, setFolderStructure] = useState("by_subject");
   const [newMemberName, setNewMemberName] = useState("");
@@ -47,9 +51,11 @@ function InstellingenContent() {
   useEffect(() => {
     const connected = searchParams.get("connected");
     const dropboxConnected = searchParams.get("dropbox_connected");
+    const googleDriveConnected = searchParams.get("googledrive_connected");
     const error = searchParams.get("error");
     if (connected === "1") showToast("success", "OneDrive succesvol gekoppeld!");
     else if (dropboxConnected === "1") showToast("success", "Dropbox succesvol gekoppeld!");
+    else if (googleDriveConnected === "1") showToast("success", "Google Drive succesvol gekoppeld!");
     else if (error === "auth_failed") showToast("error", "Koppeling mislukt. Probeer opnieuw.");
   }, [searchParams, showToast]);
 
@@ -60,6 +66,7 @@ function InstellingenContent() {
         setStatus(data);
         setArchiveRoot(data.archiveRoot);
         setDropboxArchiveRoot(data.dropboxArchiveRoot);
+        setGoogleDriveArchiveRoot(data.googleDriveArchiveRoot ?? "MijnDossier");
         setStoragePreference(data.storagePreference);
         setFolderStructure(data.folderStructure ?? "by_subject");
       });
@@ -136,11 +143,28 @@ function InstellingenContent() {
         body: JSON.stringify({ dropboxArchiveRoot }),
       });
       if (!res.ok) throw new Error();
-      showToast("success", "Dropbox archiefmap naam opgeslagen.");
+      showToast("success", "Dropbox dossiermap naam opgeslagen.");
     } catch {
       showToast("error", "Opslaan mislukt.");
     } finally {
       setSavingDropboxRoot(false);
+    }
+  }
+
+  async function saveGoogleDriveArchiveRoot() {
+    setSavingGoogleDriveRoot(true);
+    try {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ googleDriveArchiveRoot }),
+      });
+      if (!res.ok) throw new Error();
+      showToast("success", "Google Drive dossiermap naam opgeslagen.");
+    } catch {
+      showToast("error", "Opslaan mislukt.");
+    } finally {
+      setSavingGoogleDriveRoot(false);
     }
   }
 
@@ -198,6 +222,7 @@ function InstellingenContent() {
   const storageOptions = [
     { value: "onedrive", label: "OneDrive", icon: "☁️", connected: status?.connected ?? false },
     { value: "dropbox", label: "Dropbox", icon: "📦", connected: status?.dropboxConnected ?? false },
+    { value: "googledrive", label: "Google Drive", icon: "🔵", connected: status?.googleDriveConnected ?? false },
   ];
 
   const storageLoaded = storagePreference !== null;
@@ -386,6 +411,47 @@ function InstellingenContent() {
               </button>
             </div>
             <p className="text-xs text-gray-400">De naam van de hoofdmap in je Dropbox (standaard: MijnDossier).</p>
+          </div>
+        </div>
+
+        {/* Google Drive */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
+          <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Google Drive koppeling</h2>
+          {status === null ? (
+            <div className="text-sm text-gray-400">Laden…</div>
+          ) : status.googleDriveConnected ? (
+            <div className="flex items-center gap-3">
+              <span className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </span>
+              <span className="text-sm font-medium text-gray-900">Google Drive is gekoppeld</span>
+              <a href="/api/tools/mijn-dossier/googledrive/auth"
+                className="ml-auto text-xs text-amber-600 hover:text-amber-800 font-medium border border-amber-200 rounded-xl px-3 py-1.5 transition-colors">
+                Opnieuw koppelen
+              </a>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block flex-shrink-0" />
+              <span className="text-sm text-gray-600">Google Drive is nog niet gekoppeld</span>
+              <a href="/api/tools/mijn-dossier/googledrive/auth"
+                className="ml-auto bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                Google Drive koppelen
+              </a>
+            </div>
+          )}
+          <div className="space-y-2 pt-2 border-t border-gray-100">
+            <label className="text-xs text-gray-500 block">Dossiermap naam</label>
+            <div className="flex gap-2">
+              <input type="text" value={googleDriveArchiveRoot} onChange={(e) => setGoogleDriveArchiveRoot(e.target.value)}
+                className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                placeholder="MijnDossier" />
+              <button onClick={saveGoogleDriveArchiveRoot} disabled={savingGoogleDriveRoot}
+                className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors">
+                {savingGoogleDriveRoot ? "Opslaan…" : "Opslaan"}
+              </button>
+            </div>
+            <p className="text-xs text-gray-400">De naam van de hoofdmap in je Google Drive (standaard: MijnDossier).</p>
           </div>
         </div>
 
