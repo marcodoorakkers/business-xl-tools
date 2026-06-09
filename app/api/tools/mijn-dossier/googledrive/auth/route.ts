@@ -4,28 +4,30 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.redirect(new URL("/auth/login", request.url));
+  if (!user) return NextResponse.redirect(new URL("/gezin/inloggen", request.url));
 
   const host = request.nextUrl.hostname;
   const isProduction = host === "nooitmeerpostkwijt.nl" || host === "www.nooitmeerpostkwijt.nl";
   const redirectUri = isProduction
-    ? "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/dropbox/callback"
-    : `${request.nextUrl.origin}/api/tools/mijn-dossier/dropbox/callback`;
+    ? "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/googledrive/callback"
+    : `${request.nextUrl.origin}/api/tools/mijn-dossier/googledrive/callback`;
+
   const state = crypto.randomUUID();
 
   const params = new URLSearchParams({
-    client_id: process.env.DROPBOX_CLIENT_ID!,
-    response_type: "code",
+    client_id: process.env.GOOGLE_CLIENT_ID!,
     redirect_uri: redirectUri,
-    token_access_type: "offline",
-    scope: "files.content.write files.content.read sharing.write",
+    response_type: "code",
+    scope: "https://www.googleapis.com/auth/drive.file",
+    access_type: "offline",
+    prompt: "consent",
     state,
   });
 
-  const authUrl = `https://www.dropbox.com/oauth2/authorize?${params}`;
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 
   const response = NextResponse.redirect(authUrl);
-  response.cookies.set("dropbox_oauth_state", state, {
+  response.cookies.set("googledrive_oauth_state", state, {
     httpOnly: true,
     maxAge: 600,
     sameSite: "lax",
