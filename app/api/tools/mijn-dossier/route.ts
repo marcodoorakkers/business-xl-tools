@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   type ImageMediaType = "image/jpeg" | "image/png" | "image/gif" | "image/webp";
 
+  const DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
   // Blokkeer HEIC/HEIF — Claude ondersteunt dit formaat niet
   const unsupported = uploadedFiles.find(f => f.type === "image/heic" || f.type === "image/heif");
   if (unsupported) {
@@ -63,13 +65,18 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const base64 = buffer.toString("base64");
     const isPdf = file.type === "application/pdf";
+    const isDocx = file.type === DOCX || file.type === "application/msword";
     const supportedImageTypes: ImageMediaType[] = ["image/jpeg", "image/png", "image/gif", "image/webp"];
     const mediaType: ImageMediaType = supportedImageTypes.includes(file.type as ImageMediaType)
       ? (file.type as ImageMediaType)
       : "image/jpeg";
-    return isPdf
-      ? { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data: base64 } }
-      : { type: "image" as const, source: { type: "base64" as const, media_type: mediaType, data: base64 } };
+    if (isPdf) return { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data: base64 } };
+    if (isDocx) {
+      const mammoth = (await import("mammoth")).default;
+      const { value: text } = await mammoth.extractRawText({ buffer });
+      return { type: "text" as const, text: `[Word document]\n${text}` };
+    }
+    return { type: "image" as const, source: { type: "base64" as const, media_type: mediaType, data: base64 } };
   }));
 
   // Bekende afzenders ophalen voor consistente categorisering

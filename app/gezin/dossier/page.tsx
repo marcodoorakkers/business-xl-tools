@@ -35,8 +35,10 @@ const DOC_ICONS: Record<string, string> = {
   overig: "📄",
 };
 
+const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
 async function compressImage(file: File): Promise<File> {
-  if (file.type === "application/pdf") return file;
+  if (!file.type.startsWith("image/")) return file;
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -271,10 +273,13 @@ export default function GezinDossierPage() {
     setStep("saving");
     const imageFiles = files.filter(f => f.type.startsWith("image/"));
     const pdfFiles = files.filter(f => f.type === "application/pdf");
+    const docxFiles = files.filter(f => f.type === DOCX_MIME);
     let uploadFile: File;
     if (imageFiles.length > 0) {
       const compressed = await Promise.all(imageFiles.map(compressImage));
       uploadFile = compressed.length === 1 ? compressed[0] : await imagesToPdf(compressed, bestandsnaam);
+    } else if (docxFiles.length > 0) {
+      uploadFile = docxFiles[0]; // server converteert naar PDF
     } else {
       uploadFile = pdfFiles[0];
     }
@@ -377,7 +382,7 @@ export default function GezinDossierPage() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
                 multiple
                 className="hidden"
                 onChange={(e) => addFiles(Array.from(e.target.files ?? []))}
