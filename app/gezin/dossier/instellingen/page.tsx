@@ -219,10 +219,12 @@ function InstellingenContent() {
     }
   }
 
+  const googleDriveEnabled = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_ENABLED === "true";
+
   const storageOptions = [
     { value: "onedrive", label: "OneDrive", icon: "☁️", connected: status?.connected ?? false },
     { value: "dropbox", label: "Dropbox", icon: "📦", connected: status?.dropboxConnected ?? false },
-    { value: "googledrive", label: "Google Drive", icon: "🔵", connected: status?.googleDriveConnected ?? false },
+    ...(googleDriveEnabled ? [{ value: "googledrive", label: "Google Drive", icon: "🔵", connected: status?.googleDriveConnected ?? false }] : []),
   ];
 
   const storageLoaded = storagePreference !== null;
@@ -415,6 +417,7 @@ function InstellingenContent() {
         </div>
 
         {/* Google Drive */}
+        {googleDriveEnabled && (
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-5">
           <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Google Drive koppeling</h2>
           {status === null ? (
@@ -454,6 +457,7 @@ function InstellingenContent() {
             <p className="text-xs text-gray-400">De naam van de hoofdmap in je Google Drive (standaard: MijnDossier).</p>
           </div>
         </div>
+        )}
 
         {/* Scan via e-mail */}
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
