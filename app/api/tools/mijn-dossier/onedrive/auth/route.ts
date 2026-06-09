@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     client_id: process.env.MICROSOFT_CLIENT_ID!,
     response_type: "code",
     redirect_uri: redirectUri,
-    scope: "Files.ReadWrite offline_access User.Read",
+    scope: "Files.ReadWrite.AppFolder offline_access",
     response_mode: "query",
     state,
   });
