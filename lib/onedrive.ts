@@ -55,7 +55,7 @@ function buildGraphPath(fullPath: string): string {
 
 export async function checkFolderExists(accessToken: string, fullPath: string): Promise<boolean> {
   const encodedPath = buildGraphPath(fullPath);
-  const res = await fetch(`${GRAPH_BASE}/me/drive/root:/${encodedPath}`, {
+  const res = await fetch(`${GRAPH_BASE}/me/drive/special/approot:/${encodedPath}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   return res.status === 200;
@@ -68,7 +68,7 @@ export async function uploadFileToOneDrive(
   mimeType: string
 ): Promise<{ webUrl: string }> {
   const encodedPath = buildGraphPath(fullPath);
-  const res = await fetch(`${GRAPH_BASE}/me/drive/root:/${encodedPath}:/content`, {
+  const res = await fetch(`${GRAPH_BASE}/me/drive/special/approot:/${encodedPath}:/content`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${accessToken}`,
