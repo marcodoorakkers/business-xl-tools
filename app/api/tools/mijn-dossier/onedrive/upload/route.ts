@@ -33,9 +33,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
 
-  // mappad from the client already includes archiveRoot and familyMember prefix
+  // Strip archive_root prefix: AppFolder (/Apps/{AppName}/) is al de bovenste laag
+  const strippedMappad = mappad.trim().startsWith(archiveRoot + "/")
+    ? mappad.trim().slice(archiveRoot.length + 1)
+    : mappad.trim();
   const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
-  const fullPath = `${mappad.trim()}/${bestandsnaam}${ext}`;
+  const fullPath = `${strippedMappad}/${bestandsnaam}${ext}`;
 
   const buffer = Buffer.from(await file.arrayBuffer());
 
