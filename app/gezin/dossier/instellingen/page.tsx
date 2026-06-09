@@ -266,8 +266,8 @@ function InstellingenContent() {
           </p>
           <div className="space-y-2">
             {[
-              { value: "by_subject", label: "Per onderwerp", example: "Archief / Financiën / Belasting" },
-              { value: "by_person", label: "Per geadresseerde", example: "Archief / Marco / Financiën / Belasting" },
+              { value: "by_subject", label: "Per onderwerp", example: "MijnDossier / Financiën / Belasting" },
+              { value: "by_person", label: "Per geadresseerde", example: "MijnDossier / Marco / Financiën / Belasting" },
             ].map((opt) => (
               <button key={opt.value} onClick={() => saveFolderStructure(opt.value)}
                 className={`w-full flex items-start gap-3 rounded-xl px-4 py-3 border transition-colors text-left ${
