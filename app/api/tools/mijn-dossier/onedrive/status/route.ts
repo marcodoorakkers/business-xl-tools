@@ -21,6 +21,12 @@ export async function GET() {
     .eq("user_id", user.id)
     .single();
 
+  const { data: googleDriveRow } = await admin
+    .from("google_drive_tokens")
+    .select("archive_root")
+    .eq("user_id", user.id)
+    .single();
+
   const { data: archiveSettings, error: archiveErr } = await admin
     .from("archive_settings")
     .select("storage_preference, folder_structure")
@@ -44,6 +50,8 @@ export async function GET() {
     familyMemberDetails: members ?? [],
     dropboxConnected: !!dropboxRow,
     dropboxArchiveRoot: dropboxRow?.archive_root ?? "MijnDossier",
+    googleDriveConnected: !!googleDriveRow,
+    googleDriveArchiveRoot: googleDriveRow?.archive_root ?? "MijnDossier",
     storagePreference: archiveSettings?.storage_preference ?? "local",
     folderStructure: archiveSettings?.folder_structure ?? "by_subject",
   });
@@ -79,8 +87,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
+  if (typeof body.googleDriveArchiveRoot === "string") {
+    if (!body.googleDriveArchiveRoot.trim()) {
+      return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
+    }
+    await admin.from("google_drive_tokens").update({
+      archive_root: body.googleDriveArchiveRoot.trim(),
+      updated_at: new Date().toISOString(),
+    }).eq("user_id", user.id);
+    return NextResponse.json({ ok: true });
+  }
+
   if (typeof body.storagePreference === "string") {
-    const valid = ["local", "onedrive", "dropbox"];
+    const valid = ["local", "onedrive", "dropbox", "googledrive"];
     if (!valid.includes(body.storagePreference)) {
       return NextResponse.json({ error: "Ongeldige waarde" }, { status: 400 });
     }

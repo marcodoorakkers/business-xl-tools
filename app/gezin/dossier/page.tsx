@@ -103,8 +103,9 @@ export default function GezinDossierPage() {
   const [savedInfo, setSavedInfo] = useState<{ pad: string; url?: string } | null>(null);
   const [oneDriveConnected, setOneDriveConnected] = useState(false);
   const [dropboxConnected, setDropboxConnected] = useState(false);
+  const [googleDriveConnected, setGoogleDriveConnected] = useState(false);
   const [archiveRoot, setArchiveRoot] = useState("Archief");
-  const [storagePreference, setStoragePreference] = useState<"local" | "onedrive" | "dropbox">("local");
+  const [storagePreference, setStoragePreference] = useState<"local" | "onedrive" | "dropbox" | "googledrive">("local");
   const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -121,16 +122,19 @@ export default function GezinDossierPage() {
         familyMemberDetails?: { name: string; full_name?: string | null }[];
         dropboxConnected: boolean;
         dropboxArchiveRoot: string;
+        googleDriveConnected: boolean;
+        googleDriveArchiveRoot: string;
         storagePreference: string;
         folderStructure?: string;
       }) => {
         setOneDriveConnected(data.connected);
         setDropboxConnected(data.dropboxConnected);
+        setGoogleDriveConnected(data.googleDriveConnected ?? false);
         setArchiveRoot(data.archiveRoot ?? "Archief");
         setFamilyMembers(data.familyMembers ?? []);
         setFamilyMemberDetails(data.familyMemberDetails ?? []);
         setMembersLoaded(true);
-        setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox");
+        setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox" | "googledrive");
         setFolderStructure((data.folderStructure ?? "by_subject") as "by_subject" | "by_person");
       })
       .catch(() => {});
@@ -277,6 +281,8 @@ export default function GezinDossierPage() {
 
     const endpoint = storagePreference === "dropbox"
       ? "/api/tools/mijn-dossier/dropbox/upload"
+      : storagePreference === "googledrive"
+      ? "/api/tools/mijn-dossier/googledrive/upload"
       : "/api/tools/mijn-dossier/onedrive/upload";
 
     const fd = new FormData();
@@ -333,8 +339,8 @@ export default function GezinDossierPage() {
     setSavedInfo(null); setIncludeActie(true);
   }
 
-  const cloudConnected = storagePreference === "onedrive" ? oneDriveConnected : storagePreference === "dropbox" ? dropboxConnected : false;
-  const cloudLabel = storagePreference === "dropbox" ? "Dropbox" : "OneDrive";
+  const cloudConnected = storagePreference === "onedrive" ? oneDriveConnected : storagePreference === "dropbox" ? dropboxConnected : storagePreference === "googledrive" ? googleDriveConnected : false;
+  const cloudLabel = storagePreference === "dropbox" ? "Dropbox" : storagePreference === "googledrive" ? "Google Drive" : "OneDrive";
 
   return (
     <div className="min-h-screen bg-white md:pt-14">
