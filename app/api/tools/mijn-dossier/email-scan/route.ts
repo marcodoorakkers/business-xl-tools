@@ -68,19 +68,29 @@ export async function POST(req: NextRequest) {
       senderMap.set(doc.afzender, { mappad: doc.mappad, type: doc.type });
     }
   }
-  const senderInstruction = senderMap.size > 0
-    ? `\n\nBekende afzenders:\n${[...senderMap.entries()]
-        .map(([a, { mappad, type }]) => `- ${a} → mappad: ${mappad}${type ? `, type: ${type}` : ""}`)
-        .join("\n")}`
-    : "";
 
-  // Gezinsleden ophalen
+  // Gezinsleden ophalen — nodig voor senderInstruction én familyInstruction
   const { data: familyRows } = await admin
     .from("archive_family_members")
     .select("name, full_name")
     .eq("user_id", profile.id)
     .order("created_at", { ascending: true });
   const familyMemberNames = (familyRows ?? []).map((r: { name: string }) => r.name);
+
+  // Strip geadresseerde-prefix uit opgeslagen mappaden zodat Claude alleen Afzender/Onderwerp/Jaar ziet
+  function stripPersonPrefix(mappad: string): string {
+    for (const name of familyMemberNames) {
+      if (mappad.startsWith(name + "/")) return mappad.slice(name.length + 1);
+    }
+    if (mappad.startsWith("Gemeenschappelijk/")) return mappad.slice("Gemeenschappelijk/".length);
+    return mappad;
+  }
+
+  const senderInstruction = senderMap.size > 0
+    ? `\n\nBekende afzenders:\n${[...senderMap.entries()]
+        .map(([a, { mappad, type }]) => `- ${a} → mappad: ${stripPersonPrefix(mappad)}${type ? `, type: ${type}` : ""}`)
+        .join("\n")}`
+    : "";
 
   // Historische gezinslid per afzender ophalen
   const { data: gezinslidDocs } = await admin
