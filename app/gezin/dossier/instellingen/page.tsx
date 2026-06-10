@@ -291,7 +291,7 @@ function InstellingenContent() {
           <p className="text-xs text-gray-500">
             Bepaal hoe documenten worden ingedeeld in je cloudopslag.
           </p>
-          <div className="space-y-2">
+          <div className={`space-y-2 transition-opacity ${status !== null ? "opacity-100" : "opacity-0"}`}>
             {[
               { value: "by_subject", label: "Per onderwerp", example: "MijnDossier / Financiën / Belasting" },
               { value: "by_person", label: "Per geadresseerde", example: "MijnDossier / Marco / Financiën / Belasting" },
