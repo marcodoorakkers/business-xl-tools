@@ -119,7 +119,7 @@ function ArchiefContent() {
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [filterGezinslid, setFilterGezinslid] = useState(() => searchParams.get("gezinslid") ?? "");
   const [filterType, setFilterType] = useState(() => searchParams.get("type") ?? "");
-  const [filterJaar, setFilterJaar] = useState(() => searchParams.get("jaar") ?? "");
+  const [filterJaar, setFilterJaar] = useState(() => searchParams.get("jaar") ?? String(new Date().getFullYear()));
   const [gezinsleden, setGezinsleden] = useState<string[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -299,6 +299,9 @@ function ArchiefContent() {
   }
 
   const uniqueTypes = Array.from(new Set(documents.map((d) => d.type).filter(Boolean))) as string[];
+  const uniqueJaren = Array.from(new Set(
+    [String(new Date().getFullYear()), ...documents.map((d) => d.datum?.slice(0, 4)).filter(Boolean)]
+  )).sort((a, b) => Number(b) - Number(a)) as string[];
 
   // Huidige node in de drilldown
   const currentNode = treeData ? getNodeAtPath(treeData, drillPath) : null;
@@ -371,17 +374,16 @@ function ArchiefContent() {
                     ))}
                   </select>
                 )}
-                {[String(new Date().getFullYear()), String(new Date().getFullYear() - 1)].map((jaar) => (
-                  <button
-                    key={jaar}
-                    onClick={() => { const v = filterJaar === jaar ? "" : jaar; setFilterJaar(v); updateUrl(query, filterGezinslid, filterType, v); }}
-                    className={`text-xs px-3 py-2 rounded-xl border font-medium transition-colors ${
-                      filterJaar === jaar ? "bg-amber-500 text-white border-amber-500" : "border-gray-200 text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    {jaar}
-                  </button>
-                ))}
+                <select
+                  value={filterJaar}
+                  onChange={(e) => { setFilterJaar(e.target.value); updateUrl(query, filterGezinslid, filterType, e.target.value); }}
+                  className="text-xs border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                >
+                  <option value="">Alle jaren</option>
+                  {uniqueJaren.map((jaar) => (
+                    <option key={jaar} value={jaar}>{jaar}</option>
+                  ))}
+                </select>
                 {(query || filterGezinslid || filterType || filterJaar) && (
                   <button
                     onClick={() => { setQuery(""); setFilterGezinslid(""); setFilterType(""); setFilterJaar(""); setHasSearched(false); setDocuments([]); updateUrl("", "", "", ""); }}
