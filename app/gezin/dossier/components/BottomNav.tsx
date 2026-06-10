@@ -6,12 +6,23 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NMMPKLogo from "@/components/NMMPKLogo";
 
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
 export default function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const [openCount, setOpenCount] = useState(0);
   const [hasOverdue, setHasOverdue] = useState(false);
   const [meerOpen, setMeerOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (ADMIN_EMAIL) {
+      createClient().auth.getUser().then(({ data }) => {
+        setIsAdmin(data.user?.email === ADMIN_EMAIL);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     fetch("/api/tools/mijn-dossier/acties")
@@ -188,6 +199,11 @@ export default function BottomNav() {
                 label="Feedback" active={false} onClick={() => setMeerOpen(false)}
                 icon={<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
               />
+              {isAdmin && (
+                <SheetLink href="/gezin/admin" label="Admin" active={isActive("/gezin/admin")} onClick={() => setMeerOpen(false)}
+                  icon={<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>}
+                />
+              )}
             </div>
             <button
               onClick={signOut}
