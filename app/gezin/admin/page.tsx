@@ -42,6 +42,7 @@ export default function NMMPKAdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [vriendActive, setVriendActive] = useState<boolean | null>(null);
   const [togglingVriend, setTogglingVriend] = useState(false);
+  const [dangerMode, setDangerMode] = useState(false);
   const [confirmResetId, setConfirmResetId] = useState<string | null>(null);
   const [resetting, setResetting] = useState(false);
   const [resetResult, setResetResult] = useState<{ userId: string; docsDeleted: number } | null>(null);
@@ -132,7 +133,22 @@ export default function NMMPKAdminPage() {
         <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900 text-sm">Gebruikers</h2>
-            <span className="text-xs text-gray-400">{users.length} totaal</span>
+            <div className="flex items-center gap-3">
+              <span className={`text-xs font-medium ${dangerMode ? "text-red-600" : "text-gray-400"}`}>
+                {dangerMode ? "Verwijderen aan" : "Verwijderen uit"}
+              </span>
+              <button
+                onClick={() => { setDangerMode((v) => !v); setConfirmResetId(null); }}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  dangerMode ? "bg-red-500" : "bg-gray-300"
+                }`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  dangerMode ? "translate-x-6" : "translate-x-1"
+                }`} />
+              </button>
+              <span className="text-xs text-gray-400">{users.length} totaal</span>
+            </div>
           </div>
 
           {loading ? (
@@ -172,7 +188,7 @@ export default function NMMPKAdminPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span className="text-gray-700 font-semibold">{u.doc_count}</span>
-                          {confirmResetId === u.id ? (
+                          {dangerMode && confirmResetId === u.id ? (
                             <div className="flex items-center gap-1 whitespace-nowrap">
                               <button
                                 onClick={() => resetUserData(u.id)}
@@ -185,10 +201,10 @@ export default function NMMPKAdminPage() {
                             </div>
                           ) : (
                             <button
-                              onClick={() => { setConfirmResetId(u.id); setResetResult(null); }}
-                              disabled={u.doc_count === 0}
+                              onClick={() => { if (dangerMode) { setConfirmResetId(u.id); setResetResult(null); } }}
+                              disabled={!dangerMode || u.doc_count === 0}
                               className="text-xs text-red-400 hover:text-red-700 disabled:text-gray-200 disabled:cursor-not-allowed"
-                              title="Testdata wissen"
+                              title={dangerMode ? "Testdata wissen" : "Zet verwijderen aan om te gebruiken"}
                             >
                               🗑
                             </button>
