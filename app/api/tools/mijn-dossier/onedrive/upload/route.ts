@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, logUsage } from "@/lib/supabase/admin";
 import { getValidAccessToken, uploadFileToOneDrive } from "@/lib/onedrive";
+import { convertToPdf } from "@/lib/convert-to-pdf";
 import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -33,14 +36,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
 
-  // mappad from the client already includes archiveRoot and familyMember prefix
-  const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
-  const fullPath = `${mappad.trim()}/${bestandsnaam}${ext}`;
+  // Strip archive_root prefix: AppFolder (/Apps/{AppName}/) is al de bovenste laag
+  const strippedMappad = mappad.trim().startsWith(archiveRoot + "/")
+    ? mappad.trim().slice(archiveRoot.length + 1)
+    : mappad.trim();
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+  const rawBuffer = Buffer.from(await file.arrayBuffer());
+  const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
+  const fullPath = `${strippedMappad}/${bestandsnaam}.pdf`;
 
   try {
-    const { webUrl } = await uploadFileToOneDrive(accessToken, fullPath, buffer, file.type || "application/octet-stream");
+    const { webUrl } = await uploadFileToOneDrive(accessToken, fullPath, pdfBuffer, "application/pdf");
 
     await supabase.from("profiles").update({ credits: profile.credits - 1 }).eq("id", user.id);
     await logUsage(user.id, "mijn-dossier", 1);

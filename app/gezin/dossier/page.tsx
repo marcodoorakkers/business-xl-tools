@@ -35,8 +35,10 @@ const DOC_ICONS: Record<string, string> = {
   overig: "📄",
 };
 
+const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
 async function compressImage(file: File): Promise<File> {
-  if (file.type === "application/pdf") return file;
+  if (!file.type.startsWith("image/")) return file;
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
@@ -97,13 +99,15 @@ export default function GezinDossierPage() {
   const [gezinslid, setGezinslid] = useState("");
   const [familyMembers, setFamilyMembers] = useState<string[]>([]);
   const [familyMemberDetails, setFamilyMemberDetails] = useState<{ name: string; full_name?: string | null }[]>([]);
+  const [membersLoaded, setMembersLoaded] = useState(false);
   const [includeActie, setIncludeActie] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [savedInfo, setSavedInfo] = useState<{ pad: string; url?: string } | null>(null);
   const [oneDriveConnected, setOneDriveConnected] = useState(false);
   const [dropboxConnected, setDropboxConnected] = useState(false);
+  const [googleDriveConnected, setGoogleDriveConnected] = useState(false);
   const [archiveRoot, setArchiveRoot] = useState("Archief");
-  const [storagePreference, setStoragePreference] = useState<"local" | "onedrive" | "dropbox">("local");
+  const [storagePreference, setStoragePreference] = useState<"local" | "onedrive" | "dropbox" | "googledrive">("local");
   const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -120,15 +124,19 @@ export default function GezinDossierPage() {
         familyMemberDetails?: { name: string; full_name?: string | null }[];
         dropboxConnected: boolean;
         dropboxArchiveRoot: string;
+        googleDriveConnected: boolean;
+        googleDriveArchiveRoot: string;
         storagePreference: string;
         folderStructure?: string;
       }) => {
         setOneDriveConnected(data.connected);
         setDropboxConnected(data.dropboxConnected);
+        setGoogleDriveConnected(data.googleDriveConnected ?? false);
         setArchiveRoot(data.archiveRoot ?? "Archief");
         setFamilyMembers(data.familyMembers ?? []);
         setFamilyMemberDetails(data.familyMemberDetails ?? []);
-        setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox");
+        setMembersLoaded(true);
+        setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox" | "googledrive");
         setFolderStructure((data.folderStructure ?? "by_subject") as "by_subject" | "by_person");
       })
       .catch(() => {});
@@ -265,16 +273,21 @@ export default function GezinDossierPage() {
     setStep("saving");
     const imageFiles = files.filter(f => f.type.startsWith("image/"));
     const pdfFiles = files.filter(f => f.type === "application/pdf");
+    const docxFiles = files.filter(f => f.type === DOCX_MIME);
     let uploadFile: File;
     if (imageFiles.length > 0) {
       const compressed = await Promise.all(imageFiles.map(compressImage));
       uploadFile = compressed.length === 1 ? compressed[0] : await imagesToPdf(compressed, bestandsnaam);
+    } else if (docxFiles.length > 0) {
+      uploadFile = docxFiles[0]; // server converteert naar PDF
     } else {
       uploadFile = pdfFiles[0];
     }
 
-    const endpoint = storagePreference === "dropbox"
+    const endpoint = effectiveStorage === "dropbox"
       ? "/api/tools/mijn-dossier/dropbox/upload"
+      : effectiveStorage === "googledrive"
+      ? "/api/tools/mijn-dossier/googledrive/upload"
       : "/api/tools/mijn-dossier/onedrive/upload";
 
     const fd = new FormData();
@@ -331,8 +344,10 @@ export default function GezinDossierPage() {
     setSavedInfo(null); setIncludeActie(true);
   }
 
-  const cloudConnected = storagePreference === "onedrive" ? oneDriveConnected : storagePreference === "dropbox" ? dropboxConnected : false;
-  const cloudLabel = storagePreference === "dropbox" ? "Dropbox" : "OneDrive";
+  const googleDriveEnabled = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_ENABLED === "true";
+  const effectiveStorage = storagePreference === "googledrive" && !googleDriveEnabled ? "local" : storagePreference;
+  const cloudConnected = effectiveStorage === "onedrive" ? oneDriveConnected : effectiveStorage === "dropbox" ? dropboxConnected : effectiveStorage === "googledrive" ? googleDriveConnected : false;
+  const cloudLabel = effectiveStorage === "dropbox" ? "Dropbox" : effectiveStorage === "googledrive" ? "Google Drive" : "OneDrive";
 
   return (
     <div className="min-h-screen bg-white md:pt-14">
@@ -369,14 +384,14 @@ export default function GezinDossierPage() {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx"
                 multiple
                 className="hidden"
                 onChange={(e) => addFiles(Array.from(e.target.files ?? []))}
               />
             </div>
 
-            {familyMembers.length === 0 && (
+            {membersLoaded && familyMembers.length === 0 && (
               <div className="mt-4 bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-600">
                 Voeg personen toe in de{" "}
                 <Link href="/dossier/instellingen" className="underline font-medium text-amber-600">instellingen</Link>{" "}

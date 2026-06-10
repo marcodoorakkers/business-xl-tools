@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { encryptToken } from "@/lib/token-encryption";
 import { NextRequest, NextResponse } from "next/server";
 
-const TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
+const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
@@ -24,16 +24,16 @@ export async function GET(request: NextRequest) {
 
   if (error || !code || !state) return NextResponse.redirect(failUrl);
 
-  const storedState = request.cookies.get("ms_oauth_state")?.value;
+  const storedState = request.cookies.get("googledrive_oauth_state")?.value;
   if (!storedState || storedState !== state) return NextResponse.redirect(failUrl);
 
   const redirectUri = isGezinSite
-    ? "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/onedrive/callback"
-    : `${origin}/api/tools/mijn-dossier/onedrive/callback`;
+    ? "https://nooitmeerpostkwijt.nl/api/tools/mijn-dossier/googledrive/callback"
+    : `${origin}/api/tools/mijn-dossier/googledrive/callback`;
 
   const params = new URLSearchParams({
-    client_id: process.env.MICROSOFT_CLIENT_ID!,
-    client_secret: process.env.MICROSOFT_CLIENT_SECRET!,
+    client_id: process.env.GOOGLE_CLIENT_ID!,
+    client_secret: process.env.GOOGLE_CLIENT_SECRET!,
     grant_type: "authorization_code",
     code,
     redirect_uri: redirectUri,
@@ -50,10 +50,11 @@ export async function GET(request: NextRequest) {
   const tokens = await tokenRes.json();
   if (!tokens.access_token || !tokens.refresh_token) return NextResponse.redirect(failUrl);
 
-  const expiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
+  const expiresIn = typeof tokens.expires_in === "number" ? tokens.expires_in : 3600;
+  const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
 
   const admin = createAdminClient();
-  await admin.from("onedrive_tokens").upsert({
+  const { error: upsertError } = await admin.from("google_drive_tokens").upsert({
     user_id: user.id,
     access_token: encryptToken(tokens.access_token),
     refresh_token: encryptToken(tokens.refresh_token),
@@ -62,8 +63,10 @@ export async function GET(request: NextRequest) {
     updated_at: new Date().toISOString(),
   }, { onConflict: "user_id" });
 
-  const response = NextResponse.redirect(`${origin}${instellingenPath}?connected=1`);
-  response.cookies.set("ms_oauth_state", "", { maxAge: 0, path: "/" });
+  if (upsertError) return NextResponse.redirect(failUrl);
+
+  const response = NextResponse.redirect(`${origin}${instellingenPath}?googledrive_connected=1`);
+  response.cookies.set("googledrive_oauth_state", "", { maxAge: 0, path: "/" });
 
   return response;
 }

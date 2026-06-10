@@ -3,9 +3,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import Anthropic from "@anthropic-ai/sdk";
 import { getValidAccessToken, uploadFileToOneDrive } from "@/lib/onedrive";
 import { getValidDropboxToken, forceRefreshDropboxToken, uploadFileToDropbox } from "@/lib/dropbox";
+import { convertToPdf } from "@/lib/convert-to-pdf";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   // Cloudflare Worker stuurt een gedeeld secret mee
@@ -21,9 +22,10 @@ export async function POST(req: NextRequest) {
     filename: string;
     contentType: string;
     data: string; // base64
+    isEmailBody?: boolean;
   };
 
-  const { recipient, from, subject, filename, contentType, data } = body;
+  const { recipient, from, subject, filename, contentType, data, isEmailBody } = body;
   if (!recipient || !data) {
     return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
@@ -45,9 +47,10 @@ export async function POST(req: NextRequest) {
     profile.subscription_status === "active" || profile.subscription_status === "trialing";
   if (!hasAccess) return NextResponse.json({ skipped: true });
 
-  // Base64 → Buffer — nooit opslaan, alleen in memory
-  const buffer = Buffer.from(data, "base64");
-  const isPdf = contentType === "application/pdf";
+  // Base64 → Buffer → altijd omzetten naar PDF — nooit opslaan, alleen in memory
+  const rawBuffer = Buffer.from(data, "base64");
+  const pdfBuffer = await convertToPdf(rawBuffer, contentType);
+  const pdfBase64 = pdfBuffer.toString("base64");
 
   // Eerder gescande afzenders ophalen voor consistente categorisering
   const { data: recentDocs } = await admin
@@ -65,19 +68,29 @@ export async function POST(req: NextRequest) {
       senderMap.set(doc.afzender, { mappad: doc.mappad, type: doc.type });
     }
   }
-  const senderInstruction = senderMap.size > 0
-    ? `\n\nBekende afzenders:\n${[...senderMap.entries()]
-        .map(([a, { mappad, type }]) => `- ${a} → mappad: ${mappad}${type ? `, type: ${type}` : ""}`)
-        .join("\n")}`
-    : "";
 
-  // Gezinsleden ophalen
+  // Gezinsleden ophalen — nodig voor senderInstruction én familyInstruction
   const { data: familyRows } = await admin
     .from("archive_family_members")
     .select("name, full_name")
     .eq("user_id", profile.id)
     .order("created_at", { ascending: true });
   const familyMemberNames = (familyRows ?? []).map((r: { name: string }) => r.name);
+
+  // Strip geadresseerde-prefix uit opgeslagen mappaden zodat Claude alleen Afzender/Onderwerp/Jaar ziet
+  function stripPersonPrefix(mappad: string): string {
+    for (const name of familyMemberNames) {
+      if (mappad.startsWith(name + "/")) return mappad.slice(name.length + 1);
+    }
+    if (mappad.startsWith("Gemeenschappelijk/")) return mappad.slice("Gemeenschappelijk/".length);
+    return mappad;
+  }
+
+  const senderInstruction = senderMap.size > 0
+    ? `\n\nBekende afzenders:\n${[...senderMap.entries()]
+        .map(([a, { mappad, type }]) => `- ${a} → mappad: ${stripPersonPrefix(mappad)}${type ? `, type: ${type}` : ""}`)
+        .join("\n")}`
+    : "";
 
   // Historische gezinslid per afzender ophalen
   const { data: gezinslidDocs } = await admin
@@ -110,11 +123,9 @@ export async function POST(req: NextRequest) {
       }${emailContext ? `\n\nE-mailcontext:\n${emailContext}` : ""}`
     : "";
 
-  // AI-analyse
+  // AI-analyse — altijd PDF na conversie, altijd document block
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const contentBlock = isPdf
-    ? { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data } }
-    : { type: "image" as const, source: { type: "base64" as const, media_type: contentType as "image/jpeg" | "image/png" | "image/gif" | "image/webp", data } };
+  const contentBlock = { type: "document" as const, source: { type: "base64" as const, media_type: "application/pdf" as const, data: pdfBase64 } };
 
   let analysis: Record<string, string>;
   try {
@@ -155,8 +166,7 @@ Formaat:
   }
 
   const bestandsnaam = analysis.bestandsnaam ?? filename.replace(/\.[^.]+$/, "") ?? "document";
-  const ext = isPdf ? ".pdf" : ".jpg";
-  const fullFilename = `${bestandsnaam}${ext}`;
+  const fullFilename = `${bestandsnaam}.pdf`;
   const matchedGezinslid = analysis.gezinslid
     ? (familyMemberNames.find(n => n === analysis.gezinslid) ??
        familyMemberNames.find(n => n.toLowerCase().startsWith(analysis.gezinslid.toLowerCase() + " ") ||
@@ -174,9 +184,12 @@ Formaat:
   const folderStructure = archiveSettings?.folder_structure ?? "by_subject";
 
   const person = folderStructure === "by_person" ? (gezinslid ?? "Gemeenschappelijk") : null;
-  const mappad = person
-    ? `${person}/${analysis.mappad ?? "Overig"}`
-    : (analysis.mappad ?? "Overig");
+  // Defensief: strip persoonsnaam als Claude die al in analysis.mappad heeft gezet
+  const rawMappad = analysis.mappad ?? "Overig";
+  const cleanMappad = person && rawMappad.startsWith(person + "/")
+    ? rawMappad.slice(person.length + 1)
+    : rawMappad;
+  const mappad = person ? `${person}/${cleanMappad}` : cleanMappad;
 
   // Uploaden naar cloud — buffer wordt na deze aanroep vrijgegeven
   let fileUrl: string | null = null;
@@ -187,7 +200,7 @@ Formaat:
     const { data: tokenRow } = await admin.from("onedrive_tokens").select("archive_root").eq("user_id", profile.id).single();
     const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
     try {
-      const { webUrl } = await uploadFileToOneDrive(onedriveToken, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, contentType);
+      const { webUrl } = await uploadFileToOneDrive(onedriveToken, `${mappad}/${fullFilename}`, pdfBuffer, "application/pdf");
       fileUrl = webUrl;
       storage = "onedrive";
     } catch { /* ga door naar Dropbox */ }
@@ -199,7 +212,7 @@ Formaat:
       const { data: tokenRow } = await admin.from("dropbox_tokens").select("archive_root").eq("user_id", profile.id).single();
       const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
       try {
-        const result = await uploadFileToDropbox(dropboxToken, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, contentType);
+        const result = await uploadFileToDropbox(dropboxToken, `${archiveRoot}/${mappad}/${fullFilename}`, pdfBuffer, "application/pdf");
         fileUrl = result.webUrl;
         storage = "dropbox";
       } catch (err) {
@@ -207,7 +220,7 @@ Formaat:
           const refreshed = await forceRefreshDropboxToken(profile.id);
           if (refreshed) {
             try {
-              const result = await uploadFileToDropbox(refreshed, `${archiveRoot}/${mappad}/${fullFilename}`, buffer, contentType);
+              const result = await uploadFileToDropbox(refreshed, `${archiveRoot}/${mappad}/${fullFilename}`, pdfBuffer, "application/pdf");
               fileUrl = result.webUrl;
               storage = "dropbox";
             } catch { /* upload mislukt */ }
