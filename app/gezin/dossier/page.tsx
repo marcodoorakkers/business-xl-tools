@@ -470,6 +470,17 @@ export default function GezinDossierPage() {
         {step === "suggestion" && analysis && (
           <div>
             <div className="mb-5">
+              <div className="flex items-center gap-3 mb-3">
+                <button
+                  onClick={() => setStep(files.some(f => f.type.startsWith("image/")) ? "staging" : "idle")}
+                  className="text-sm text-gray-400 hover:text-gray-700 transition-colors flex items-center gap-1"
+                >
+                  ← Terug
+                </button>
+                <button onClick={reset} className="text-sm text-gray-400 hover:text-gray-600 transition-colors ml-auto">
+                  Annuleren
+                </button>
+              </div>
               <h1 className="text-2xl font-extrabold text-gray-900 mb-1">
                 {DOC_ICONS[analysis.type] ?? "📄"} {analysis.onderwerp}
               </h1>
