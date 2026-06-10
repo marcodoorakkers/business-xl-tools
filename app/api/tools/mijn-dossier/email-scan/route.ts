@@ -187,7 +187,7 @@ Formaat:
     const { data: tokenRow } = await admin.from("onedrive_tokens").select("archive_root").eq("user_id", profile.id).single();
     const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
     try {
-      const { webUrl } = await uploadFileToOneDrive(onedriveToken, `${archiveRoot}/${mappad}/${fullFilename}`, pdfBuffer, "application/pdf");
+      const { webUrl } = await uploadFileToOneDrive(onedriveToken, `${mappad}/${fullFilename}`, pdfBuffer, "application/pdf");
       fileUrl = webUrl;
       storage = "onedrive";
     } catch { /* ga door naar Dropbox */ }
