@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, logUsage } from "@/lib/supabase/admin";
 import { getValidDropboxToken, forceRefreshDropboxToken, uploadFileToDropbox } from "@/lib/dropbox";
+import { convertToPdf } from "@/lib/convert-to-pdf";
 import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -33,23 +36,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
 
-  // mappad from the client already includes archiveRoot and familyMember prefix
-  const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
-  const fullPath = `${mappad.trim()}/${bestandsnaam}${ext}`;
-
-  const buffer = Buffer.from(await file.arrayBuffer());
+  const rawBuffer = Buffer.from(await file.arrayBuffer());
+  const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
+  const fullPath = `${mappad.trim()}/${bestandsnaam}.pdf`;
 
   try {
     let token = accessToken;
     let result: { webUrl: string };
     try {
-      result = await uploadFileToDropbox(token, fullPath, buffer, file.type || "application/octet-stream");
+      result = await uploadFileToDropbox(token, fullPath, pdfBuffer, "application/pdf");
     } catch (err) {
       if ((err as Error & { status?: number }).status === 401) {
         const refreshed = await forceRefreshDropboxToken(user.id);
         if (!refreshed) return NextResponse.json({ error: "Dropbox koppeling verlopen — koppel Dropbox opnieuw via instellingen" }, { status: 401 });
         token = refreshed;
-        result = await uploadFileToDropbox(token, fullPath, buffer, file.type || "application/octet-stream");
+        result = await uploadFileToDropbox(token, fullPath, pdfBuffer, "application/pdf");
       } else {
         throw err;
       }

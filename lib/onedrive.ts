@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { encryptToken, decryptToken } from "@/lib/token-encryption";
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 const TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
@@ -13,18 +14,21 @@ export async function getValidAccessToken(userId: string): Promise<string | null
 
   if (!row) return null;
 
+  const accessToken = decryptToken(row.access_token);
+  const refreshToken = decryptToken(row.refresh_token);
+
   const expiresAt = new Date(row.expires_at).getTime();
   const fiveMinutes = 5 * 60 * 1000;
 
   if (Date.now() < expiresAt - fiveMinutes) {
-    return row.access_token;
+    return accessToken;
   }
 
   const params = new URLSearchParams({
     client_id: process.env.MICROSOFT_CLIENT_ID!,
     client_secret: process.env.MICROSOFT_CLIENT_SECRET!,
     grant_type: "refresh_token",
-    refresh_token: row.refresh_token,
+    refresh_token: refreshToken,
   });
 
   const res = await fetch(TOKEN_ENDPOINT, {
@@ -39,8 +43,8 @@ export async function getValidAccessToken(userId: string): Promise<string | null
   const newExpiresAt = new Date(Date.now() + tokens.expires_in * 1000).toISOString();
 
   await admin.from("onedrive_tokens").update({
-    access_token: tokens.access_token,
-    refresh_token: tokens.refresh_token ?? row.refresh_token,
+    access_token: encryptToken(tokens.access_token),
+    refresh_token: encryptToken(tokens.refresh_token ?? refreshToken),
     expires_at: newExpiresAt,
     updated_at: new Date().toISOString(),
   }).eq("user_id", userId);

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { encryptToken } from "@/lib/token-encryption";
 import { NextRequest, NextResponse } from "next/server";
 
 const TOKEN_ENDPOINT = "https://login.microsoftonline.com/common/oauth2/v2.0/token";
@@ -54,8 +55,8 @@ export async function GET(request: NextRequest) {
   const admin = createAdminClient();
   await admin.from("onedrive_tokens").upsert({
     user_id: user.id,
-    access_token: tokens.access_token,
-    refresh_token: tokens.refresh_token,
+    access_token: encryptToken(tokens.access_token),
+    refresh_token: encryptToken(tokens.refresh_token),
     expires_at: expiresAt,
     archive_root: "MijnDossier",
     updated_at: new Date().toISOString(),

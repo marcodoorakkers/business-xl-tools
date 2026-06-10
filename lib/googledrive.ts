@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { encryptToken, decryptToken } from "@/lib/token-encryption";
 
 const TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
 
@@ -12,14 +13,17 @@ export async function getValidGoogleDriveToken(userId: string): Promise<string |
 
   if (!row) return null;
 
+  const accessToken = decryptToken(row.access_token);
+  const refreshTokenValue = decryptToken(row.refresh_token);
+
   const expiresAt = new Date(row.expires_at).getTime();
   const fiveMinutes = 5 * 60 * 1000;
 
   if (Date.now() < expiresAt - fiveMinutes) {
-    return row.access_token;
+    return accessToken;
   }
 
-  return refreshToken(userId, row.refresh_token);
+  return doRefreshToken(userId, refreshTokenValue);
 }
 
 export async function forceRefreshGoogleDriveToken(userId: string): Promise<string | null> {
@@ -31,10 +35,10 @@ export async function forceRefreshGoogleDriveToken(userId: string): Promise<stri
     .single();
 
   if (!row) return null;
-  return refreshToken(userId, row.refresh_token);
+  return doRefreshToken(userId, decryptToken(row.refresh_token));
 }
 
-async function refreshToken(userId: string, refreshTokenValue: string): Promise<string | null> {
+async function doRefreshToken(userId: string, refreshTokenValue: string): Promise<string | null> {
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID!,
     client_secret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -55,7 +59,7 @@ async function refreshToken(userId: string, refreshTokenValue: string): Promise<
 
   const admin = createAdminClient();
   await admin.from("google_drive_tokens").update({
-    access_token: tokens.access_token,
+    access_token: encryptToken(tokens.access_token),
     expires_at: newExpiresAt,
     updated_at: new Date().toISOString(),
   }).eq("user_id", userId);

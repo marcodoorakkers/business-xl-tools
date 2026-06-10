@@ -1,7 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient, logUsage } from "@/lib/supabase/admin";
 import { getValidGoogleDriveToken, forceRefreshGoogleDriveToken, uploadFileToGoogleDrive } from "@/lib/googledrive";
+import { convertToPdf } from "@/lib/convert-to-pdf";
 import { NextRequest, NextResponse } from "next/server";
+
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -32,23 +35,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
 
-  const ext = file.name.includes(".") ? "." + file.name.split(".").pop() : "";
-  const filename = `${bestandsnaam}${ext}`;
+  const rawBuffer = Buffer.from(await file.arrayBuffer());
+  const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
+  const filename = `${bestandsnaam}.pdf`;
   const folderPath = mappad.trim();
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const mimeType = file.type || "application/octet-stream";
 
   try {
     let token = accessToken;
     let result: { webUrl: string };
     try {
-      result = await uploadFileToGoogleDrive(token, folderPath, filename, buffer, mimeType);
+      result = await uploadFileToGoogleDrive(token, folderPath, filename, pdfBuffer, "application/pdf");
     } catch (err) {
       if ((err as Error & { status?: number }).status === 401) {
         const refreshed = await forceRefreshGoogleDriveToken(user.id);
         if (!refreshed) return NextResponse.json({ error: "Google Drive koppeling verlopen — koppel opnieuw via instellingen" }, { status: 401 });
         token = refreshed;
-        result = await uploadFileToGoogleDrive(token, folderPath, filename, buffer, mimeType);
+        result = await uploadFileToGoogleDrive(token, folderPath, filename, pdfBuffer, "application/pdf");
       } else {
         throw err;
       }
