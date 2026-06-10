@@ -184,9 +184,12 @@ Formaat:
   const folderStructure = archiveSettings?.folder_structure ?? "by_subject";
 
   const person = folderStructure === "by_person" ? (gezinslid ?? "Gemeenschappelijk") : null;
-  const mappad = person
-    ? `${person}/${analysis.mappad ?? "Overig"}`
-    : (analysis.mappad ?? "Overig");
+  // Defensief: strip persoonsnaam als Claude die al in analysis.mappad heeft gezet
+  const rawMappad = analysis.mappad ?? "Overig";
+  const cleanMappad = person && rawMappad.startsWith(person + "/")
+    ? rawMappad.slice(person.length + 1)
+    : rawMappad;
+  const mappad = person ? `${person}/${cleanMappad}` : cleanMappad;
 
   // Uploaden naar cloud — buffer wordt na deze aanroep vrijgegeven
   let fileUrl: string | null = null;
