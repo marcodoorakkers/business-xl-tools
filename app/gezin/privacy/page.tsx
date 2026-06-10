@@ -60,7 +60,7 @@ export default function GezinPrivacyPage() {
                   <li>Niet permanent opgeslagen op onze servers na verwerking</li>
                 </ul>
                 <p>Als je documenten doorstuurt via e-mail, verwerken wij tijdelijk het afzenderadres van die e-mail om de analyse te kunnen uitvoeren. Dit adres wordt niet opgeslagen na verwerking.</p>
-                <p className="mt-1">Documenten die jij zelf opslaat in OneDrive of Dropbox worden door jou beheerd — niet door ons.</p>
+                <p className="mt-1">Documenten die jij zelf opslaat in OneDrive, Dropbox of Google Drive worden door jou beheerd — niet door ons.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.4 Acties en instellingen</h3>
@@ -148,6 +148,7 @@ export default function GezinPrivacyPage() {
                     ["Cloudflare", "Domeinbeveiliging en verwerking van inkomende e-mails (scan via e-mail)"],
                     ["Microsoft OneDrive", "Cloudopslag (alleen als je kiest voor OneDrive-opslag)"],
                     ["Dropbox", "Cloudopslag (alleen als je kiest voor Dropbox-opslag)"],
+                    ["Google Drive", "Cloudopslag (alleen als je kiest voor Google Drive-opslag)"],
                   ].map(([party, purpose], i) => (
                     <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
                       <td className="px-4 py-3 font-medium text-gray-800">{party}</td>
@@ -183,6 +184,7 @@ export default function GezinPrivacyPage() {
             <ul className="list-disc list-inside space-y-0.5">
               <li>Versleutelde verbindingen (HTTPS/TLS)</li>
               <li>Versleutelde opslag van wachtwoorden</li>
+              <li>Versleutelde opslag van cloudopslagtokens (AES-256-GCM)</li>
               <li>Beperkte toegang tot persoonsgegevens</li>
               <li>Row-level security: jouw gegevens zijn alleen voor jou zichtbaar</li>
             </ul>
