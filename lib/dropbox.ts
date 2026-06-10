@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { encryptToken, decryptToken } from "@/lib/token-encryption";
 
 const TOKEN_ENDPOINT = "https://api.dropbox.com/oauth2/token";
 
@@ -12,18 +13,21 @@ export async function getValidDropboxToken(userId: string): Promise<string | nul
 
   if (!row) return null;
 
+  const accessToken = decryptToken(row.access_token);
+  const refreshToken = decryptToken(row.refresh_token);
+
   const expiresAt = new Date(row.expires_at).getTime();
   const fiveMinutes = 5 * 60 * 1000;
 
   if (Date.now() < expiresAt - fiveMinutes) {
-    return row.access_token;
+    return accessToken;
   }
 
   const params = new URLSearchParams({
     client_id: process.env.DROPBOX_CLIENT_ID!,
     client_secret: process.env.DROPBOX_CLIENT_SECRET!,
     grant_type: "refresh_token",
-    refresh_token: row.refresh_token,
+    refresh_token: refreshToken,
   });
 
   const res = await fetch(TOKEN_ENDPOINT, {
@@ -38,8 +42,8 @@ export async function getValidDropboxToken(userId: string): Promise<string | nul
   const newExpiresAt = new Date(Date.now() + (tokens.expires_in ?? 14400) * 1000).toISOString();
 
   await admin.from("dropbox_tokens").update({
-    access_token: tokens.access_token,
-    refresh_token: tokens.refresh_token ?? row.refresh_token,
+    access_token: encryptToken(tokens.access_token),
+    refresh_token: encryptToken(tokens.refresh_token ?? refreshToken),
     expires_at: newExpiresAt,
     updated_at: new Date().toISOString(),
   }).eq("user_id", userId);
@@ -57,11 +61,13 @@ export async function forceRefreshDropboxToken(userId: string): Promise<string |
 
   if (!row) return null;
 
+  const refreshToken = decryptToken(row.refresh_token);
+
   const params = new URLSearchParams({
     client_id: process.env.DROPBOX_CLIENT_ID!,
     client_secret: process.env.DROPBOX_CLIENT_SECRET!,
     grant_type: "refresh_token",
-    refresh_token: row.refresh_token,
+    refresh_token: refreshToken,
   });
 
   const res = await fetch(TOKEN_ENDPOINT, {
@@ -76,8 +82,8 @@ export async function forceRefreshDropboxToken(userId: string): Promise<string |
   const newExpiresAt = new Date(Date.now() + (tokens.expires_in ?? 14400) * 1000).toISOString();
 
   await admin.from("dropbox_tokens").update({
-    access_token: tokens.access_token,
-    refresh_token: tokens.refresh_token ?? row.refresh_token,
+    access_token: encryptToken(tokens.access_token),
+    refresh_token: encryptToken(tokens.refresh_token ?? refreshToken),
     expires_at: newExpiresAt,
     updated_at: new Date().toISOString(),
   }).eq("user_id", userId);
@@ -138,7 +144,6 @@ export async function uploadFileToDropbox(
     return { webUrl: linkData.url ?? "" };
   }
 
-  // Link may already exist — fetch it
   if (linkRes.status === 409) {
     const listRes = await fetch("https://api.dropboxapi.com/2/sharing/list_shared_links", {
       method: "POST",
