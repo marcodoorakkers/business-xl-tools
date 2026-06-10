@@ -6,6 +6,7 @@ import SubscribeButton from "@/app/account/SubscribeButton";
 import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
+import TwoFactorSection from "./TwoFactorSection";
 
 
 export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string }> }) {
@@ -162,6 +163,8 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           <h2 className="font-semibold text-gray-900 mb-1">E-mailadres</h2>
           <p className="text-sm text-gray-600">{user.email}</p>
         </div>
+
+        <TwoFactorSection />
 
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <h2 className="font-semibold text-gray-900 mb-4">Wachtwoord wijzigen</h2>

@@ -8,40 +8,77 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 
+type LoginStep = "credentials" | "mfa";
+
 export default function GezinLoginPage() {
+  const [step, setStep] = useState<LoginStep>("credentials");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mfaCode, setMfaCode] = useState("");
+  const [factorId, setFactorId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) {
+    if (signInError) {
       setError("E-mailadres of wachtwoord is onjuist.");
       setLoading(false);
-    } else {
-      // Check of er al een abonnement actief is
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("subscription_status")
-          .eq("id", user.id)
-          .single();
-        if (!profile?.subscription_status) {
-          router.push("/account");
-        } else {
-          router.push("/dossier");
-        }
-      } else {
-        router.push("/dossier");
+      return;
+    }
+
+    // Check of MFA vereist is
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal?.nextLevel === "aal2" && aal.nextLevel !== aal.currentLevel) {
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      const totp = factors?.totp?.[0];
+      if (totp) {
+        setFactorId(totp.id);
+        setStep("mfa");
+        setLoading(false);
+        return;
       }
+    }
+
+    await redirectAfterLogin(supabase);
+  }
+
+  async function handleMfa(e: React.FormEvent) {
+    e.preventDefault();
+    if (!factorId || mfaCode.length !== 6) return;
+    setLoading(true);
+    setError("");
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code: mfaCode });
+    if (error) {
+      setError("Code onjuist — probeer opnieuw.");
+      setMfaCode("");
+      setLoading(false);
+      return;
+    }
+
+    await redirectAfterLogin(supabase);
+  }
+
+  async function redirectAfterLogin(supabase: ReturnType<typeof createClient>) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_status")
+        .eq("id", user.id)
+        .single();
+      router.push(profile?.subscription_status ? "/dossier" : "/account");
+    } else {
+      router.push("/dossier");
     }
   }
 
@@ -52,43 +89,79 @@ export default function GezinLoginPage() {
           <NMMPKLogo size="lg" />
         </div>
         <div className="bg-white rounded-3xl shadow-sm p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Inloggen</h1>
-          <p className="text-gray-500 text-sm mb-6">Welkom terug!</p>
-          <form onSubmit={handleLogin} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">E-mailadres</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                placeholder="jij@example.com"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Wachtwoord</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-            </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
-            >
-              {loading ? "Bezig..." : "Inloggen"}
-            </button>
-            <div className="flex justify-between text-sm text-gray-500 mt-1">
-              <Link href="/auth/forgot-password" className="hover:text-amber-600">Wachtwoord vergeten?</Link>
-              <Link href="/aanmelden" className="hover:text-amber-600">Account aanmaken</Link>
-            </div>
-          </form>
+
+          {step === "credentials" && (
+            <>
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">Inloggen</h1>
+              <p className="text-gray-500 text-sm mb-6">Welkom terug!</p>
+              <form onSubmit={handleLogin} className="flex flex-col gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">E-mailadres</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    placeholder="jij@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Wachtwoord</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  />
+                </div>
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
+                >
+                  {loading ? "Bezig..." : "Inloggen"}
+                </button>
+                <div className="flex justify-between text-sm text-gray-500 mt-1">
+                  <Link href="/auth/forgot-password" className="hover:text-amber-600">Wachtwoord vergeten?</Link>
+                  <Link href="/aanmelden" className="hover:text-amber-600">Account aanmaken</Link>
+                </div>
+              </form>
+            </>
+          )}
+
+          {step === "mfa" && (
+            <>
+              <div className="flex items-center gap-3 mb-5">
+                <button onClick={() => { setStep("credentials"); setError(""); }} className="text-sm text-gray-400 hover:text-gray-600 transition-colors">← Terug</button>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-1">Verificatie</h1>
+              <p className="text-gray-500 text-sm mb-6">Voer de 6-cijferige code in uit je authenticator-app.</p>
+              <form onSubmit={handleMfa} className="flex flex-col gap-4">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={mfaCode}
+                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ""))}
+                  placeholder="123456"
+                  autoFocus
+                  className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm font-mono text-center tracking-widest text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                />
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+                <button
+                  type="submit"
+                  disabled={loading || mfaCode.length !== 6}
+                  className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
+                >
+                  {loading ? "Controleren..." : "Bevestigen"}
+                </button>
+              </form>
+            </>
+          )}
+
         </div>
       </div>
     </main>
