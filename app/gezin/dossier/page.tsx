@@ -284,9 +284,9 @@ export default function GezinDossierPage() {
       uploadFile = pdfFiles[0];
     }
 
-    const endpoint = storagePreference === "dropbox"
+    const endpoint = effectiveStorage === "dropbox"
       ? "/api/tools/mijn-dossier/dropbox/upload"
-      : storagePreference === "googledrive"
+      : effectiveStorage === "googledrive"
       ? "/api/tools/mijn-dossier/googledrive/upload"
       : "/api/tools/mijn-dossier/onedrive/upload";
 
@@ -344,8 +344,10 @@ export default function GezinDossierPage() {
     setSavedInfo(null); setIncludeActie(true);
   }
 
-  const cloudConnected = storagePreference === "onedrive" ? oneDriveConnected : storagePreference === "dropbox" ? dropboxConnected : storagePreference === "googledrive" ? googleDriveConnected : false;
-  const cloudLabel = storagePreference === "dropbox" ? "Dropbox" : storagePreference === "googledrive" ? "Google Drive" : "OneDrive";
+  const googleDriveEnabled = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_ENABLED === "true";
+  const effectiveStorage = storagePreference === "googledrive" && !googleDriveEnabled ? "local" : storagePreference;
+  const cloudConnected = effectiveStorage === "onedrive" ? oneDriveConnected : effectiveStorage === "dropbox" ? dropboxConnected : effectiveStorage === "googledrive" ? googleDriveConnected : false;
+  const cloudLabel = effectiveStorage === "dropbox" ? "Dropbox" : effectiveStorage === "googledrive" ? "Google Drive" : "OneDrive";
 
   return (
     <div className="min-h-screen bg-white md:pt-14">
