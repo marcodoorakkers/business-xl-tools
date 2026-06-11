@@ -35,7 +35,7 @@ export default function GezinLoginPage() {
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
-      options: { captchaToken },
+      options: { captchaToken: captchaToken ?? undefined },
     });
 
     captchaRef.current?.resetCaptcha();
