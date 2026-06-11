@@ -197,7 +197,7 @@ export default async function GezinLandingPage() {
                 Mijn boekhouder vroeg om de oorspronkelijke aanslag VPB. Vroeger betekende dat een uur spitten door een stapel papier in mijn kast. Nu zoek ik het op en heb het in tien seconden.
               </p>
               <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
-                — Jeroen, eigenaar van een eenmanszaak
+                — Marco, eigenaar van een BV
               </footer>
             </blockquote>
 
