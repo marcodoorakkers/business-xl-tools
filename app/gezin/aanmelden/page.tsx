@@ -9,6 +9,7 @@ import NMMPKLogo from "@/components/NMMPKLogo";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ?? "";
+const REGISTRATION_OPEN = process.env.NEXT_PUBLIC_REGISTRATION_OPEN !== "false";
 
 export default function GezinRegisterPage() {
   const [email, setEmail] = useState("");
@@ -22,15 +23,18 @@ export default function GezinRegisterPage() {
 
   const [promoActive, setPromoActive] = useState(false);
   const [promoCode, setPromoCode] = useState<string | null>(null);
+  const [promoChecked, setPromoChecked] = useState(false);
 
   // Promo code uit URL opslaan in localStorage + banner tonen
   useEffect(() => {
-    const promo = new URLSearchParams(window.location.search).get("promo");
+    const promo = new URLSearchParams(window.location.search).get("promo")
+      ?? localStorage.getItem("nmpk_promo");
     if (promo) {
       localStorage.setItem("nmpk_promo", promo);
       setPromoActive(true);
       setPromoCode(promo);
     }
+    setPromoChecked(true);
   }, []);
 
   async function handleRegister(e: React.FormEvent) {
@@ -66,6 +70,29 @@ export default function GezinRegisterPage() {
     } else {
       setSuccess(true);
     }
+  }
+
+  // Aanmelding gesloten — toon alleen als promo check klaar is (voorkomt flash)
+  if (promoChecked && !REGISTRATION_OPEN && !promoCode) {
+    return (
+      <main className="min-h-screen bg-white flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <NMMPKLogo href="/" size="lg" />
+          </div>
+          <div className="bg-white rounded-3xl shadow-sm p-8 text-center">
+            <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m0 0v2m0-2h2m-2 0H10m2-6V7m0 0a5 5 0 100 10A5 5 0 0012 7z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Aanmelding gesloten</h1>
+            <p className="text-sm text-gray-500 mb-6">NooitMeerPostKwijt is momenteel niet open voor nieuwe aanmeldingen. Heb je een uitnodigingslink? Open die link om je aan te melden.</p>
+            <Link href="/" className="text-sm text-amber-600 hover:underline font-medium">Terug naar de homepage</Link>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   if (success) {
