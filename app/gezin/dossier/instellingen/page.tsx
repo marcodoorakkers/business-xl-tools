@@ -42,6 +42,9 @@ function InstellingenContent() {
   const [addingMember, setAddingMember] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [scanEmail, setScanEmail] = useState<string | null>(null);
+  const [allowlist, setAllowlist] = useState<{ id: string; email: string }[]>([]);
+  const [newAllowEmail, setNewAllowEmail] = useState("");
+  const [addingAllow, setAddingAllow] = useState(false);
 
   const showToast = useCallback((type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -81,6 +84,12 @@ function InstellingenContent() {
       .then((r) => r.json())
       .then((data: { email?: string }) => {
         if (data.email) setScanEmail(data.email);
+      });
+
+    fetch("/api/tools/mijn-dossier/scan-allowlist")
+      .then((r) => r.json())
+      .then((data: { allowlist: { id: string; email: string }[] }) => {
+        setAllowlist(data.allowlist ?? []);
       });
   }, []);
 
@@ -214,6 +223,44 @@ function InstellingenContent() {
       });
       if (!res.ok) throw new Error();
       setFamilyMembers((prev) => prev.filter((m) => m.id !== id));
+    } catch {
+      showToast("error", "Verwijderen mislukt.");
+    }
+  }
+
+  async function addAllowEmail() {
+    if (!newAllowEmail.trim() || !newAllowEmail.includes("@")) return;
+    setAddingAllow(true);
+    try {
+      const res = await fetch("/api/tools/mijn-dossier/scan-allowlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: newAllowEmail.trim() }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        showToast("error", err.error === "Al toegevoegd" ? "Dit adres staat er al in." : "Toevoegen mislukt.");
+        return;
+      }
+      const entry = await res.json();
+      setAllowlist((prev) => [...prev, entry]);
+      setNewAllowEmail("");
+    } catch {
+      showToast("error", "Toevoegen mislukt.");
+    } finally {
+      setAddingAllow(false);
+    }
+  }
+
+  async function removeAllowEmail(id: string) {
+    try {
+      const res = await fetch("/api/tools/mijn-dossier/scan-allowlist", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error();
+      setAllowlist((prev) => prev.filter((a) => a.id !== id));
     } catch {
       showToast("error", "Verwijderen mislukt.");
     }
@@ -483,6 +530,48 @@ function InstellingenContent() {
           ) : (
             <div className="text-sm text-gray-400">Laden…</div>
           )}
+        </div>
+
+        {/* Toegestane afzenders */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
+          <div>
+            <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Toegestane afzenders</h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Alleen e-mails van deze adressen worden verwerkt. Laat leeg om alle afzenders toe te staan.
+            </p>
+          </div>
+          <ul className="space-y-2">
+            {allowlist.map((a) => (
+              <li key={a.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2">
+                <span className="text-sm text-gray-700 font-mono">{a.email}</span>
+                <button
+                  onClick={() => removeAllowEmail(a.id)}
+                  className="text-gray-400 hover:text-red-500 text-lg leading-none transition-colors ml-3"
+                  aria-label="Verwijderen"
+                >×</button>
+              </li>
+            ))}
+            {allowlist.length === 0 && (
+              <li className="text-sm text-gray-400 italic">Alle afzenders toegestaan.</li>
+            )}
+          </ul>
+          <div className="flex gap-2 pt-2 border-t border-gray-100">
+            <input
+              type="email"
+              value={newAllowEmail}
+              onChange={(e) => setNewAllowEmail(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") addAllowEmail(); }}
+              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
+              placeholder="afzender@example.com"
+            />
+            <button
+              onClick={addAllowEmail}
+              disabled={addingAllow || !newAllowEmail.includes("@")}
+              className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+            >
+              {addingAllow ? "Toevoegen…" : "Toevoegen"}
+            </button>
+          </div>
         </div>
 
         {/* Gezinsleden */}
