@@ -2,10 +2,13 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+
+const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ?? "";
 
 export default function GezinRegisterPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +17,8 @@ export default function GezinRegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HCaptcha>(null);
 
   const [promoActive, setPromoActive] = useState(false);
   const [promoCode, setPromoCode] = useState<string | null>(null);
@@ -27,6 +32,7 @@ export default function GezinRegisterPage() {
       setPromoCode(promo);
     }
   }, []);
+
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -39,13 +45,20 @@ export default function GezinRegisterPage() {
       setError("Wachtwoord moet minimaal 8 tekens zijn.");
       return;
     }
+    if (HCAPTCHA_SITE_KEY && !captchaToken) return;
 
     setLoading(true);
     const { error } = await createClient().auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `https://nooitmeerpostkwijt.nl/account${promoCode ? `?promo=${promoCode}` : ""}` },
+      options: {
+        emailRedirectTo: `https://nooitmeerpostkwijt.nl/account${promoCode ? `?promo=${promoCode}` : ""}`,
+        captchaToken: captchaToken ?? undefined,
+      },
     });
+
+    captchaRef.current?.resetCaptcha();
+    setCaptchaToken(null);
 
     if (error) {
       setError(error.message);
@@ -135,10 +148,19 @@ export default function GezinRegisterPage() {
                 className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
               />
             </div>
+            {HCAPTCHA_SITE_KEY && (
+              <HCaptcha
+                ref={captchaRef}
+                sitekey={HCAPTCHA_SITE_KEY}
+                onVerify={setCaptchaToken}
+                onExpire={() => setCaptchaToken(null)}
+                theme="light"
+              />
+            )}
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (!!HCAPTCHA_SITE_KEY && !captchaToken)}
               className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
             >
               {loading ? "Bezig..." : "Account aanmaken"}
