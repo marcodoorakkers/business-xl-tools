@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  const [profile, documents, actions, settings, members] = await Promise.all([
+  const [authUser, profile, documents, actions, settings, members] = await Promise.all([
+    admin.auth.admin.getUserById(userId),
     admin.from("profiles").select("*").eq("id", userId).single(),
     admin.from("documents").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
     admin.from("document_actions").select("*").eq("user_id", userId).order("created_at", { ascending: false }),
@@ -29,6 +30,7 @@ export async function GET(req: NextRequest) {
     const exportData = {
       export_date: new Date().toISOString(),
       user_id: userId,
+      email: authUser.data.user?.email ?? null,
       profiel: profile.data ?? null,
       instellingen: settings.data ?? null,
       geadresseerden: members.data ?? [],
@@ -97,7 +99,7 @@ export async function GET(req: NextRequest) {
 
   <h2>Profiel</h2>
   <table>
-    ${row("E-mailadres", p.email)}
+    ${row("E-mailadres", authUser.data.user?.email)}
     ${row("Aangemeld op", fmt(p.created_at))}
     ${row("Abonnementsstatus", p.subscription_status)}
     ${row("Proefperiode eindigt", fmt(p.subscription_period_end))}
