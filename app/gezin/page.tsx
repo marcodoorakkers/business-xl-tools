@@ -197,7 +197,7 @@ export default async function GezinLandingPage() {
                 Mijn boekhouder vroeg om de oorspronkelijke aanslag VPB. Vroeger betekende dat een uur spitten door een stapel papier in mijn kast. Nu zoek ik het op en heb het in tien seconden.
               </p>
               <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
-                — Marco, eigenaar van een BV
+                — Jeroen, eigenaar van een eenmanszaak
               </footer>
             </blockquote>
 
@@ -207,7 +207,7 @@ export default async function GezinLandingPage() {
                 Ik ging mijn auto verkopen en kon de brief van het RDW met de tenaamstellingscode niet snel genoeg vinden. Uiteindelijk heb ik maar een nieuwe code aangeschaft bij het RDW. Achteraf zo zonde.
               </p>
               <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
-                — Sandra, vennoot in een VOF
+                — Marco, eigenaar van een BV
               </footer>
             </blockquote>
           </div>
