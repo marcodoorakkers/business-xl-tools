@@ -12,6 +12,16 @@ export async function GET() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
+  // Eerste keer: eigen e-mailadres automatisch toevoegen
+  if (data && data.length === 0 && user.email) {
+    const { data: inserted } = await supabase
+      .from("scan_email_allowlist")
+      .insert({ user_id: user.id, email: user.email.toLowerCase() })
+      .select("id, email, created_at")
+      .single();
+    return NextResponse.json({ allowlist: inserted ? [inserted] : [] });
+  }
+
   return NextResponse.json({ allowlist: data ?? [] });
 }
 
