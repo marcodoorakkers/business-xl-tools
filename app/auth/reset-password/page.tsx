@@ -28,11 +28,30 @@ export default function ResetPasswordPage() {
     }
 
     setLoading(true);
-    const { error } = await createClient().auth.updateUser({ password });
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      setError(error.message);
+      if (error.message.toLowerCase().includes("weak")) {
+        setError("Wachtwoord is te zwak. Gebruik hoofdletters, cijfers en leestekens.");
+      } else if (error.message.toLowerCase().includes("same password")) {
+        setError("Nieuw wachtwoord mag niet hetzelfde zijn als het huidige.");
+      } else {
+        setError("Er ging iets mis. Probeer het opnieuw.");
+      }
       setLoading(false);
+      return;
+    }
+
+    // Redirect op basis van accounttype
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_status")
+        .eq("id", user.id)
+        .single();
+      router.push(profile?.subscription_status ? "/dossier" : "/dashboard");
     } else {
       router.push("/dashboard");
     }
