@@ -43,7 +43,7 @@ export default async function GezinLandingPage() {
       <nav className="flex items-center justify-between px-5 py-4 max-w-5xl mx-auto">
         <NMMPKLogo href="/" size="lg" />
         <div className="flex gap-2 items-center">
-          <Link href="/inloggen" className="hidden sm:block text-sm text-gray-600 font-medium hover:text-gray-900 transition-colors px-3 py-2">
+          <Link href="/inloggen" className="text-sm text-gray-600 hover:text-gray-900 font-medium border border-gray-200 hover:border-gray-300 px-4 py-2 rounded-xl transition-colors whitespace-nowrap">
             Inloggen
           </Link>
           <Link
