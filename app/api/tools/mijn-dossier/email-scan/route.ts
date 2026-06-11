@@ -47,20 +47,21 @@ export async function POST(req: NextRequest) {
     profile.subscription_status === "active" || profile.subscription_status === "trialing";
   if (!hasAccess) return NextResponse.json({ skipped: true });
 
-  // Allowlist check: als de gebruiker een allowlist heeft, moet de afzender erin staan
-  if (from) {
-    const { data: allowlist } = await admin
-      .from("scan_email_allowlist")
-      .select("email")
-      .eq("user_id", profile.id);
+  // Allowlist check: alleen afzenders in de lijst worden verwerkt
+  const { data: allowlist } = await admin
+    .from("scan_email_allowlist")
+    .select("email")
+    .eq("user_id", profile.id);
 
-    if (allowlist && allowlist.length > 0) {
-      const senderEmail = from.toLowerCase().trim();
-      const allowed = allowlist.some((a) => a.email.toLowerCase() === senderEmail);
-      if (!allowed) {
-        return NextResponse.json({ skipped: true, reason: "sender_not_allowed" });
-      }
+  if (from) {
+    const senderEmail = from.toLowerCase().trim();
+    const allowed = allowlist?.some((a) => a.email.toLowerCase() === senderEmail) ?? false;
+    if (!allowed) {
+      return NextResponse.json({ skipped: true, reason: "sender_not_allowed" });
     }
+  } else {
+    // Geen afzender bekend → weigeren
+    return NextResponse.json({ skipped: true, reason: "sender_unknown" });
   }
 
   // Base64 → Buffer → altijd omzetten naar PDF — nooit opslaan, alleen in memory

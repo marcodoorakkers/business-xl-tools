@@ -537,7 +537,7 @@ function InstellingenContent() {
           <div>
             <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Toegestane afzenders</h2>
             <p className="text-xs text-gray-500 mt-1">
-              Alleen e-mails van deze adressen worden verwerkt. Laat leeg om alle afzenders toe te staan.
+              Alleen e-mails van deze adressen worden verwerkt. E-mails van andere adressen worden genegeerd.
             </p>
           </div>
           <ul className="space-y-2">
@@ -552,7 +552,7 @@ function InstellingenContent() {
               </li>
             ))}
             {allowlist.length === 0 && (
-              <li className="text-sm text-gray-400 italic">Alle afzenders toegestaan.</li>
+              <li className="text-sm text-gray-400 italic">Geen adressen — scan via e-mail is geblokkeerd.</li>
             )}
           </ul>
           <div className="flex gap-2 pt-2 border-t border-gray-100">
