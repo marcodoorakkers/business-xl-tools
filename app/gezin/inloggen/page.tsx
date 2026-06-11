@@ -27,7 +27,7 @@ export default function GezinLoginPage() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (!captchaToken) return;
+    if (HCAPTCHA_SITE_KEY && !captchaToken) return;
     setLoading(true);
     setError("");
 
