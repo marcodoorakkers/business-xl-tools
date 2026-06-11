@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ChangePasswordForm() {
+  const [current, setCurrent] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
@@ -25,13 +26,27 @@ export default function ChangePasswordForm() {
     }
 
     setLoading(true);
-    const { error } = await createClient().auth.updateUser({ password });
+    const { error } = await createClient().auth.updateUser({
+      password,
+      nonce: current,
+    });
     setLoading(false);
 
     if (error) {
-      setError(error.message);
+      if (error.message.toLowerCase().includes("same password")) {
+        setError("Nieuw wachtwoord mag niet hetzelfde zijn als het huidige.");
+      } else if (error.message.toLowerCase().includes("weak")) {
+        setError("Wachtwoord is te zwak. Gebruik hoofdletters, cijfers en leestekens.");
+      } else if (error.message.toLowerCase().includes("reauthentication")) {
+        setError("Je sessie is verlopen. Log opnieuw in en probeer het opnieuw.");
+      } else if (error.message.toLowerCase().includes("invalid") || error.message.toLowerCase().includes("incorrect")) {
+        setError("Huidig wachtwoord is onjuist.");
+      } else {
+        setError("Er ging iets mis. Probeer het opnieuw.");
+      }
     } else {
       setSuccess(true);
+      setCurrent("");
       setPassword("");
       setConfirm("");
     }
@@ -41,11 +56,19 @@ export default function ChangePasswordForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <input
         type="password"
+        value={current}
+        onChange={(e) => setCurrent(e.target.value)}
+        placeholder="Huidig wachtwoord"
+        required
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+      />
+      <input
+        type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="Nieuw wachtwoord"
+        placeholder="Nieuw wachtwoord (min. 8 tekens)"
         required
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
       />
       <input
         type="password"
@@ -53,14 +76,14 @@ export default function ChangePasswordForm() {
         onChange={(e) => setConfirm(e.target.value)}
         placeholder="Bevestig nieuw wachtwoord"
         required
-        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
       />
       {error && <p className="text-red-500 text-sm">{error}</p>}
       {success && <p className="text-green-600 text-sm">Wachtwoord succesvol gewijzigd!</p>}
       <button
         type="submit"
         disabled={loading}
-        className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg py-2 text-sm font-medium transition-colors"
+        className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-lg py-2 text-sm font-medium transition-colors"
       >
         {loading ? "Bezig..." : "Wachtwoord wijzigen"}
       </button>
