@@ -2,13 +2,16 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 type LoginStep = "credentials" | "mfa";
+
+const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ?? "";
 
 export default function GezinLoginPage() {
   const [step, setStep] = useState<LoginStep>("credentials");
@@ -16,17 +19,27 @@ export default function GezinLoginPage() {
   const [password, setPassword] = useState("");
   const [mfaCode, setMfaCode] = useState("");
   const [factorId, setFactorId] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const captchaRef = useRef<HCaptcha>(null);
   const router = useRouter();
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (HCAPTCHA_SITE_KEY && !captchaToken) return;
     setLoading(true);
     setError("");
 
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: { captchaToken },
+    });
+
+    captchaRef.current?.resetCaptcha();
+    setCaptchaToken(null);
 
     if (signInError) {
       setError("E-mailadres of wachtwoord is onjuist.");
@@ -116,10 +129,19 @@ export default function GezinLoginPage() {
                     className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400"
                   />
                 </div>
+                {HCAPTCHA_SITE_KEY && (
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={HCAPTCHA_SITE_KEY}
+                    onVerify={setCaptchaToken}
+                    onExpire={() => setCaptchaToken(null)}
+                    theme="light"
+                  />
+                )}
                 {error && <p className="text-red-500 text-sm">{error}</p>}
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || (!!HCAPTCHA_SITE_KEY && !captchaToken)}
                   className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl py-2.5 text-sm font-semibold transition-colors"
                 >
                   {loading ? "Bezig..." : "Inloggen"}
