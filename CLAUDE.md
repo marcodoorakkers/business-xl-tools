@@ -223,6 +223,7 @@ supabase/migrations/
   - "Meer" opent een bottom sheet: Ideeën, Instellingen, Account, Feedback, Uitloggen
   - iPhone safe-area inset via `env(safe-area-inset-bottom)`
 - **Desktop** (`≥ md`): sticky topnav — logo links, primaire links midden (Scannen · Documenten · Acties · Ideeën), iconen + Uitloggen rechts
+- **Admin-link**: zichtbaar in desktop topnav (shield-icoon) én mobiele Meer-sheet, alleen als `user.email === NEXT_PUBLIC_ADMIN_EMAIL`
 - **Acties-badge**: telt openstaande acties via `/api/tools/mijn-dossier/acties`; rood bij verlopen deadlines, amber anders; ververst bij elke paginawisseling
 - Actieve pagina licht op in amber via `usePathname()`
 - Alle pagina's gebruiken `pb-24` op de content om overlap met de bottom nav te voorkomen
@@ -235,7 +236,7 @@ Route: `dossier/archief/page.tsx` — API: `documents/route.ts`
 
 ### Lijstview
 - Zoekbalk (afzender, onderwerp, samenvatting, mappad, bestandsnaam)
-- Filters: geadresseerde (dropdown), type (dropdown), jaar (knopjes — toggle, bewaard in URL)
+- Filters: geadresseerde (dropdown), type (dropdown), jaar (dropdown — default huidig jaar, bewaard in URL)
 - Paginering: 20 per keer, "Meer laden" knop, offset via `?offset=`
 - Per document: type-icoon, afzender, onderwerp, datum, samenvatting (2 regels), badges (type, geadresseerde, mappad, opslag)
 - **Mappad bewerken**: klik op het mappad-badge of `+ map` → inline invoerveld → PATCH `?id=`
@@ -289,6 +290,9 @@ Route: `dossier/archief/page.tsx` — API: `documents/route.ts`
 - API op `/api/admin/nmmpk-users` — toont subscription_status, promo_code, storage, doc count
 - `/api/admin/reset-user-data` — wist alle documenten + document_actions voor een userId (POST, admin-only)
 - `/api/admin/test-email` — stuurt testmails naar ADMIN_EMAIL (type: `welcome_founding` of `trial_ending`)
+- `/api/admin/user-data` — AVG gegevensexport per gebruiker als HTML-rapport (printbaar naar PDF); `?format=json` voor ruwe JSON
+- Admin verwijder-knop vereist een safety toggle (rode schakelaar) voordat verwijderen mogelijk is
+- Admin nav-link zichtbaar in BottomNav (desktop + mobiel) alleen voor `NEXT_PUBLIC_ADMIN_EMAIL`
 
 ## Stripe (NMMPK)
 
@@ -320,6 +324,43 @@ Route: `dossier/archief/page.tsx` — API: `documents/route.ts`
 - `cancel_at_period_end = true` → status wordt `cancelling` (niet `active`)
 - `canceled` → status wordt `null`
 - `subscription_period_end` wordt bijgewerkt bij elke webhook
+
+## Authenticatie & beveiliging (NMMPK)
+
+### Login (`gezin/inloggen/page.tsx`)
+- **hCaptcha** op het inlogformulier — vereist `NEXT_PUBLIC_HCAPTCHA_SITE_KEY` in Vercel
+- **TOTP 2FA** via `supabase.auth.mfa` — na login check op `getAuthenticatorAssuranceLevel()`; indien `aal2` vereist → TOTP-scherm
+- 2FA beheer in `gezin/account/TwoFactorSection.tsx` (inschakelen/uitschakelen)
+- Na login: redirect naar `/dossier` als abonnement actief, anders `/account`
+
+### Aanmelden (`gezin/aanmelden/page.tsx`)
+- **hCaptcha** op het aanmeldformulier — zelfde site key als login
+- **Aanmelding dichtzetten**: `NEXT_PUBLIC_REGISTRATION_OPEN=false` toont een "gesloten" melding
+  - Uitzondering: met promo code in URL of localStorage blijft formulier zichtbaar
+  - Promo check leest ook uit localStorage (zodat terugkomende bezoekers niet geblokkeerd worden)
+- Beide env vars zijn `NEXT_PUBLIC_` — graceful fallback als ze niet gezet zijn (captcha overgeslagen, aanmelding open)
+
+### Wachtwoord wijzigen (`app/account/ChangePasswordForm.tsx`)
+- Vereist huidig wachtwoord (`nonce` parameter in `updateUser`) — Supabase instelling "Require current password" staat aan
+- Nederlandse foutmeldingen voor alle Supabase-foutcases
+
+### Wachtwoord resetten (`app/auth/reset-password/page.tsx`)
+- Geen huidig wachtwoord nodig (recovery session via e-maillink)
+- Na reset: redirect naar `/dossier` voor NMMPK-gebruikers, `/dashboard` voor TST
+
+### Supabase Auth instellingen (geconfigureerd)
+- Secure email change: aan
+- Secure password change: aan (sessie < 24u vereist)
+- Require current password when updating: aan
+- Minimum password length: 8
+- Password requirements: lowercase + uppercase + digits + symbols
+- hCaptcha: aan — secret ingevuld in Supabase dashboard
+
+### Env vars beveiliging
+- `TOKEN_ENCRYPTION_KEY` — AES-256-GCM encryptie van OneDrive/Dropbox OAuth tokens
+- `CLOUDFLARE_WEBHOOK_SECRET` — beschermt de inbound email webhook
+- `STRIPE_WEBHOOK_SECRET` — beschermt Stripe webhook handler
+- `NEXT_PUBLIC_ADMIN_EMAIL` — bepaalt wie de admin nav-link ziet (moet overeenkomen met `ADMIN_EMAIL`)
 
 ## Backlog
 
