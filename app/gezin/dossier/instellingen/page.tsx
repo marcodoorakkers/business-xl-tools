@@ -268,10 +268,11 @@ function InstellingenContent() {
 
   const googleDriveEnabled = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_ENABLED === "true";
 
-  const storageOptions = [
+  const storageOptions: { value: string; label: string; icon: string; connected: boolean; statusLabel?: string }[] = [
     { value: "onedrive", label: "OneDrive", icon: "☁️", connected: status?.connected ?? false },
     { value: "dropbox", label: "Dropbox", icon: "📦", connected: status?.dropboxConnected ?? false },
     ...(googleDriveEnabled ? [{ value: "googledrive", label: "Google Drive", icon: "🔵", connected: status?.googleDriveConnected ?? false }] : []),
+    { value: "local", label: "Zelf opslaan", icon: "💾", connected: false, statusLabel: "Geen upload" },
   ];
 
   const storageLoaded = storagePreference !== null;
@@ -314,13 +315,18 @@ function InstellingenContent() {
                   <span className="text-xl">{opt.icon}</span>
                   <span className="text-xs">{opt.label}</span>
                   <span className={`text-xs font-medium ${opt.connected ? "text-green-600" : "text-gray-400"}`}>
-                    {opt.connected ? "✓ Gekoppeld" : "Niet gekoppeld"}
+                    {opt.statusLabel ?? (opt.connected ? "✓ Gekoppeld" : "Niet gekoppeld")}
                   </span>
                 </button>
               );
             })}
           </div>
-          {storagePreference && storagePreference !== "onedrive" && storagePreference !== "dropbox" && (
+          {storagePreference === "local" && (
+            <p className="text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2">
+              ℹ️ Documenten worden geanalyseerd door AI, maar niet geüpload. Na het scannen ontvang je een mappad-suggestie zodat je het bestand zelf kunt bewaren.
+            </p>
+          )}
+          {storagePreference && storagePreference !== "onedrive" && storagePreference !== "dropbox" && storagePreference !== "googledrive" && storagePreference !== "local" && (
             <p className="text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2">
               ⚠️ Kies OneDrive of Dropbox om documenten automatisch op te slaan.
             </p>
@@ -336,7 +342,7 @@ function InstellingenContent() {
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
           <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Mapstructuur</h2>
           <p className="text-xs text-gray-500">
-            Bepaal hoe documenten worden ingedeeld in je cloudopslag.
+            Bepaal hoe documenten worden ingedeeld in je dossier.
           </p>
           <div className={`space-y-2 transition-opacity ${status !== null ? "opacity-100" : "opacity-0"}`}>
             {[
@@ -512,7 +518,11 @@ function InstellingenContent() {
           <p className="text-xs text-gray-500">
             Stuur of forward een e-mail met PDF-bijlage naar jouw persoonlijke scan-adres. De bijlage wordt automatisch geanalyseerd en toegevoegd aan je dossier.
           </p>
-          {scanEmail ? (
+          {storagePreference === "local" ? (
+            <p className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+              Niet beschikbaar bij &quot;Zelf opslaan&quot; — er is geen cloudopslag om het bestand automatisch in te bewaren.
+            </p>
+          ) : scanEmail ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
                 <span className="text-sm font-mono text-amber-800 break-all flex-1">{scanEmail}</span>
@@ -540,38 +550,46 @@ function InstellingenContent() {
               Alleen e-mails van deze adressen worden verwerkt. E-mails van andere adressen worden genegeerd.
             </p>
           </div>
-          <ul className="space-y-2">
-            {allowlist.map((a) => (
-              <li key={a.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2">
-                <span className="text-sm text-gray-700 font-mono">{a.email}</span>
+          {storagePreference === "local" ? (
+            <p className="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+              Niet beschikbaar bij &quot;Zelf opslaan&quot; — scan via e-mail is niet actief.
+            </p>
+          ) : (
+            <>
+              <ul className="space-y-2">
+                {allowlist.map((a) => (
+                  <li key={a.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-2">
+                    <span className="text-sm text-gray-700 font-mono">{a.email}</span>
+                    <button
+                      onClick={() => removeAllowEmail(a.id)}
+                      className="text-gray-400 hover:text-red-500 text-lg leading-none transition-colors ml-3"
+                      aria-label="Verwijderen"
+                    >×</button>
+                  </li>
+                ))}
+                {allowlist.length === 0 && (
+                  <li className="text-sm text-gray-400 italic">Geen adressen — scan via e-mail is geblokkeerd.</li>
+                )}
+              </ul>
+              <div className="flex gap-2 pt-2 border-t border-gray-100">
+                <input
+                  type="email"
+                  value={newAllowEmail}
+                  onChange={(e) => setNewAllowEmail(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") addAllowEmail(); }}
+                  className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
+                  placeholder="afzender@example.com"
+                />
                 <button
-                  onClick={() => removeAllowEmail(a.id)}
-                  className="text-gray-400 hover:text-red-500 text-lg leading-none transition-colors ml-3"
-                  aria-label="Verwijderen"
-                >×</button>
-              </li>
-            ))}
-            {allowlist.length === 0 && (
-              <li className="text-sm text-gray-400 italic">Geen adressen — scan via e-mail is geblokkeerd.</li>
-            )}
-          </ul>
-          <div className="flex gap-2 pt-2 border-t border-gray-100">
-            <input
-              type="email"
-              value={newAllowEmail}
-              onChange={(e) => setNewAllowEmail(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") addAllowEmail(); }}
-              className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300"
-              placeholder="afzender@example.com"
-            />
-            <button
-              onClick={addAllowEmail}
-              disabled={addingAllow || !newAllowEmail.includes("@")}
-              className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-            >
-              {addingAllow ? "Toevoegen…" : "Toevoegen"}
-            </button>
-          </div>
+                  onClick={addAllowEmail}
+                  disabled={addingAllow || !newAllowEmail.includes("@")}
+                  className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+                >
+                  {addingAllow ? "Toevoegen…" : "Toevoegen"}
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Gezinsleden */}

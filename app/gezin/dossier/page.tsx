@@ -332,9 +332,10 @@ export default function GezinDossierPage() {
       a.click(); URL.revokeObjectURL(url);
     }
 
+    const fileExt = saveFile.type === "application/pdf" ? "pdf" : "jpg";
     if (includeActie && analysis.actie) await saveActie(analysis);
     await saveDocumentMetadata(undefined, "local");
-    setSavedInfo({ pad: mappad });
+    setSavedInfo({ pad: `${mappad}/${bestandsnaam}.${fileExt}` });
     setStep("done");
   }
 
@@ -555,13 +556,20 @@ export default function GezinDossierPage() {
 
             {/* Opslaan — gebaseerd op opslagvoorkeur uit instellingen */}
             <div className="space-y-2">
-              {storagePreference === "local" || !storagePreference ? (
+              {!storagePreference ? (
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
                   <p className="text-sm text-amber-800 mb-2 font-medium">Kies eerst een opslaglocatie.</p>
                   <Link href="/dossier/instellingen" className="text-sm font-semibold text-amber-600 hover:text-amber-800 underline">
                     Naar Instellingen →
                   </Link>
                 </div>
+              ) : storagePreference === "local" ? (
+                <button
+                  onClick={handleSaveLocal}
+                  className="w-full bg-gray-900 hover:bg-gray-700 text-white font-semibold py-3.5 rounded-2xl transition-colors"
+                >
+                  Zelf opslaan →
+                </button>
               ) : !cloudConnected ? (
                 <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
                   <p className="text-sm text-amber-800 mb-2 font-medium">{cloudLabel} is nog niet gekoppeld.</p>
@@ -577,13 +585,18 @@ export default function GezinDossierPage() {
                   Opslaan in Dossier →
                 </button>
               )}
-              {storagePreference && storagePreference !== "local" && (
+              {storagePreference === "local" ? (
+                <p className="text-center text-xs text-gray-400">
+                  Het bestand wordt gedownload naar je apparaat{" · "}
+                  <Link href="/dossier/instellingen" className="underline hover:text-gray-600">wijzigen</Link>
+                </p>
+              ) : storagePreference ? (
                 <p className="text-center text-xs text-gray-400">
                   Wordt opgeslagen in {cloudLabel}
                   {" · "}
                   <Link href="/dossier/instellingen" className="underline hover:text-gray-600">wijzigen</Link>
                 </p>
-              )}
+              ) : null}
             </div>
           </div>
         )}
@@ -606,13 +619,22 @@ export default function GezinDossierPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Opgeslagen!</h2>
-            <p className="text-sm text-gray-500 font-mono mb-6">{savedInfo.pad}</p>
-            {savedInfo.url && (
-              <a href={savedInfo.url} target="_blank" rel="noopener noreferrer"
-                className="inline-block text-sm text-amber-600 hover:underline mb-6">
-                Bekijken in cloud →
-              </a>
+            <h2 className="text-2xl font-extrabold text-gray-900 mb-2">
+              {savedInfo.url ? "Opgeslagen!" : "Gedownload!"}
+            </h2>
+            {savedInfo.url ? (
+              <>
+                <p className="text-sm text-gray-500 font-mono mb-2">{savedInfo.pad}</p>
+                <a href={savedInfo.url} target="_blank" rel="noopener noreferrer"
+                  className="inline-block text-sm text-amber-600 hover:underline mb-6">
+                  Bekijken in cloud →
+                </a>
+              </>
+            ) : (
+              <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 mb-6 text-left">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Bewaar het bestand in</p>
+                <p className="text-sm text-gray-700 font-mono break-all">{savedInfo.pad}</p>
+              </div>
             )}
             {includeActie && analysis?.actie && (
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6 text-left">
