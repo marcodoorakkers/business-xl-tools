@@ -29,7 +29,7 @@ export async function GET() {
 
   const { data: archiveSettings, error: archiveErr } = await admin
     .from("archive_settings")
-    .select("storage_preference, folder_structure")
+    .select("storage_preference, folder_structure, privacy_mode")
     .eq("user_id", user.id)
     .single();
 
@@ -54,6 +54,7 @@ export async function GET() {
     googleDriveArchiveRoot: googleDriveRow?.archive_root ?? "MijnDossier",
     storagePreference: archiveSettings?.storage_preference ?? "local",
     folderStructure: archiveSettings?.folder_structure ?? "by_subject",
+    privacyMode: archiveSettings?.privacy_mode ?? false,
   });
 }
 
@@ -125,6 +126,18 @@ export async function POST(req: NextRequest) {
     );
     if (upsertErr) {
       console.error("[status] folderStructure upsert failed:", upsertErr);
+      return NextResponse.json({ error: upsertErr.message }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true });
+  }
+
+  if (typeof body.privacyMode === "boolean") {
+    const { error: upsertErr } = await admin.from("archive_settings").upsert(
+      { user_id: user.id, privacy_mode: body.privacyMode, updated_at: new Date().toISOString() },
+      { onConflict: "user_id", ignoreDuplicates: false }
+    );
+    if (upsertErr) {
+      console.error("[status] privacyMode upsert failed:", upsertErr);
       return NextResponse.json({ error: upsertErr.message }, { status: 500 });
     }
     return NextResponse.json({ ok: true });
