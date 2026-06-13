@@ -108,7 +108,7 @@ export async function POST() {
       .single();
     const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
     try {
-      await uploadFileToOneDrive(onedriveToken, `${archiveRoot}/Actielijst.md`, buffer, "text/markdown");
+      await uploadFileToOneDrive(onedriveToken, `${archiveRoot}/! Actielijst.md`, buffer, "text/markdown");
       results.onedrive = true;
     } catch {
       // non-fatal: log but continue
@@ -125,7 +125,7 @@ export async function POST() {
       .single();
     const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
     try {
-      await uploadFileToDropbox(dropboxToken, `${archiveRoot}/Actielijst.md`, buffer, "text/markdown");
+      await uploadFileToDropbox(dropboxToken, `${archiveRoot}/! Actielijst.md`, buffer, "text/markdown");
       results.dropbox = true;
     } catch (err) {
       if ((err as Error & { status?: number }).status === 401) {
@@ -133,7 +133,7 @@ export async function POST() {
         if (refreshed) {
           dropboxToken = refreshed;
           try {
-            await uploadFileToDropbox(dropboxToken, `${archiveRoot}/Actielijst.md`, buffer, "text/markdown");
+            await uploadFileToDropbox(dropboxToken, `${archiveRoot}/! Actielijst.md`, buffer, "text/markdown");
             results.dropbox = true;
           } catch {
             // still failed after refresh
