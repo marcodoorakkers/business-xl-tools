@@ -110,8 +110,8 @@ export async function POST(req: NextRequest) {
   if (event.type === "invoice.payment_succeeded") {
     const invoice = event.data.object as Stripe.Invoice;
 
-    // Act on renewals and on the first real payment after a trial ends
-    if (invoice.billing_reason !== "subscription_cycle" && invoice.billing_reason !== "subscription_create") {
+    // Only act on monthly renewals — start bonus is already handled in checkout.session.completed
+    if (invoice.billing_reason !== "subscription_cycle") {
       return NextResponse.json({ received: true });
     }
 
