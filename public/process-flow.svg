@@ -8,20 +8,23 @@
   <!-- Background -->
   <rect width="880" height="300" fill="#fafafa" rx="20"/>
 
-  <!-- ── Step 1: Jouw telefoon ── -->
+  <!-- ── Step 1: Telefoon of desktop ── -->
   <rect x="40" y="44" width="160" height="172" rx="16" fill="white" stroke="#fde68a" stroke-width="1.5" filter="url(#card-shadow)"/>
   <!-- Step number -->
   <circle cx="62" cy="66" r="12" fill="#fef3c7"/>
   <text x="62" y="70" text-anchor="middle" font-size="11" font-weight="700" fill="#d97706">01</text>
+  <!-- Laptop icon -->
+  <rect x="84" y="76" width="28" height="19" rx="2.5" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="80" y="95" width="36" height="5" rx="2" fill="none" stroke="#f59e0b" stroke-width="2"/>
   <!-- Phone icon -->
-  <rect x="103" y="72" width="34" height="56" rx="6" fill="none" stroke="#f59e0b" stroke-width="2.2"/>
-  <line x1="103" y1="84" x2="137" y2="84" stroke="#f59e0b" stroke-width="1.5"/>
-  <line x1="103" y1="116" x2="137" y2="116" stroke="#f59e0b" stroke-width="1.5"/>
-  <circle cx="120" cy="124" r="3.5" fill="#f59e0b"/>
+  <rect x="120" y="73" width="20" height="34" rx="4" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <line x1="120" y1="81" x2="140" y2="81" stroke="#f59e0b" stroke-width="1.5"/>
+  <line x1="120" y1="99" x2="140" y2="99" stroke="#f59e0b" stroke-width="1.5"/>
+  <circle cx="130" cy="104" r="2.5" fill="#f59e0b"/>
   <!-- Text -->
-  <text x="120" y="152" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">Jouw telefoon</text>
-  <text x="120" y="169" text-anchor="middle" font-size="11" fill="#6b7280">Foto maken of</text>
-  <text x="120" y="183" text-anchor="middle" font-size="11" fill="#6b7280">PDF uploaden</text>
+  <text x="120" y="134" text-anchor="middle" font-size="12" font-weight="700" fill="#111827">Telefoon of desktop</text>
+  <text x="120" y="151" text-anchor="middle" font-size="11" fill="#6b7280">Foto, scan of PDF</text>
+  <text x="120" y="165" text-anchor="middle" font-size="11" fill="#6b7280">uploaden</text>
 
   <!-- Arrow 1 -->
   <line x1="204" y1="130" x2="232" y2="130" stroke="#d1d5db" stroke-width="2" stroke-linecap="round"/>
