@@ -233,7 +233,6 @@ export default async function GezinLandingPage() {
                   <p>OneDrive &amp; Dropbox</p>
                   <p>Personen en entiteiten koppelen</p>
                   <p>Zakelijk aftrekbaar</p>
-                  <p>✦ 10 gratis TimeSaverTools credits per maand</p>
                 </div>
               </div>
               <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
