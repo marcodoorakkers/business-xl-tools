@@ -64,6 +64,13 @@ export async function POST(req: NextRequest) {
 
   if (!bestandsnaam) return NextResponse.json({ error: "Bestandsnaam vereist" }, { status: 400 });
 
+  const { data: settings } = await supabase
+    .from("archive_settings")
+    .select("privacy_mode")
+    .eq("user_id", user.id)
+    .single();
+  const privacyMode = settings?.privacy_mode ?? false;
+
   const { data, error } = await supabase
     .from("documents")
     .insert({
@@ -75,10 +82,10 @@ export async function POST(req: NextRequest) {
       onderwerp: onderwerp ?? null,
       mappad: mappad ?? null,
       gezinslid: gezinslid ?? null,
-      samenvatting: samenvatting ?? null,
+      samenvatting: privacyMode ? null : (samenvatting ?? null),
       file_url: file_url ?? null,
       storage: storage ?? "local",
-      actie: actie ?? null,
+      actie: privacyMode ? null : (actie ?? null),
       actie_gedaan: false,
     })
     .select()

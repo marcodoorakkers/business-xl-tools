@@ -15,6 +15,7 @@ interface StatusData {
   googleDriveArchiveRoot: string;
   storagePreference: string;
   folderStructure: string;
+  privacyMode: boolean;
 }
 
 interface FamilyMember {
@@ -33,6 +34,7 @@ function InstellingenContent() {
   const [savingGoogleDriveRoot, setSavingGoogleDriveRoot] = useState(false);
   const [storagePreference, setStoragePreference] = useState<string | null>(null);
   const [folderStructure, setFolderStructure] = useState("by_subject");
+  const [privacyMode, setPrivacyMode] = useState(false);
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberFullName, setNewMemberFullName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -72,6 +74,7 @@ function InstellingenContent() {
         setGoogleDriveArchiveRoot(data.googleDriveArchiveRoot ?? "MijnDossier");
         setStoragePreference(data.storagePreference);
         setFolderStructure(data.folderStructure ?? "by_subject");
+        setPrivacyMode(data.privacyMode ?? false);
       });
 
     fetch("/api/tools/mijn-dossier/onedrive/family")
@@ -106,6 +109,22 @@ function InstellingenContent() {
     } catch {
       showToast("error", "Opslaan mislukt — probeer opnieuw.");
       setFolderStructure(folderStructure);
+    }
+  }
+
+  async function savePrivacyMode(value: boolean) {
+    setPrivacyMode(value);
+    try {
+      const res = await fetch("/api/tools/mijn-dossier/onedrive/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ privacyMode: value }),
+      });
+      if (!res.ok) throw new Error();
+      showToast("success", value ? "Minimale opslag ingeschakeld." : "Volledige opslag ingeschakeld.");
+    } catch {
+      showToast("error", "Opslaan mislukt — probeer opnieuw.");
+      setPrivacyMode(!value);
     }
   }
 
@@ -590,6 +609,30 @@ function InstellingenContent() {
               </div>
             </>
           )}
+        </div>
+
+        {/* Privacy modus */}
+        <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
+          <div>
+            <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Privacy</h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Bij minimale opslag worden samenvattingen en acties (zoals &quot;Betaal €156 aan gemeente&quot;) wel getoond na het scannen, maar niet opgeslagen in je account. Alleen afzender, type, datum en mappad worden bewaard.
+            </p>
+          </div>
+          <button
+            onClick={() => savePrivacyMode(!privacyMode)}
+            className={`w-full flex items-center justify-between rounded-xl px-4 py-3 border transition-colors ${
+              privacyMode ? "border-amber-400 bg-amber-50" : "border-gray-200 hover:border-gray-300"
+            }`}
+          >
+            <div className="text-left">
+              <div className="text-sm font-medium text-gray-800">Minimale opslag</div>
+              <div className="text-xs text-gray-400 mt-0.5">Samenvatting en acties niet opslaan</div>
+            </div>
+            <div className={`relative w-10 h-6 rounded-full transition-colors flex-shrink-0 ${privacyMode ? "bg-amber-500" : "bg-gray-200"}`}>
+              <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${privacyMode ? "left-5" : "left-1"}`} />
+            </div>
+          </button>
         </div>
 
         {/* Gezinsleden */}

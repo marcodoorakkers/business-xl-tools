@@ -26,6 +26,13 @@ export async function POST(req: NextRequest) {
   const { actie, deadline, actie_type, document_naam, afzender, mappad, file_url } = body;
   if (!actie) return NextResponse.json({ error: "Actie verplicht" }, { status: 400 });
 
+  const { data: settings } = await supabase
+    .from("archive_settings")
+    .select("privacy_mode")
+    .eq("user_id", user.id)
+    .single();
+  if (settings?.privacy_mode) return NextResponse.json({ skipped: true });
+
   const { data, error } = await supabase
     .from("document_actions")
     .insert({
