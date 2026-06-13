@@ -159,6 +159,9 @@ export default async function GezinLandingPage() {
               </div>
             ))}
           </div>
+          <div className="mt-12">
+            <img src="/process-flow.svg" alt="Zo werkt NooitMeerPostKwijt: upload, AI-analyse, resultaat, cloud-opslag" className="w-full max-w-4xl mx-auto block" />
+          </div>
         </div>
 
         {/* Interactieve demo */}
