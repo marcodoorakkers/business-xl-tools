@@ -87,11 +87,23 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Kan ik mijn gegevens opvragen of exporteren?",
-    a: "Ja, dit is een recht onder de AVG. Stuur een verzoek naar nooitmeerpostkwijt@business-xl.nl — we reageren binnen 30 dagen met een overzicht van alle gegevens die we van je bewaren. Een geautomatiseerde exportfunctie staat op de roadmap.",
+    a: (
+      <>
+        Ja. Via je accountpagina kun je direct alle gegevens bekijken die we van je bewaren — afzender, type, datum, samenvatting en acties. Vanuit dat overzicht kun je ook een PDF opslaan. Dit is een recht onder de AVG en je hebt er geen e-mail voor nodig.
+      </>
+    ),
+  },
+  {
+    q: "Kan ik zelf kiezen hoeveel metadata er wordt opgeslagen?",
+    a: "Ja. In Instellingen kun je de privacymodus aanpassen: 'Alles bijhouden' (standaard), 'Acties bijhouden, geen samenvattingen', of 'Niets bijhouden' (alleen afzender, type en datum). Zo heb je zelf controle over wat er in onze database terechtkomt.",
+  },
+  {
+    q: "Kan ik opgeslagen metadata wissen zonder mijn account te verwijderen?",
+    a: "Ja. Via de accountpagina kun je in één keer alle samenvattingen en acties wissen, of alle scanresultaten verwijderen. Je account en abonnement blijven dan gewoon actief.",
   },
   {
     q: "Kan ik mijn account en gegevens laten verwijderen?",
-    a: "Ja. Je kunt je account zelf verwijderen via de accountpagina. Dit verwijdert je profielgegevens, actiepunten en instellingen permanent. Betalingsgegevens bewaren we 7 jaar op basis van de fiscale bewaarplicht — dat is wettelijk verplicht.",
+    a: "Ja. Je kunt je account zelf verwijderen via de accountpagina. Dit verwijdert je profielgegevens, scanresultaten, actiepunten en instellingen permanent. Betalingsgegevens bewaren we 7 jaar op basis van de fiscale bewaarplicht — dat is wettelijk verplicht.",
   },
   {
     q: "Wat als er een datalek is?",
@@ -99,7 +111,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Heeft de app tweefactorauthenticatie (2FA)?",
-    a: "Nog niet. Dit staat op de roadmap. Op dit moment beveiligen we accounts via versleutelde wachtwoorden en veilig sessiebeheer. We raden je aan een sterk, uniek wachtwoord te gebruiken.",
+    a: "Ja. Je kunt 2FA inschakelen via je accountpagina onder 'Tweefactorauthenticatie'. Na het inschakelen heb je bij elke login naast je wachtwoord ook een tijdelijke code uit een authenticator-app nodig.",
   },
   {
     q: "Wat gebeurt er met mijn data als ik stop met het abonnement?",
