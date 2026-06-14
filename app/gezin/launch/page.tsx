@@ -4,7 +4,7 @@ import NMMPKLogo from "@/components/NMMPKLogo";
 
 export const metadata = {
   title: "Founding members — NooitMeerPostKwijt",
-  description: "6 maanden gratis als founding member. NooitMeerPostKwijt — digitaal archief voor ZZP'ers en kleine ondernemers.",
+  description: "6 maanden gratis als founding member. NooitMeerPostKwijt — nooit meer een brief kwijt. Scan, begrijp, archiveer — in je eigen OneDrive of Dropbox.",
 };
 
 export const revalidate = 60;
@@ -68,7 +68,7 @@ export default async function LaunchPage() {
           </p>
 
           <p>
-            Als ZZP'er is je administratie niet ingewikkeld — maar wél verspreid. Brieven op het aanrecht, facturen in je mail, polissen in een map die je al maanden niet hebt geopend. Er was geen app die gewoon deed wat nodig was: <strong>scan een document, begrijp wat erin staat, sla het op de juiste plek op.</strong>
+            Of je nu ZZP'er bent of gewoon thuis de post bijhoudt: je administratie is niet ingewikkeld — maar wél verspreid. Brieven op het aanrecht, facturen in je mail, polissen in een map die je al maanden niet hebt geopend. Er was geen app die gewoon deed wat nodig was: <strong>scan een document, begrijp wat erin staat, sla het op de juiste plek op.</strong>
           </p>
 
           <p>
@@ -92,13 +92,18 @@ export default async function LaunchPage() {
               },
               {
                 icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 5l10 8 10-8"/></svg>,
-                title: "Onbeperkt scannen",
-                desc: "Via de app of door een document door te mailen naar je persoonlijke scanadres.",
+                title: "Scannen via de app én via e-mail",
+                desc: "Foto maken in de app, of een PDF doorsturen naar je persoonlijke scanadres — alles wordt automatisch verwerkt.",
               },
               {
-                icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/><path d="M18 4l2 2-8 8-4-4 2-2 2 2z" style={{display:"none"}}/><polyline points="17 1 21 5 13 13 9 9"/></svg>,
-                title: "Automatisch opslaan in OneDrive of Dropbox",
-                desc: "In de juiste map, met de juiste naam.",
+                icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 20a6 6 0 0 0-12 0"/><circle cx="12" cy="10" r="4"/><path d="M6 20v-1a6 6 0 0 1 12 0v1"/><polyline points="17 1 21 5 13 13 9 9"/></svg>,
+                title: "Opgeslagen bij jou, niet bij ons",
+                desc: "Documenten gaan rechtstreeks naar jouw OneDrive of Dropbox — in de juiste map, met de juiste naam. Wij bewaren ze niet.",
+              },
+              {
+                icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+                title: "Privacy by design",
+                desc: "Geen bedragen, rekeningnummers of BSN in onze database — alleen afzender, type en datum.",
               },
               {
                 icon: <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
