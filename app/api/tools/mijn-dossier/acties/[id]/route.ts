@@ -21,7 +21,7 @@ export async function PATCH(
       .select("privacy_mode")
       .eq("user_id", user.id)
       .single();
-    if (settings?.privacy_mode) {
+    if (settings?.privacy_mode === "none") {
       const { error } = await supabase
         .from("document_actions")
         .delete()

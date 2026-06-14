@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     .select("privacy_mode")
     .eq("user_id", user.id)
     .single();
-  const privacyMode = settings?.privacy_mode ?? false;
+  const privacyMode = settings?.privacy_mode ?? "full";
 
   const { data, error } = await supabase
     .from("documents")
@@ -82,10 +82,10 @@ export async function POST(req: NextRequest) {
       onderwerp: onderwerp ?? null,
       mappad: mappad ?? null,
       gezinslid: gezinslid ?? null,
-      samenvatting: privacyMode ? null : (samenvatting ?? null),
+      samenvatting: privacyMode === "full" ? (samenvatting ?? null) : null,
       file_url: file_url ?? null,
       storage: storage ?? "local",
-      actie: privacyMode ? null : (actie ?? null),
+      actie: privacyMode === "none" ? null : (actie ?? null),
       actie_gedaan: false,
     })
     .select()

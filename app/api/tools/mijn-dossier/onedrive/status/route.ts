@@ -54,7 +54,7 @@ export async function GET() {
     googleDriveArchiveRoot: googleDriveRow?.archive_root ?? "MijnDossier",
     storagePreference: archiveSettings?.storage_preference ?? "local",
     folderStructure: archiveSettings?.folder_structure ?? "by_subject",
-    privacyMode: archiveSettings?.privacy_mode ?? false,
+    privacyMode: archiveSettings?.privacy_mode ?? "full",
   });
 }
 
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  if (typeof body.privacyMode === "boolean") {
+  if (typeof body.privacyMode === "string" && ["full", "minimal", "none"].includes(body.privacyMode)) {
     const { error: upsertErr } = await admin.from("archive_settings").upsert(
       { user_id: user.id, privacy_mode: body.privacyMode, updated_at: new Date().toISOString() },
       { onConflict: "user_id", ignoreDuplicates: false }
