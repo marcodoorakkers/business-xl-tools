@@ -169,12 +169,23 @@ export async function GET() {
 </html>`;
 
   const htmlBuffer = Buffer.from(html, "utf-8");
-  const pdfBuffer = await convertToPdf(htmlBuffer, "text/html");
+  const filename = `mijn-gegevens-nmpk-${new Date().toISOString().slice(0, 10)}`;
 
-  return new NextResponse(pdfBuffer as unknown as BodyInit, {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="mijn-gegevens-nmpk-${new Date().toISOString().slice(0, 10)}.pdf"`,
-    },
-  });
+  try {
+    const pdfBuffer = await convertToPdf(htmlBuffer, "text/html");
+    return new NextResponse(pdfBuffer as unknown as BodyInit, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${filename}.pdf"`,
+      },
+    });
+  } catch {
+    // PDF generation failed (Chromium not available) — serve HTML instead
+    return new NextResponse(htmlBuffer, {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${filename}.html"`,
+      },
+    });
+  }
 }
