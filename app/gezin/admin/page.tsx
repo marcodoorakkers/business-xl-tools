@@ -210,12 +210,11 @@ export default function NMMPKAdminPage() {
                             </button>
                           )}
                           <a
-                            href={`/api/admin/user-data?userId=${u.id}`}
-                            download
+                            href={`/gezin/admin/gebruiker/${u.id}`}
                             className="text-xs text-blue-400 hover:text-blue-700"
-                            title="Gegevens exporteren (AVG inzage)"
+                            title="Gegevens bekijken (AVG inzage)"
                           >
-                            ↓
+                            ↗
                           </a>
                         </div>
                       </td>
