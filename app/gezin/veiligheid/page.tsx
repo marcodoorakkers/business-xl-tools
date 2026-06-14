@@ -10,7 +10,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Worden mijn documenten opgeslagen op jullie servers?",
-    a: "Nee. De inhoud van je foto's en PDF's wordt verwerkt voor AI-analyse en daarna niet bewaard op onze servers. Wat we wél opslaan is de geëxtraheerde metadata: afzender, onderwerp, samenvatting, actiepunten en datum. De bestanden zelf sla jij op in je eigen OneDrive of Dropbox.",
+    a: "Nee. De inhoud van je foto's en PDF's wordt verwerkt voor AI-analyse en daarna niet bewaard op onze servers. Wat we standaard opslaan is de geëxtraheerde metadata: afzender, onderwerp, samenvatting, actiepunten en datum. Via de privacymodus in Instellingen kun je zelf bepalen hoeveel er wordt opgeslagen — tot en met helemaal niets. De bestanden zelf sla jij op in je eigen OneDrive of Dropbox.",
   },
   {
     q: "Gaan mijn documenten naar de Verenigde Staten?",
@@ -39,7 +39,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: "Staat mijn data in Europa?",
-    a: "Onze database draait op Supabase in een EU-datacenterregio. Anthropic (AI-verwerking) en Resend (e-mail) zijn Amerikaanse bedrijven. Zij verwerken gegevens uitsluitend in onze opdracht conform hun API-voorwaarden.",
+    a: "Onze database draait op Supabase in een EU-datacenterregio. Anthropic (AI-verwerking), Resend (e-mail) en Stripe (betalingen) zijn Amerikaanse bedrijven. Zij verwerken gegevens uitsluitend in onze opdracht conform hun verwerkersovereenkomsten en zijn gecertificeerd voor doorgifte naar de VS via Standard Contractual Clauses (SCC's).",
   },
   {
     q: "Wat is de CLOUD Act en is mijn data hierdoor kwetsbaar?",
