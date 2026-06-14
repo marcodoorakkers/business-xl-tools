@@ -616,7 +616,7 @@ function InstellingenContent() {
           <div>
             <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Privacy</h2>
             <p className="text-xs text-gray-500 mt-1">
-              Bij minimale opslag worden samenvattingen en acties (zoals &quot;Betaal €156 aan gemeente&quot;) wel getoond na het scannen, maar niet opgeslagen in je account. Alleen afzender, type, datum en mappad worden bewaard.
+              Bij minimale opslag wordt de samenvatting van een document wel getoond na het scannen, maar niet opgeslagen. Acties en deadlines worden wel bijgehouden zodat je actielijst actueel blijft.
             </p>
           </div>
           <button
