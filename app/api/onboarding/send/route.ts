@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       .select("promo_code")
       .eq("id", user.id)
       .single();
-    const isFoundingMember = profile?.promo_code === "founding25";
+    const isFoundingMember = profile?.promo_code === "founding25" || /^fm\d+$/.test(profile?.promo_code ?? "");
     const isVriend = profile?.promo_code === "vriendenvan";
     await resend.emails.send({
       from: "NooitMeerPostKwijt <noreply@timesavertools.nl>",
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
       .select("promo_code")
       .eq("id", user.id)
       .single();
-    const isFoundingMember = profile?.promo_code === "founding25";
+    const isFoundingMember = profile?.promo_code === "founding25" || /^fm\d+$/.test(profile?.promo_code ?? "");
     const isVriend = profile?.promo_code === "vriendenvan";
     const is6Months = isFoundingMember || isVriend;
     await resend.emails.send({
