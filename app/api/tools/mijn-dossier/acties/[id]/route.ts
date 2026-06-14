@@ -14,6 +14,24 @@ export async function PATCH(
   const valid = ["open", "gedaan", "overgeslagen"];
   if (!valid.includes(status)) return NextResponse.json({ error: "Ongeldige status" }, { status: 400 });
 
+  // In privacy-modus: afgevinkte acties direct verwijderen (geen spoor in DB)
+  if (status === "gedaan" || status === "overgeslagen") {
+    const { data: settings } = await supabase
+      .from("archive_settings")
+      .select("privacy_mode")
+      .eq("user_id", user.id)
+      .single();
+    if (settings?.privacy_mode) {
+      const { error } = await supabase
+        .from("document_actions")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ ok: true, deleted: true });
+    }
+  }
+
   const { error } = await supabase
     .from("document_actions")
     .update({ status })
