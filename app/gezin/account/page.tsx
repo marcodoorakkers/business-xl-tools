@@ -7,6 +7,7 @@ import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
 import TwoFactorSection from "./TwoFactorSection";
+import ClearDataSection from "./ClearDataSection";
 
 
 export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string }> }) {
@@ -169,6 +170,8 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
             Gegevens downloaden
           </a>
         </div>
+
+        <ClearDataSection />
 
         <div className="bg-white rounded-2xl border border-red-100 p-6">
           <h2 className="font-semibold text-red-600 mb-2">Account verwijderen</h2>
