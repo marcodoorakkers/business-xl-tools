@@ -254,13 +254,13 @@ export default async function GezinLandingPage() {
         <div className="max-w-2xl mx-auto mb-10 py-10 border-t border-gray-100">
           <h2 className="text-xl font-extrabold text-gray-900 mb-3">Jouw documenten, alleen voor jou</h2>
           <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-            Belastingaanslagen, contracten en facturen zijn vertrouwelijk. Je foto wordt naar de analyse-API gestuurd, verwerkt, en daarna door zowel ons als Anthropic automatisch verwijderd. Anthropic gebruikt API-verzoeken nooit voor training. Wat wij bewaren is alleen het resultaat — nooit de afbeelding zelf.
+            Belastingaanslagen, contracten en facturen zijn vertrouwelijk. Je foto wordt naar de analyse-API gestuurd, verwerkt, en daarna door zowel ons als Anthropic automatisch verwijderd. Anthropic gebruikt API-verzoeken nooit voor training. Wat wij bewaren is alleen het resultaat — nooit de afbeelding zelf, en nooit specifieke bedragen of rekeningnummers.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
             <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Documenten opgeslagen in jouw eigen OneDrive of Dropbox</p>
             <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>De foto verdwijnt na de analyse — bij ons én bij Anthropic</p>
-            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Alleen het resultaat wordt bewaard: afzender, categorie en deadline</p>
-            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Je kunt al je data op elk moment volledig verwijderen</p>
+            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Geen bedragen of rekeningnummers in de database — alleen afzender, type en datum</p>
+            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Download of wis al je data zelf — geen e-mail aan ons nodig</p>
           </div>
         </div>
 
