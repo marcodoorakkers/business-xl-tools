@@ -7,9 +7,8 @@ async function htmlToPdf(html: string): Promise<Buffer> {
   console.log("[htmlToPdf] executablePath:", executablePath);
   const browser = await puppeteer.launch({
     args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
     executablePath,
-    headless: chromium.headless,
+    headless: true,
   });
   const page = await browser.newPage();
   try {
