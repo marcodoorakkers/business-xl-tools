@@ -206,7 +206,7 @@ export default function GezinPrivacyPage() {
               <p className="font-semibold text-gray-800">Zelf regelen via de app</p>
               <p>Via je accountpagina kun je zonder tussenkomst van ons:</p>
               <ul className="list-disc list-inside space-y-0.5 mt-1">
-                <li><span className="font-medium">Gegevens downloaden</span> — een PDF met alles wat wij van je opslaan (recht op inzage + dataportabiliteit)</li>
+                <li><span className="font-medium">Gegevens bekijken &amp; downloaden</span> — een overzicht van alles wat wij van je opslaan, op te slaan als PDF (recht op inzage + dataportabiliteit)</li>
                 <li><span className="font-medium">Samenvattingen en acties wissen</span> — verwijdert gevoelige tekstinhoud, bewaard structuurdata</li>
                 <li><span className="font-medium">Alle documenten en acties verwijderen</span> — volledig opruimen van je archief</li>
                 <li><span className="font-medium">Account verwijderen</span> — verwijdert je account en alle bijbehorende gegevens</li>
@@ -223,7 +223,8 @@ export default function GezinPrivacyPage() {
               <li>Versleutelde opslag van wachtwoorden</li>
               <li>Versleutelde opslag van cloudopslagtokens (AES-256-GCM)</li>
               <li>Beperkte toegang tot persoonsgegevens</li>
-              <li>Row-level security: jouw gegevens zijn alleen voor jou zichtbaar</li>
+              <li>Row-level security: andere gebruikers kunnen jouw gegevens nooit inzien</li>
+              <li>Beheerderstoegang is beperkt tot scan-metadata voor ondersteuning en AVG-verzoeken — werkelijke bestanden zijn voor ons nooit toegankelijk</li>
             </ul>
           </section>
 
