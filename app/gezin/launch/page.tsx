@@ -72,7 +72,7 @@ export default async function LaunchPage() {
           </p>
 
           <p>
-            Dus werd hij gebouwd. Sinds januari, stap voor stap, naast het gewone werk. NooitMeerPostKwijt is het resultaat.
+            Dus werd hij gebouwd. Stap voor stap. NooitMeerPostKwijt is het resultaat.
           </p>
 
           <p>
