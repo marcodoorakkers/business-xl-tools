@@ -143,5 +143,19 @@ export async function POST() {
     }
   }
 
+  // Als privacy-modus aan staat: verwijder de gesyncte acties uit de database
+  const synced = results.onedrive || results.dropbox;
+  if (synced && actions && actions.length > 0) {
+    const { data: settings } = await supabase
+      .from("archive_settings")
+      .select("privacy_mode")
+      .eq("user_id", user.id)
+      .single();
+    if (settings?.privacy_mode) {
+      const ids = actions.map((a) => a.id);
+      await supabase.from("document_actions").delete().in("id", ids).eq("user_id", user.id);
+    }
+  }
+
   return NextResponse.json({ ...results, total: actions?.length ?? 0 });
 }
