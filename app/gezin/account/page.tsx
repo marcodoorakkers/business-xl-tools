@@ -160,14 +160,13 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           <h2 className="font-semibold text-gray-900 mb-1">Mijn gegevens downloaden</h2>
           <p className="text-sm text-gray-500 mb-4">Download een overzicht van alles wat we over jou opslaan. Je foto&apos;s en documenten staan niet in dit bestand — die bewaren we nooit op onze servers.</p>
           <a
-            href="/api/gezin/my-data"
-            download
+            href="/gezin/mijn-gegevens"
             className="inline-flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-sm font-medium px-4 py-2 rounded-xl transition-colors"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
             </svg>
-            Gegevens downloaden
+            Gegevens bekijken &amp; downloaden
           </a>
         </div>
 
