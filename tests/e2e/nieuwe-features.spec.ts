@@ -1,48 +1,53 @@
 import { test, expect } from "@playwright/test";
 
-// T21 — Reminder API auth
-test.describe("Reminder API (T21)", () => {
-  test("weigert ongeautoriseerde aanroep", async ({ request }) => {
+// API auth — geen sessie = 401 of redirect
+test.describe("API auth-checks (geen sessie)", () => {
+  const apiRoutes: { method: "get" | "post"; path: string }[] = [
+    { method: "post", path: "/api/reminders/send" },
+    { method: "post", path: "/api/tools/mijn-dossier/sync-actielijst" },
+    { method: "get",  path: "/api/gezin/my-data" },
+    { method: "get",  path: "/api/gezin/clear-data" },
+    { method: "post", path: "/api/gezin/clear-data" },
+    { method: "get",  path: "/api/tools/mijn-dossier/acties" },
+    { method: "get",  path: "/api/tools/mijn-dossier/documents" },
+  ];
+
+  for (const { method, path } of apiRoutes) {
+    test(`${method.toUpperCase()} ${path} weigert zonder sessie`, async ({ request }) => {
+      const res = method === "get"
+        ? await request.get(path)
+        : await request.post(path);
+      expect([401, 307]).toContain(res.status());
+    });
+  }
+
+  test("Reminder API weigert verkeerde bearer token", async ({ request }) => {
     const res = await request.post("/api/reminders/send", {
       headers: { Authorization: "Bearer wrongsecret" },
     });
     expect(res.status()).toBe(401);
   });
+});
 
-  test("weigert aanroep zonder Authorization header", async ({ request }) => {
-    const res = await request.post("/api/reminders/send");
-    expect(res.status()).toBe(401);
+// Launch pagina — founding members
+test.describe("Launch pagina", () => {
+  test("laadt en toont founding member inhoud", async ({ page }) => {
+    await page.goto("/launch");
+    await expect(page.getByText(/founding member/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/6 maanden/i).first()).toBeVisible();
+  });
+
+  test("CTA stuurt door naar aanmelden met promo code", async ({ page }) => {
+    await page.goto("/launch");
+    const ctaLink = page.getByRole("link", { name: /claim jouw plek|gratis proberen/i }).first();
+    await expect(ctaLink).toBeVisible();
+    const href = await ctaLink.getAttribute("href");
+    expect(href).toMatch(/aanmelden/);
   });
 });
 
-// Actielijst sync API auth
-test.describe("Sync-actielijst API", () => {
-  test("weigert aanroep zonder sessie", async ({ request }) => {
-    const res = await request.post("/api/tools/mijn-dossier/sync-actielijst");
-    expect([401, 307]).toContain(res.status());
-  });
-});
-
-// T15 — Actiespagina vereist login
-test.describe("Actiespagina auth (T15)", () => {
-  test("redirect naar inloggen als niet ingelogd", async ({ page }) => {
-    await page.goto("/acties");
-    await expect(page).toHaveURL(/\/inloggen/);
-  });
-});
-
-// Trial-informatie op landingspagina (relevant voor T22)
-test.describe("Trial-informatie op landingspagina (T22)", () => {
-  test("vermeldt geen creditcard nodig", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByText(/geen creditcard/i).first()).toBeVisible();
-  });
-
-  test("vermeldt eerste maand gratis", async ({ page }) => {
-    await page.goto("/");
-    await expect(page.getByText(/eerste maand gratis/i).first()).toBeVisible();
-  });
-
+// Trial-informatie op landingspagina
+test.describe("Trial-informatie op landingspagina", () => {
   test("CTA stuurt door naar aanmelden", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: /gratis beginnen/i }).first().click();

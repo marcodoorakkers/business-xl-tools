@@ -26,6 +26,6 @@ test.describe("Mobiele weergave", () => {
 
   test("hero-tekst is leesbaar op mobiel", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("h1").filter({ hasText: /waar is[\s\S]*mijn post/i })).toBeVisible();
+    await expect(page.locator("h1").filter({ hasText: /nooit meer.*document.*kwijt/i })).toBeVisible();
   });
 });

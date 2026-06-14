@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Landingspagina", () => {
   test("laadt correct en toont de hero-tekst", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("h1").filter({ hasText: /waar is[\s\S]*mijn post/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator("h1").filter({ hasText: /nooit meer.*document.*kwijt/i })).toBeVisible({ timeout: 10000 });
   });
 
   test("toont de abonnementsprijs", async ({ page }) => {
@@ -12,9 +12,14 @@ test.describe("Landingspagina", () => {
     await expect(page.getByText("Maandelijks abonnement").first()).toBeVisible();
   });
 
-  test("toont eerste maand gratis badge", async ({ page }) => {
+  test("toont eerste maand gratis", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("Eerste maand gratis").first()).toBeVisible();
+    await expect(page.getByText(/eerste maand gratis/i).first()).toBeVisible();
+  });
+
+  test("vermeldt geen creditcard nodig", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByText(/geen creditcard/i).first()).toBeVisible();
   });
 
   test("navigeert naar aanmelden via CTA-knop", async ({ page }) => {
