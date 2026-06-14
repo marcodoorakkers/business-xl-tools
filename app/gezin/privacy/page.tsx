@@ -14,7 +14,7 @@ export default function GezinPrivacyPage() {
       <main className="max-w-3xl mx-auto px-6 py-14">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Privacyverklaring</h1>
-          <p className="text-gray-500 text-sm">Versie 1.0 · Ingangsdatum: 27 mei 2026</p>
+          <p className="text-gray-500 text-sm">Versie 1.1 · Ingangsdatum: 14 juni 2026</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col gap-10 text-sm text-gray-600 leading-relaxed">
@@ -59,12 +59,37 @@ export default function GezinPrivacyPage() {
                   <li>Via een beveiligde verbinding naar Anthropic verzonden voor analyse</li>
                   <li>Niet permanent opgeslagen op onze servers na verwerking</li>
                 </ul>
-                <p>Als je documenten doorstuurt via e-mail, verwerken wij tijdelijk het afzenderadres van die e-mail om de analyse te kunnen uitvoeren. Dit adres wordt niet opgeslagen na verwerking.</p>
-                <p className="mt-1">Documenten die jij zelf opslaat in OneDrive, Dropbox of Google Drive worden door jou beheerd — niet door ons.</p>
+                <p className="mb-2">Als je documenten doorstuurt via e-mail, verwerken wij tijdelijk het afzenderadres van die e-mail om de analyse te kunnen uitvoeren. Dit adres wordt niet opgeslagen na verwerking.</p>
+                <p>Documenten die jij zelf opslaat in OneDrive, Dropbox of Google Drive worden door jou beheerd — niet door ons.</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-1">2.4 Acties en instellingen</h3>
-                <p>Actiepunten die je bijhoudt en instellingen zoals geadresseerden worden opgeslagen in onze beveiligde database, gekoppeld aan jouw account.</p>
+                <h3 className="font-semibold text-gray-800 mb-1">2.4 Analyseresultaten en privacy-instelling</h3>
+                <p className="mb-2">Na de AI-analyse slaan wij het resultaat op in onze beveiligde database. Welke velden worden bewaard, is afhankelijk van jouw privacyinstelling (te wijzigen via Instellingen → Privacy):</p>
+                <div className="overflow-hidden rounded-xl border border-gray-100 mt-2">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="bg-gray-100 text-gray-700">
+                        <th className="px-3 py-2 text-left font-semibold">Instelling</th>
+                        <th className="px-3 py-2 text-left font-semibold">Wat wordt opgeslagen</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="bg-gray-50">
+                        <td className="px-3 py-2 font-medium text-gray-800">Alles bijhouden (standaard)</td>
+                        <td className="px-3 py-2">Afzender, type, datum, samenvatting, acties en deadlines</td>
+                      </tr>
+                      <tr className="bg-white">
+                        <td className="px-3 py-2 font-medium text-gray-800">Acties bijhouden, geen samenvattingen</td>
+                        <td className="px-3 py-2">Afzender, type, datum, acties en deadlines — geen samenvatting</td>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <td className="px-3 py-2 font-medium text-gray-800">Niets bijhouden</td>
+                        <td className="px-3 py-2">Alleen afzender, type en datum — geen samenvatting, geen acties</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-2">Instellingen zoals geadresseerden en opslagvoorkeur worden altijd opgeslagen, ongeacht de privacyinstelling.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.5 Technische gegevens</h3>
@@ -113,7 +138,9 @@ export default function GezinPrivacyPage() {
                   {[
                     ["Accountgegevens", "Zolang je account actief is, plus 12 maanden na verwijdering"],
                     ["Geüploade documenten (AI-verwerking)", "Worden na verwerking niet opgeslagen op onze servers"],
-                    ["Actiepunten en instellingen", "Zolang je account actief is"],
+                    ["Analyseresultaten (afzender, type, datum)", "Zolang je account actief is, tenzij je ze zelf verwijdert"],
+                    ["Samenvatting en acties", "Afhankelijk van je privacyinstelling — kan ook helemaal niet worden opgeslagen"],
+                    ["Instellingen en geadresseerden", "Zolang je account actief is"],
                     ["Betalingsgegevens", "7 jaar (wettelijke fiscale bewaarplicht)"],
                     ["Loggegevens", "Maximaal 90 dagen"],
                   ].map(([type, period], i) => (
@@ -175,7 +202,17 @@ export default function GezinPrivacyPage() {
                 <li key={right}><span className="font-medium text-gray-800">{right}:</span> {desc}</li>
               ))}
             </ul>
-            <p className="mt-3">Stuur een verzoek naar <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a>. Wij reageren binnen 30 dagen.</p>
+            <div className="mt-4 bg-amber-50 border border-amber-100 rounded-xl p-4 text-sm space-y-1">
+              <p className="font-semibold text-gray-800">Zelf regelen via de app</p>
+              <p>Via je accountpagina kun je zonder tussenkomst van ons:</p>
+              <ul className="list-disc list-inside space-y-0.5 mt-1">
+                <li><span className="font-medium">Gegevens downloaden</span> — een PDF met alles wat wij van je opslaan (recht op inzage + dataportabiliteit)</li>
+                <li><span className="font-medium">Samenvattingen en acties wissen</span> — verwijdert gevoelige tekstinhoud, bewaard structuurdata</li>
+                <li><span className="font-medium">Alle documenten en acties verwijderen</span> — volledig opruimen van je archief</li>
+                <li><span className="font-medium">Account verwijderen</span> — verwijdert je account en alle bijbehorende gegevens</li>
+              </ul>
+            </div>
+            <p className="mt-3">Voor overige verzoeken: <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a>. Wij reageren binnen 30 dagen.</p>
           </section>
 
           <section>
