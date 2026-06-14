@@ -152,37 +152,34 @@ function welcomeFoundingHtml() {
   return emailShell(`
     <div style="background:#fef3c7;border-radius:12px;padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
       <span style="font-size:20px;">⭐</span>
-      <p style="margin:0;color:#92400e;font-size:14px;font-weight:700;">Jij bent een van de eerste 25 — Founding Member</p>
+      <p style="margin:0;color:#92400e;font-size:14px;font-weight:700;">Founding Member — een van de eerste 25</p>
     </div>
-    <h1 style="margin:0 0 16px;color:#1c1917;font-size:22px;font-weight:800;line-height:1.3;">Welkom! Je krijgt 6 maanden gratis.</h1>
+    <h1 style="margin:0 0 16px;color:#1c1917;font-size:22px;font-weight:800;line-height:1.3;">Fijn dat je meedoet.</h1>
     <p style="margin:0 0 16px;color:#57534e;font-size:15px;line-height:1.6;">
-      Goed dat je erbij bent. Als founding member krijg je <strong>6 maanden gratis</strong> toegang tot NooitMeerPostKwijt — geen creditcard nodig.
+      Ik heb je persoonlijk uitgenodigd omdat ik benieuwd ben wat jij ervan vindt. Je krijgt <strong>6 maanden gratis</strong> toegang — geen creditcard nodig, geen verplichtingen.
     </p>
     <p style="margin:0 0 16px;color:#57534e;font-size:15px;line-height:1.6;">
-      NooitMeerPostKwijt werkt simpel: scan een brief of factuur, en wij regelen de rest — analyse, archivering en deadlines bijhouden.
+      NooitMeerPostKwijt is simpel: maak een foto van een brief of stuur een PDF door, en de app herkent wat het is, of er iets van je verwacht wordt en wanneer. Het document gaat automatisch naar je eigen OneDrive of Dropbox.
     </p>
 
-    <p style="margin:0 0 8px;color:#1c1917;font-size:14px;font-weight:700;">Zo begin je in 3 stappen:</p>
+    <p style="margin:0 0 8px;color:#1c1917;font-size:14px;font-weight:700;">Zo begin je:</p>
     <ol style="margin:0 0 24px;padding-left:20px;color:#57534e;font-size:14px;line-height:2;">
       <li>Koppel je OneDrive of Dropbox in <a href="https://nooitmeerpostkwijt.nl/dossier/instellingen" style="color:#d97706;">Instellingen</a></li>
-      <li>Maak een foto of upload een PDF via het Dossier</li>
-      <li>Bekijk de analyse — NooitMeerPostKwijt vertelt je wat het is en wat je moet doen</li>
+      <li>Scan je eerste document via de app of stuur een PDF door naar je persoonlijke scanadres</li>
+      <li>Bekijk wat de app ervan maakt — en laat me weten wat je ervan vindt</li>
     </ol>
 
     <div style="background:#f0fdf4;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
-      <p style="margin:0 0 6px;color:#166534;font-size:14px;font-weight:700;">Over je proefperiode</p>
+      <p style="margin:0 0 6px;color:#166534;font-size:14px;font-weight:700;">Je 6 maanden activeren</p>
       <p style="margin:0;color:#166534;font-size:13px;line-height:1.6;">
-        Je 6 maanden starten zodra je op <a href="https://nooitmeerpostkwijt.nl/account" style="color:#166534;font-weight:700;">Account</a> op <strong>"Abonnement starten"</strong> klikt — dit is gratis en vereist geen creditcard.
+        Ga naar <a href="https://nooitmeerpostkwijt.nl/account" style="color:#166534;font-weight:700;">Account</a> en klik op <strong>"Abonnement starten"</strong> — dit is gratis en vereist geen creditcard. Je 6 maanden gaan dan in.
         <br><br>
-        Wil je daarna doorgaan? Voeg dan een betaalmethode toe. Doe je niets, dan stopt het abonnement automatisch na 6 maanden. Je documenten in OneDrive of Dropbox blijven altijd van jou.
+        Wil je daarna doorgaan? Dan voeg je zelf een betaalmethode toe. Doe je niets, dan stopt het automatisch. Je bestanden in OneDrive of Dropbox blijven altijd van jou.
       </p>
     </div>
 
-    <p style="margin:0 0 24px;color:#57534e;font-size:14px;line-height:1.6;">
-      💡 <strong>Tip:</strong> Heb je Gmail? Je kunt facturen en brieven direct doorsturen naar je persoonlijke scanadres — te vinden in Instellingen.
-    </p>
     ${cta("https://nooitmeerpostkwijt.nl/account", "Activeer je 6 maanden gratis →")}
-    <p style="margin:16px 0 0;font-size:13px;color:#a8a29e;text-align:center;">Of ga direct naar <a href="https://nooitmeerpostkwijt.nl/dossier/aan-de-slag" style="color:#d97706;">Aan de slag</a></p>
+    <p style="margin:16px 0 0;font-size:13px;color:#a8a29e;text-align:center;">Vragen? Stuur me gewoon een berichtje terug.</p>
   `);
 }
 
