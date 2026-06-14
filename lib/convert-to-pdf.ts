@@ -3,10 +3,13 @@ import { PDFDocument } from "pdf-lib";
 async function htmlToPdf(html: string): Promise<Buffer> {
   const chromium = (await import("@sparticuz/chromium")).default;
   const puppeteer = (await import("puppeteer-core")).default;
+  const executablePath = await chromium.executablePath();
+  console.log("[htmlToPdf] executablePath:", executablePath);
   const browser = await puppeteer.launch({
     args: chromium.args,
-    executablePath: await chromium.executablePath(),
-    headless: true,
+    defaultViewport: chromium.defaultViewport,
+    executablePath,
+    headless: chromium.headless,
   });
   const page = await browser.newPage();
   try {

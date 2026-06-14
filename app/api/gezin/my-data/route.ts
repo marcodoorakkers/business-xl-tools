@@ -180,12 +180,14 @@ export async function GET() {
         "Content-Disposition": `attachment; filename="${filename}.pdf"`,
       },
     });
-  } catch {
-    // PDF generation failed (Chromium not available) — serve HTML instead
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("[my-data] PDF generation failed:", errMsg);
     return new NextResponse(htmlBuffer, {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
         "Content-Disposition": `attachment; filename="${filename}.html"`,
+        "X-PDF-Error": errMsg.slice(0, 200),
       },
     });
   }
