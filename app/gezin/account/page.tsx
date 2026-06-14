@@ -23,7 +23,7 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
 
   const subscriptionStatus = profile?.subscription_status ?? null;
   const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
-  const isFoundingMember = profile?.promo_code === "founding25";
+  const isFoundingMember = profile?.promo_code === "founding25" || /^fm\d+$/.test(profile?.promo_code ?? "");
   const isVriend = profile?.promo_code === "vriendenvan";
   const params = await searchParams;
   const paymentStatus = params.payment;
