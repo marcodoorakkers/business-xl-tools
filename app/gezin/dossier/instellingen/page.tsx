@@ -15,7 +15,7 @@ interface StatusData {
   googleDriveArchiveRoot: string;
   storagePreference: string;
   folderStructure: string;
-  privacyMode: boolean;
+  privacyMode: string;
 }
 
 interface FamilyMember {
@@ -34,7 +34,7 @@ function InstellingenContent() {
   const [savingGoogleDriveRoot, setSavingGoogleDriveRoot] = useState(false);
   const [storagePreference, setStoragePreference] = useState<string | null>(null);
   const [folderStructure, setFolderStructure] = useState("by_subject");
-  const [privacyMode, setPrivacyMode] = useState(false);
+  const [privacyMode, setPrivacyMode] = useState("full");
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberFullName, setNewMemberFullName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -74,7 +74,7 @@ function InstellingenContent() {
         setGoogleDriveArchiveRoot(data.googleDriveArchiveRoot ?? "MijnDossier");
         setStoragePreference(data.storagePreference);
         setFolderStructure(data.folderStructure ?? "by_subject");
-        setPrivacyMode(data.privacyMode ?? false);
+        setPrivacyMode(data.privacyMode ?? "full");
       });
 
     fetch("/api/tools/mijn-dossier/onedrive/family")
@@ -112,7 +112,8 @@ function InstellingenContent() {
     }
   }
 
-  async function savePrivacyMode(value: boolean) {
+  async function savePrivacyMode(value: string) {
+    const previous = privacyMode;
     setPrivacyMode(value);
     try {
       const res = await fetch("/api/tools/mijn-dossier/onedrive/status", {
@@ -121,10 +122,10 @@ function InstellingenContent() {
         body: JSON.stringify({ privacyMode: value }),
       });
       if (!res.ok) throw new Error();
-      showToast("success", value ? "Minimale opslag ingeschakeld." : "Volledige opslag ingeschakeld.");
+      showToast("success", "Privacy-instelling opgeslagen.");
     } catch {
       showToast("error", "Opslaan mislukt — probeer opnieuw.");
-      setPrivacyMode(!value);
+      setPrivacyMode(previous);
     }
   }
 
@@ -615,24 +616,30 @@ function InstellingenContent() {
         <div className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4">
           <div>
             <h2 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Privacy</h2>
-            <p className="text-xs text-gray-500 mt-1">
-              Bij minimale opslag wordt de samenvatting van een document wel getoond na het scannen, maar niet opgeslagen. Acties en deadlines worden wel bijgehouden zodat je actielijst actueel blijft.
-            </p>
+            <p className="text-xs text-gray-500 mt-1">Kies wat er na het scannen wordt opgeslagen in je account.</p>
           </div>
-          <button
-            onClick={() => savePrivacyMode(!privacyMode)}
-            className={`w-full flex items-center justify-between rounded-xl px-4 py-3 border transition-colors ${
-              privacyMode ? "border-amber-400 bg-amber-50" : "border-gray-200 hover:border-gray-300"
-            }`}
-          >
-            <div className="text-left">
-              <div className="text-sm font-medium text-gray-800">Minimale opslag</div>
-              <div className="text-xs text-gray-400 mt-0.5">Samenvatting en acties niet opslaan</div>
-            </div>
-            <div className={`relative w-10 h-6 rounded-full transition-colors flex-shrink-0 ${privacyMode ? "bg-amber-500" : "bg-gray-200"}`}>
-              <div className={`absolute top-1 w-4 h-4 rounded-full bg-white shadow transition-all ${privacyMode ? "left-5" : "left-1"}`} />
-            </div>
-          </button>
+          <div className="space-y-2">
+            {[
+              { value: "full",    label: "Alles bijhouden",                  desc: "Afzender, type, datum, samenvatting en acties worden opgeslagen" },
+              { value: "minimal", label: "Acties bijhouden, geen samenvattingen", desc: "Samenvatting wordt niet opgeslagen; acties en deadlines wel" },
+              { value: "none",    label: "Niets bijhouden",                  desc: "Alleen afzender, type en datum — geen samenvatting, geen acties" },
+            ].map((opt) => (
+              <button key={opt.value} onClick={() => savePrivacyMode(opt.value)}
+                className={`w-full flex items-start gap-3 rounded-xl px-4 py-3 border transition-colors text-left ${
+                  privacyMode === opt.value ? "border-amber-400 bg-amber-50" : "border-gray-200 hover:border-gray-100"
+                }`}>
+                <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex-shrink-0 flex items-center justify-center ${
+                  privacyMode === opt.value ? "border-amber-500" : "border-gray-300"
+                }`}>
+                  {privacyMode === opt.value && <div className="w-2 h-2 rounded-full bg-amber-500" />}
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-gray-800">{opt.label}</div>
+                  <div className="text-xs text-gray-400 mt-0.5">{opt.desc}</div>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Gezinsleden */}
