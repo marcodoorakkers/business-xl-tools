@@ -135,7 +135,7 @@ Formaat:
   "mappad": "altijd exact dit formaat: Afzender/Onderwerp/Jaartal — bijv. Belastingdienst/Omzetbelasting/2026 of Gemeente Amsterdam/Parkeervergunning/2025. Gebruik de officiële naam van de afzender, een kort onderwerp (max 2 woorden), en het jaar van het document.",
   "bestandsnaam": "bestandsnaam zonder extensie, formaat: YYYY-MM-DD_onderwerp_afzender (alles lowercase, spaties als koppelteken)",
   "samenvatting": "één zin die het document beschrijft — zonder specifieke bedragen, rekeningnummers, BSN of andere gevoelige getallen te noemen (bijv. 'Aanslag inkomstenbelasting 2025' in plaats van 'Aanslag van €892 inkomstenbelasting 2025')",
-  "actie": "concrete actie die ondernomen moet worden, bijv. 'Betaal €156 aan gemeente' of 'Reageer vóór de deadline' — null als er geen actie vereist is",
+  "actie": "concrete actie die ondernomen moet worden zonder specifieke bedragen of gevoelige getallen te noemen, bijv. 'Betaal openstaand bedrag aan gemeente' of 'Reageer vóór de deadline' — null als er geen actie vereist is",
   "actie_deadline": "YYYY-MM-DD van de uiterste datum voor de actie, of null",
   "actie_type": "betaling/reageren/aanvragen/registreren/overig — of null als er geen actie is",
   "gezinslid": "roepnaam van de geadresseerde als die overeenkomt met een bekende geadresseerde, anders null"
