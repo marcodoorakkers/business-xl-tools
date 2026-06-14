@@ -6,7 +6,7 @@ export const metadata = { title: "Veiligheid & Privacy — NooitMeerPostKwijt" }
 const faqs: { q: string; a: React.ReactNode }[] = [
   {
     q: "Wie kan mijn documenten zien?",
-    a: "Alleen jij. Documenten zijn per gebruiker afgeschermd via row-level security op databaseniveau — een technische maatregel die voorkomt dat iemand anders, ook wij als beheerder, bij jouw gegevens kan.",
+    a: "Alleen jij. De scan-metadata (afzender, type, samenvatting) is via row-level security afgeschermd zodat andere gebruikers er nooit bij kunnen. De beheerder van NooitMeerPostKwijt heeft via een beveiligde beheerderstoegang wel inzage in scan-metadata — uitsluitend voor ondersteuning en AVG-inzageverzoeken. De werkelijke bestanden (foto's en PDF's) worden nooit op onze servers bewaard.",
   },
   {
     q: "Worden mijn documenten opgeslagen op jullie servers?",
@@ -123,8 +123,8 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     ),
   },
   {
-    q: "Kunnen medewerkers van NooitMeerPostKwijt mijn documenten lezen?",
-    a: "Nee. Door de row-level security op databaseniveau zijn individuele documenten ook voor ons als beheerder niet zomaar toegankelijk. We hebben geen reden en geen procedure om individuele documenten in te zien. De enige uitzondering zou een gerechtelijk bevel zijn.",
+    q: "Kunnen medewerkers van NooitMeerPostKwijt mijn gegevens lezen?",
+    a: "De beheerder van NooitMeerPostKwijt heeft via een beveiligde beheerderstoegang inzage in scan-metadata (afzender, type, datum, samenvatting). Dit wordt uitsluitend gebruikt voor ondersteuning en om te voldoen aan AVG-inzageverzoeken. De werkelijke bestanden — je foto's en PDF's — worden nooit op onze servers opgeslagen en zijn voor ons dus nooit toegankelijk. Andere medewerkers of derden hebben geen toegang tot jouw gegevens.",
   },
 ];
 
