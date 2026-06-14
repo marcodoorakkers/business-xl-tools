@@ -83,6 +83,10 @@ app/
     dossier/instellingen/page.tsx — opslag, geadresseerden, mapstructuur, scan-e-mailadres
     dossier/archief/page.tsx     — documentenpagina: lijst + mappenview (drilldown)
     dossier/aan-de-slag/page.tsx — onboarding pagina nieuwe gebruikers (4 stappen + tips)
+    mijn-gegevens/page.tsx       — AVG gegevensoverzicht (server component, printbaar via browser)
+    mijn-gegevens/PrintButton.tsx — client component voor window.print()
+    admin/page.tsx               — admin overzicht gebruikers + founding/vriend stats
+    admin/gebruiker/[userId]/page.tsx — admin AVG inzage per gebruiker (server component)
     aanmelden/page.tsx           — NMMPK registratie
     inloggen/page.tsx            — NMMPK login
   api/
@@ -91,6 +95,8 @@ app/
       webhook/route.ts           — Stripe webhook handler
     gezin/
       share-target/route.ts      — Web Share Target (Android PWA, POST + GET)
+      my-data/route.ts           — gebruiker gegevensexport als HTML (geen server-side PDF)
+      clear-data/route.ts        — bulk wissen samenvattingen/acties of alle scans (POST)
     tools/mijn-dossier/
       route.ts                   — handmatige scan (AI-analyse + upload)
       email-scan/route.ts        — Cloudflare webhook-ontvanger (inbound e-mail)
@@ -122,6 +128,11 @@ supabase/migrations/
   add_promo_code_to_profiles.sql — promo_code kolom op profiles
   add_reminder_sent_at.sql       — reminder_sent_at kolom op document_actions
   add_actie_to_documents.sql     — actie en actie_gedaan kolommen op documents
+  add_scan_email_allowlist.sql   — allowlist voor inkomende e-mail adressen
+  add_google_drive_tokens.sql    — Google Drive OAuth tokens
+  add_privacy_mode.sql           — privacy_mode kolom op archive_settings
+  add_privacy_mode_v2.sql        — correctie/uitbreiding privacy_mode
+  add_fm_invite_codes.sql        — fm01–fm25 persoonlijke invite codes (elk max_uses: 1)
 ```
 
 ## PWA (NMMPK)
@@ -187,9 +198,13 @@ supabase/migrations/
 ## Promo codes (NMMPK)
 
 - Tabel `promo_codes` (code, max_uses, uses, trial_days, active)
-- Actieve promo: `founding25` — 25x 180 dagen trial
-- Flow: `?promo=founding25` in aanmeld-URL → localStorage → SubscribeButton → create-session
-- Cap wordt atomisch gecontroleerd; bij max bereikt → gewone 30-daagse trial
+- Actieve promo: `founding25` — 25x 180 dagen trial (groepscode voor LinkedIn/publiek)
+- Persoonlijke invite codes: `fm01` t/m `fm25` — elk max_uses: 1, 180 dagen trial
+  - Worden per persoon uitgedeeld zodat doorgestuurde links niet misbruikt worden
+  - Bij max bereikt (code al gebruikt): gewone 30-daagse trial als fallback
+  - Gebruik monitoren: `SELECT code, uses, max_uses FROM promo_codes WHERE code LIKE 'fm%';`
+- Flow: `?promo=<code>` in aanmeld-URL → localStorage → SubscribeButton → create-session
+- Cap wordt atomisch gecontroleerd
 - Gebruik monitoren: `SELECT code, uses, max_uses FROM promo_codes;`
 
 ## Storage (NMMPK)
@@ -205,16 +220,19 @@ supabase/migrations/
 
 ## Founding members (NMMPK)
 
-- Promo code `founding25` — 25x 180 dagen trial, cap van 25 gebruikers
+- Promo code `founding25` — 25x 180 dagen trial, cap van 25 gebruikers (groepscode)
+- Persoonlijke codes `fm01`–`fm25` — ook founding members, elk voor één persoon
 - `promo_code` kolom op `profiles` — wordt ingevuld bij checkout als promo geldig is
-- Teller op homepage en launch pagina gebaseerd op `profiles.promo_code = 'founding25'` (NIET op `promo_codes.uses` — die kan afwijken)
-- Founding member badge op accountpagina als `promo_code = 'founding25'`
-- Aparte welkomstmail met uitleg 6 maanden + activatie instructie
+- `isFoundingMember` check: `profile?.promo_code === "founding25" || /^fm\d+$/.test(profile?.promo_code ?? "")`
+  - Deze check zit in `gezin/account/page.tsx` én `api/onboarding/send/route.ts`
+- Teller op homepage en launch pagina gebaseerd op `profiles.promo_code = 'founding25'` (NIET op `promo_codes.uses` en NIET op fm-codes — die tellen apart)
+- Founding member badge op accountpagina als `isFoundingMember` true is
+- Welkomstmail persoonlijk van toon ("Fijn dat je meedoet. Ik heb je persoonlijk uitgenodigd.")
 - Aparte trial-ending mail na ~6 maanden met persoonlijke toon
 - Proefperiode tekst op accountpagina past zich aan voor founding members
 - `PromoActiveerBanner` op accountpagina — leest promo uit URL param (via bevestigingsmail) én localStorage
 - Bevestigingsmail redirect naar `/account` (niet `/dossier`) zodat activatie direct zichtbaar is
-- Promo code wordt meegegeven in de bevestigingsmail URL (`?promo=founding25`) zodat hij werkt in elke browser
+- Promo code wordt meegegeven in de bevestigingsmail URL zodat hij werkt in elke browser
 
 ## Navigatie (NMMPK)
 
@@ -268,7 +286,7 @@ Route: `dossier/archief/page.tsx` — API: `documents/route.ts`
 - `documents` tabel heeft ook `actie text` en `actie_gedaan boolean DEFAULT false` — gevuld bij opslaan scan als gebruiker "Actie toevoegen" had aangevinkt
 - Deadline-badge toont lopende teller ("X dagen te laat") alleen in tab Open; in Gedaan/Overgeslagen altijd statische datum
 - Afvinken vanuit documenten-pagina via PATCH op `documents.actie_gedaan` (los van `document_actions`)
-- Actielijst sync naar OneDrive/Dropbox via `/api/tools/mijn-dossier/sync-actielijst` (Markdown met checkboxes)
+- Actielijst sync naar OneDrive/Dropbox via `/api/tools/mijn-dossier/sync-actielijst` (Markdown met checkboxes, bestandsnaam `! Actielijst.md` — `!` zorgt voor sortering bovenaan)
 - Reminder-emails: open acties met deadline 1–3 dagen vooruit, bijgehouden via `reminder_sent_at`
 
 ## Launch pagina (NMMPK)
@@ -284,13 +302,36 @@ Route: `dossier/archief/page.tsx` — API: `documents/route.ts`
 - `product` kolom toegevoegd aan `ideas` tabel via `add_product_to_ideas.sql`
 - Stemmen via bestaande `/api/ideas/[id]/vote` route (gedeeld met TST)
 
+## Gebruikersdata & AVG (NMMPK)
+
+- `/gezin/mijn-gegevens` — gebruiker ziet alle eigen opgeslagen data; kan afdrukken als PDF via `window.print()`
+- Geen server-side PDF generatie (Puppeteer/Chromium niet betrouwbaar op Vercel serverless)
+- `PrintButton.tsx` is een client component — `onClick={() => window.print()}` — aangeroepen vanuit server component `page.tsx`
+- Accountpagina linkt naar `/gezin/mijn-gegevens` ("Gegevens bekijken & downloaden")
+- `/api/gezin/my-data` — HTML rapport als fallback (geen `Content-Disposition: attachment` — anders download iOS het als bestand)
+- `/api/gezin/clear-data` — POST: wist bulk data voor ingelogde gebruiker (samenvattingen/acties of alle scans)
+
+## Privacy mode (NMMPK)
+
+- `archive_settings.privacy_mode` — tekstveld: `"full"` | `"minimal"` | `"none"`
+- **full** (standaard): alles bijhouden (afzender, type, datum, samenvatting, actiepunten)
+- **minimal**: acties bijhouden, geen samenvattingen
+- **none**: alleen afzender, type en datum — geen samenvatting, geen actiepunten
+- Instelling aanpasbaar in Instellingen (`dossier/instellingen/page.tsx`)
+- AI-analyse loopt altijd; wat er wordt opgeslagen hangt af van `privacy_mode`
+- Migratie: `add_privacy_mode.sql` + `add_privacy_mode_v2.sql`
+
 ## Admin (NMMPK)
 
 - `/gezin/admin` en `/admin` (TST admin, "Testdata" tab) — alleen toegankelijk voor `ADMIN_EMAIL`
 - API op `/api/admin/nmmpk-users` — toont subscription_status, promo_code, storage, doc count
 - `/api/admin/reset-user-data` — wist alle documenten + document_actions voor een userId (POST, admin-only)
 - `/api/admin/test-email` — stuurt testmails naar ADMIN_EMAIL (type: `welcome_founding` of `trial_ending`)
-- `/api/admin/user-data` — AVG gegevensexport per gebruiker als HTML-rapport (printbaar naar PDF); `?format=json` voor ruwe JSON
+- `/api/admin/user-data` — AVG gegevensexport als HTML of JSON (`?format=json`); geen `Content-Disposition: attachment`
+- `/gezin/admin/gebruiker/[userId]` — admin AVG inzage per gebruiker, zelfde lay-out als `/gezin/mijn-gegevens`
+  - Server component; checkt `user.email !== process.env.ADMIN_EMAIL` → redirect
+  - Leest via `createAdminClient()` (bypasses RLS)
+  - JSON download knop: `/api/admin/user-data?userId=...&format=json`
 - Admin verwijder-knop vereist een safety toggle (rode schakelaar) voordat verwijderen mogelijk is
 - Admin nav-link zichtbaar in BottomNav (desktop + mobiel) alleen voor `NEXT_PUBLIC_ADMIN_EMAIL`
 
