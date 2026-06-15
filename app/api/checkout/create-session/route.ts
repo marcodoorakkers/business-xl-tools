@@ -99,6 +99,8 @@ export async function POST(req: NextRequest) {
       ...(isFamilySite && {
         subscription_data: { trial_period_days: trialDays },
         payment_method_collection: "if_required",
+        billing_address_collection: "required",
+        tax_id_collection: { enabled: true },
       }),
     });
 
