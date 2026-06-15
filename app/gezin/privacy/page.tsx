@@ -43,6 +43,7 @@ export default function GezinPrivacyPage() {
                   <li>E-mailadres</li>
                   <li>Wachtwoord (versleuteld opgeslagen)</li>
                   <li>Datum van registratie</li>
+                  <li>Factuurgegevens (naam en adres) — alleen bij het afsluiten van een betaald abonnement, opgeslagen bij Stripe</li>
                 </ul>
               </div>
               <div>
