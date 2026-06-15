@@ -94,7 +94,7 @@ export default function NMMPKAdminPage() {
     setTogglingVriend(false);
   }
 
-  const founding = users.filter((u) => u.promo_code === "founding25");
+  const founding = users.filter((u) => u.promo_code === "founding25" || /^fm\d+$/.test(u.promo_code ?? ""));
   const vrienden = users.filter((u) => u.promo_code === "vriendenvan");
   const trialing = users.filter((u) => u.subscription_status === "trialing");
   const active   = users.filter((u) => u.subscription_status === "active");
