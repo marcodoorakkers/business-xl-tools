@@ -219,7 +219,7 @@ export default function NMMPKAdminPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        {u.promo_code === "founding25" ? (
+                        {(u.promo_code === "founding25" || /^fm\d+$/.test(u.promo_code ?? "")) ? (
                           <span className="inline-flex items-center gap-1">
                             <svg className="w-4 h-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
                               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
