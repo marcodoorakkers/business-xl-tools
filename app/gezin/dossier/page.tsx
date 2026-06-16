@@ -37,18 +37,17 @@ const DOC_ICONS: Record<string, string> = {
 
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-async function compressImage(file: File): Promise<File> {
+async function compressImage(file: File, maxPx = 1920, quality = 0.85): Promise<File> {
   if (!file.type.startsWith("image/")) return file;
   return new Promise((resolve) => {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
       URL.revokeObjectURL(url);
-      const maxSize = 1920;
       let { width, height } = img;
-      if (width > maxSize || height > maxSize) {
-        if (width >= height) { height = Math.round(height * maxSize / width); width = maxSize; }
-        else { width = Math.round(width * maxSize / height); height = maxSize; }
+      if (width > maxPx || height > maxPx) {
+        if (width >= height) { height = Math.round(height * maxPx / width); width = maxPx; }
+        else { width = Math.round(width * maxPx / height); height = maxPx; }
       }
       const canvas = document.createElement("canvas");
       canvas.width = width; canvas.height = height;
@@ -56,11 +55,17 @@ async function compressImage(file: File): Promise<File> {
       canvas.toBlob((blob) => {
         if (blob) resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
         else resolve(file);
-      }, "image/jpeg", 0.85);
+      }, "image/jpeg", quality);
     };
     img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
     img.src = url;
   });
+}
+
+function uploadCompressParams(pageCount: number): { maxPx: number; quality: number } {
+  if (pageCount > 15) return { maxPx: 1024, quality: 0.70 };
+  if (pageCount > 8)  return { maxPx: 1440, quality: 0.75 };
+  return { maxPx: 1920, quality: 0.85 };
 }
 
 async function imagesToPdf(imageFiles: File[], name: string): Promise<File> {
@@ -305,7 +310,8 @@ export default function GezinDossierPage() {
     const docxFiles = files.filter(f => f.type === DOCX_MIME);
     let uploadFile: File;
     if (imageFiles.length > 0) {
-      const compressed = await Promise.all(imageFiles.map(compressImage));
+      const { maxPx, quality } = uploadCompressParams(imageFiles.length);
+      const compressed = await Promise.all(imageFiles.map(f => compressImage(f, maxPx, quality)));
       uploadFile = compressed.length === 1 ? compressed[0] : await imagesToPdf(compressed, bestandsnaam);
     } else if (docxFiles.length > 0) {
       uploadFile = docxFiles[0]; // server converteert naar PDF
@@ -352,7 +358,8 @@ export default function GezinDossierPage() {
     const imageFiles = files.filter(f => f.type.startsWith("image/"));
     let saveFile: File;
     if (imageFiles.length > 0) {
-      const compressed = await Promise.all(imageFiles.map(compressImage));
+      const { maxPx, quality } = uploadCompressParams(imageFiles.length);
+      const compressed = await Promise.all(imageFiles.map(f => compressImage(f, maxPx, quality)));
       saveFile = compressed.length === 1 ? compressed[0] : await imagesToPdf(compressed, bestandsnaam);
     } else {
       saveFile = files[0];
