@@ -35,12 +35,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
 
-  const rawBuffer = Buffer.from(await file.arrayBuffer());
-  const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
-  const filename = `${bestandsnaam}.pdf`;
-  const folderPath = mappad.trim();
-
   try {
+    const rawBuffer = Buffer.from(await file.arrayBuffer());
+    const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
+    const filename = `${bestandsnaam}.pdf`;
+    const folderPath = mappad.trim();
+
     let token = accessToken;
     let result: { webUrl: string };
     try {

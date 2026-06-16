@@ -41,11 +41,11 @@ export async function POST(req: NextRequest) {
     ? mappad.trim().slice(archiveRoot.length + 1)
     : mappad.trim();
 
-  const rawBuffer = Buffer.from(await file.arrayBuffer());
-  const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
-  const fullPath = `${strippedMappad}/${bestandsnaam}.pdf`;
-
   try {
+    const rawBuffer = Buffer.from(await file.arrayBuffer());
+    const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
+    const fullPath = `${strippedMappad}/${bestandsnaam}.pdf`;
+
     const { webUrl } = await uploadFileToOneDrive(accessToken, fullPath, pdfBuffer, "application/pdf");
 
     await supabase.from("profiles").update({ credits: profile.credits - 1 }).eq("id", user.id);
