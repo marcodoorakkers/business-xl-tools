@@ -109,6 +109,7 @@ export default function GezinDossierPage() {
   const [archiveRoot, setArchiveRoot] = useState("Archief");
   const [storagePreference, setStoragePreference] = useState<"local" | "onedrive" | "dropbox" | "googledrive">("local");
   const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
+  const [privacyMode, setPrivacyMode] = useState<"full" | "minimal" | "none">("full");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pageInputRef = useRef<HTMLInputElement>(null);
@@ -128,6 +129,7 @@ export default function GezinDossierPage() {
         googleDriveArchiveRoot: string;
         storagePreference: string;
         folderStructure?: string;
+        privacyMode?: string;
       }) => {
         setOneDriveConnected(data.connected);
         setDropboxConnected(data.dropboxConnected);
@@ -136,6 +138,10 @@ export default function GezinDossierPage() {
         setFamilyMembers(data.familyMembers ?? []);
         setFamilyMemberDetails(data.familyMemberDetails ?? []);
         setMembersLoaded(true);
+        if (data.privacyMode === "minimal" || data.privacyMode === "none") {
+          setPrivacyMode(data.privacyMode);
+          if (data.privacyMode === "none") setIncludeActie(false);
+        }
         setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox" | "googledrive");
         setFolderStructure((data.folderStructure ?? "by_subject") as "by_subject" | "by_person");
       })
@@ -257,10 +263,10 @@ export default function GezinDossierPage() {
           onderwerp: analysis.onderwerp ?? null,
           mappad: mappad ?? null,
           gezinslid: gezinslid || null,
-          samenvatting: analysis.samenvatting ?? null,
+          samenvatting: privacyMode === "full" ? (analysis.samenvatting ?? null) : null,
           file_url: fileUrl ?? null,
           storage: storage ?? "local",
-          actie: includeActie ? (analysis.actie ?? null) : null,
+          actie: (includeActie && privacyMode !== "none") ? (analysis.actie ?? null) : null,
         }),
       });
     } catch {
@@ -301,7 +307,7 @@ export default function GezinDossierPage() {
       const data = await res.json();
       if (data.error) { setErrorMsg(data.error); setStep("error"); return; }
 
-      if (includeActie && analysis.actie) await saveActie(analysis, data.webUrl);
+      if (includeActie && privacyMode !== "none" && analysis.actie) await saveActie(analysis, data.webUrl);
       await saveDocumentMetadata(data.webUrl, storagePreference);
       setSavedInfo({ pad: data.path ?? mappad, url: data.webUrl });
       setStep("done");
@@ -333,7 +339,7 @@ export default function GezinDossierPage() {
     }
 
     const fileExt = saveFile.type === "application/pdf" ? "pdf" : "jpg";
-    if (includeActie && analysis.actie) await saveActie(analysis);
+    if (includeActie && privacyMode !== "none" && analysis.actie) await saveActie(analysis);
     await saveDocumentMetadata(undefined, "local");
     setSavedInfo({ pad: `${mappad}/${bestandsnaam}.${fileExt}` });
     setStep("done");
