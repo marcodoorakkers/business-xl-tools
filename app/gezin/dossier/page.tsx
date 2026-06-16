@@ -209,7 +209,7 @@ export default function GezinDossierPage() {
     const otherFiles = fs.filter(f => !f.type.startsWith("image/"));
     // Voor analyse: max 5 pagina's (genoeg voor afzender/type/datum), rest wordt alleen geüpload
     const analysisImages = imageFiles.slice(0, 5);
-    const compressed = await Promise.all(analysisImages.map(compressImage));
+    const compressed = await Promise.all(analysisImages.map(f => compressImage(f)));
     const toSend: File[] = analysisImages.length > 1
       ? [await imagesToPdf(compressed, "document"), ...otherFiles]
       : [...compressed, ...otherFiles];
