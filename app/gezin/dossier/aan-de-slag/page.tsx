@@ -8,19 +8,31 @@ const steps = [
     num: "1",
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4"/><path d="M16 11h6m-3-3v6"/>
+      </svg>
+    ),
+    title: "Voeg geadresseerden toe",
+    body: "Ga naar Instellingen en voeg de personen en entiteiten toe waarop post kan binnenkomen — jezelf, een partner, kinderen, of je bedrijf. NooitMeerPostKwijt koppelt documenten automatisch aan de juiste persoon op basis van naam of initialen op het document.",
+    cta: { label: "Naar Instellingen →", href: "/dossier/instellingen" },
+  },
+  {
+    num: "2",
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
       </svg>
     ),
     title: "Koppel je cloudopslag",
-    body: "Ga naar Instellingen en koppel OneDrive of Dropbox. Kies daarna je opslagvoorkeur. Documenten worden dan automatisch in de juiste map opgeslagen — jij hoeft er niets voor te doen.",
+    body: "Koppel OneDrive, Dropbox of Google Drive in Instellingen. Documenten worden dan automatisch in de juiste map opgeslagen — jij hoeft er niets voor te doen.",
     cta: { label: "Naar Instellingen →", href: "/dossier/instellingen" },
     ctaSecondary: [
       { label: "Gratis OneDrive aanmaken →", href: "https://onedrive.live.com" },
       { label: "Gratis Dropbox aanmaken →", href: "https://www.dropbox.com/register" },
+      { label: "Gratis Google Drive aanmaken →", href: "https://drive.google.com" },
     ],
   },
   {
-    num: "2",
+    num: "3",
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="3" width="20" height="14" rx="2"/>
@@ -32,7 +44,7 @@ const steps = [
     cta: { label: "Document scannen →", href: "/dossier" },
   },
   {
-    num: "3",
+    num: "4",
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
@@ -43,7 +55,7 @@ const steps = [
     cta: { label: "Naar Documenten →", href: "/dossier/archief" },
   },
   {
-    num: "4",
+    num: "5",
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="5" width="20" height="14" rx="2"/>
@@ -83,7 +95,7 @@ export default function AanDeSlagPage() {
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Aan de slag</h1>
           <p className="text-gray-500 text-sm leading-relaxed">
-            In vier stappen je administratie op orde. Het kost je de eerste keer 5 minuten — daarna gaat alles automatisch.
+            In vijf stappen je administratie op orde. Het kost je de eerste keer 5 minuten — daarna gaat alles automatisch.
           </p>
         </div>
 
