@@ -199,10 +199,16 @@ export default function GezinDossierPage() {
   async function analyzeFiles(fs: File[]) {
     setStep("analyzing");
     setErrorMsg("");
-    const compressed = await Promise.all(fs.map(compressImage));
+    const imageFiles = fs.filter(f => f.type.startsWith("image/"));
+    const otherFiles = fs.filter(f => !f.type.startsWith("image/"));
+    const compressed = await Promise.all(imageFiles.map(compressImage));
+    // Meerdere afbeeldingen samenvoegen tot PDF voor analyse — anders te groot voor Vercel
+    const toSend: File[] = imageFiles.length > 1
+      ? [await imagesToPdf(compressed, "document"), ...otherFiles]
+      : [...compressed, ...otherFiles];
     const formData = new FormData();
-    compressed.forEach((f, i) => formData.append(`file_${i}`, f));
-    formData.append("file_count", String(compressed.length));
+    toSend.forEach((f, i) => formData.append(`file_${i}`, f));
+    formData.append("file_count", String(toSend.length));
     if (familyMembers.length > 0) {
       formData.append("family_members", JSON.stringify(familyMemberDetails.length > 0 ? familyMemberDetails : familyMembers));
     }
