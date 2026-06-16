@@ -253,7 +253,7 @@ Formaat:
     bestandsnaam: fullFilename,
     type: analysis.type ?? null,
     afzender: analysis.afzender ?? null,
-    datum: analysis.datum ?? null,
+    datum: /^\d{4}-\d{2}-\d{2}$/.test(analysis.datum ?? "") ? analysis.datum : null,
     onderwerp: analysis.onderwerp ?? null,
     mappad: mappad ?? null,
     samenvatting: analysis.samenvatting ?? null,
@@ -266,7 +266,7 @@ Formaat:
     await admin.from("document_actions").insert({
       user_id: profile.id,
       actie: analysis.actie,
-      deadline: analysis.actie_deadline ?? null,
+      deadline: /^\d{4}-\d{2}-\d{2}$/.test(analysis.actie_deadline ?? "") ? analysis.actie_deadline : null,
       actie_type: analysis.actie_type ?? null,
       document_naam: fullFilename,
       afzender: analysis.afzender ?? null,

@@ -64,6 +64,8 @@ export async function POST(req: NextRequest) {
 
   if (!bestandsnaam) return NextResponse.json({ error: "Bestandsnaam vereist" }, { status: 400 });
 
+  const safeDate = (d: unknown) => (typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null);
+
   const { data: settings } = await supabase
     .from("archive_settings")
     .select("privacy_mode")
@@ -78,7 +80,7 @@ export async function POST(req: NextRequest) {
       bestandsnaam,
       type: type ?? null,
       afzender: afzender ?? null,
-      datum: datum ?? null,
+      datum: safeDate(datum),
       onderwerp: onderwerp ?? null,
       mappad: mappad ?? null,
       gezinslid: gezinslid ?? null,
