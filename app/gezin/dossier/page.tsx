@@ -83,7 +83,8 @@ async function imagesToPdf(imageFiles: File[], name: string): Promise<File> {
     const iR = dims.w / dims.h, pR = PW / PH;
     let drawW = PW, drawH = PH;
     if (iR > pR) drawH = PW / iR; else drawW = PH * iR;
-    pdf.addImage(dataUrl, "JPEG", (PW - drawW) / 2, (PH - drawH) / 2, drawW, drawH);
+    const imgFormat = dataUrl.startsWith("data:image/png") ? "PNG" : "JPEG";
+    pdf.addImage(dataUrl, imgFormat, (PW - drawW) / 2, (PH - drawH) / 2, drawW, drawH);
   }
   return new File([pdf.output("blob")], `${name}.pdf`, { type: "application/pdf" });
 }
@@ -229,7 +230,12 @@ export default function GezinDossierPage() {
       setGezinslid(matched ?? "");
       setStep("suggestion");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Er is iets misgegaan");
+      const msg = err instanceof Error ? err.message : "Er is iets misgegaan";
+      if (msg.includes("string did not match") || msg.includes("patroon")) {
+        setErrorMsg("Fout bij aanmaken PDF. Zorg dat alle pagina's JPEG- of PNG-foto's zijn en probeer opnieuw.");
+      } else {
+        setErrorMsg(`Analyse mislukt: ${msg}`);
+      }
       setStep("error");
     }
   }
@@ -237,7 +243,7 @@ export default function GezinDossierPage() {
   async function saveActie(a: Analysis, fileUrl?: string) {
     if (!a.actie) return;
     try {
-      await fetch("/api/tools/mijn-dossier/acties", {
+      const res = await fetch("/api/tools/mijn-dossier/acties", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -250,16 +256,21 @@ export default function GezinDossierPage() {
           file_url: fileUrl ?? null,
         }),
       });
-      fetch("/api/tools/mijn-dossier/sync-actielijst", { method: "POST" }).catch(() => {});
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        console.error("Actie opslaan mislukt:", d.error ?? res.status);
+      } else {
+        fetch("/api/tools/mijn-dossier/sync-actielijst", { method: "POST" }).catch(() => {});
+      }
     } catch (err) {
       console.error("Kon actie niet opslaan:", err);
     }
   }
 
-  async function saveDocumentMetadata(fileUrl?: string, storage?: string) {
-    if (!analysis) return;
+  async function saveDocumentMetadata(fileUrl?: string, storage?: string): Promise<string | null> {
+    if (!analysis) return null;
     try {
-      await fetch("/api/tools/mijn-dossier/documents", {
+      const res = await fetch("/api/tools/mijn-dossier/documents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -276,8 +287,13 @@ export default function GezinDossierPage() {
           actie: (includeActie && privacyMode !== "none") ? (analysis.actie ?? null) : null,
         }),
       });
-    } catch {
-      // Stil falen — metadata opslaan is niet kritiek
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        return d.error ?? `HTTP ${res.status}`;
+      }
+      return null;
+    } catch (err) {
+      return err instanceof Error ? err.message : "Netwerk fout";
     }
   }
 
@@ -311,15 +327,21 @@ export default function GezinDossierPage() {
 
     try {
       const res = await fetch(endpoint, { method: "POST", body: fd });
-      const data = await res.json();
-      if (data.error) { setErrorMsg(data.error); setStep("error"); return; }
+      const data = await res.json().catch(() => ({ error: "Onverwacht antwoord van server" }));
+      if (data.error) { setErrorMsg(`Upload mislukt: ${data.error}`); setStep("error"); return; }
 
       if (includeActie && privacyMode !== "none" && analysis.actie) await saveActie(analysis, data.webUrl);
-      await saveDocumentMetadata(data.webUrl, storagePreference);
+      const metaErr = await saveDocumentMetadata(data.webUrl, storagePreference);
+      if (metaErr) console.error("Metadata opslaan mislukt:", metaErr);
       setSavedInfo({ pad: data.path ?? mappad, url: data.webUrl });
       setStep("done");
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Upload mislukt — probeer opnieuw");
+      const msg = err instanceof Error ? err.message : "Onbekende fout";
+      if (msg.includes("string did not match") || msg.includes("patroon")) {
+        setErrorMsg("Fout bij aanmaken PDF. Zorg dat alle pagina's JPEG- of PNG-foto's zijn en probeer opnieuw.");
+      } else {
+        setErrorMsg(`Opslaan mislukt: ${msg}`);
+      }
       setStep("error");
     }
   }
@@ -347,7 +369,8 @@ export default function GezinDossierPage() {
 
     const fileExt = saveFile.type === "application/pdf" ? "pdf" : "jpg";
     if (includeActie && privacyMode !== "none" && analysis.actie) await saveActie(analysis);
-    await saveDocumentMetadata(undefined, "local");
+    const metaErr = await saveDocumentMetadata(undefined, "local");
+    if (metaErr) console.error("Metadata opslaan mislukt:", metaErr);
     setSavedInfo({ pad: `${mappad}/${bestandsnaam}.${fileExt}` });
     setStep("done");
   }
