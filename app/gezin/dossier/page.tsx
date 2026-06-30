@@ -113,6 +113,13 @@ export default function GezinDossierPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pageInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const [isNative, setIsNative] = useState(false);
+
+  useEffect(() => {
+    import("@capacitor/core").then(({ Capacitor }) => {
+      setIsNative(Capacitor.isNativePlatform());
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/tools/mijn-dossier/onedrive/status", { cache: "no-store" })
@@ -157,6 +164,30 @@ export default function GezinDossierPage() {
           await addFiles(fileObjects);
         })
         .catch(() => {});
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const takeNativePhoto = useCallback(async () => {
+    try {
+      const { Camera, CameraResultType, CameraSource } = await import("@capacitor/camera");
+      const photo = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Prompt,
+        promptLabelHeader: "Document scannen",
+        promptLabelPhoto: "Kies uit fotobibliotheek",
+        promptLabelPicture: "Foto maken",
+      });
+      if (!photo.base64String) return;
+      const mime = `image/${photo.format === "jpeg" ? "jpeg" : photo.format}`;
+      const bytes = atob(photo.base64String);
+      const arr = new Uint8Array(bytes.length);
+      for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+      const file = new File([arr], `scan.${photo.format}`, { type: mime });
+      await addFiles([file]);
+    } catch (err: unknown) {
+      if (err instanceof Error && (err.message?.includes("cancelled") || err.message?.includes("User cancelled"))) return;
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -366,7 +397,7 @@ export default function GezinDossierPage() {
               className={`border-2 border-dashed rounded-3xl p-10 text-center transition-colors cursor-pointer ${
                 dragOver ? "border-amber-400 bg-amber-100" : "border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50"
               }`}
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => isNative ? takeNativePhoto() : fileInputRef.current?.click()}
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
               onDrop={(e) => {
@@ -426,7 +457,7 @@ export default function GezinDossierPage() {
                 </div>
               ))}
               <button
-                onClick={() => pageInputRef.current?.click()}
+                onClick={() => isNative ? takeNativePhoto() : pageInputRef.current?.click()}
                 className="aspect-[3/4] border-2 border-dashed border-amber-200 rounded-xl flex flex-col items-center justify-center text-amber-400 hover:border-amber-400 hover:bg-amber-50 transition-colors"
               >
                 <span className="text-2xl">+</span>
