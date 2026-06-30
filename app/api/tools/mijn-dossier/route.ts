@@ -10,8 +10,19 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("profiles").select("credits").eq("id", user.id).single();
-  if (!profile || profile.credits < 1) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
+  const { data: profile } = await supabase.from("profiles").select("credits, subscription_status").eq("id", user.id).single();
+  if (!profile) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
+
+  const hostname = req.nextUrl.hostname;
+  const isFamilySite = hostname === "nooitmeerpostkwijt.nl" || hostname === "www.nooitmeerpostkwijt.nl";
+  const hasActiveSubscription =
+    profile.subscription_status === "active" || profile.subscription_status === "trialing";
+  // NMMPK-abonnees scannen onbeperkt — credits gelden alleen voor TimeSaverTools
+  const isUnlimited = isFamilySite && hasActiveSubscription;
+
+  if (!isUnlimited && profile.credits < 1) {
+    return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
+  }
 
   const formData = await req.formData();
 
@@ -160,8 +171,10 @@ Formaat:
     return NextResponse.json({ error: "AI kon het document niet analyseren. Probeer een duidelijkere scan." }, { status: 500 });
   }
 
-  await supabase.from("profiles").update({ credits: profile.credits - 1 }).eq("id", user.id);
-  await logUsage(user.id, "mijn-dossier", 1);
+  if (!isUnlimited) {
+    await supabase.from("profiles").update({ credits: profile.credits - 1 }).eq("id", user.id);
+  }
+  await logUsage(user.id, "mijn-dossier", isUnlimited ? 0 : 1);
 
   return NextResponse.json(result);
 }
