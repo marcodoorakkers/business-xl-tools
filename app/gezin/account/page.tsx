@@ -1,8 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import BottomNav from "@/app/gezin/dossier/components/BottomNav";
-import AutoCheckoutWrapper from "./AutoCheckoutWrapper";
-import SubscribeButton from "@/app/account/SubscribeButton";
+import NativeSubscribeSection from "./NativeSubscribeSection";
 import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
@@ -69,9 +68,6 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           </div>
         )}
 
-        {/* Auto checkout als promo in URL of localStorage — alleen als nog geen abonnement */}
-        {!subscriptionStatus && <AutoCheckoutWrapper priceId={proPriceId} />}
-
         {/* Betaalfeedback */}
         {paymentStatus === "subscribed" && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
@@ -86,24 +82,8 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           </div>
         )}
 
-        {/* Maandelijks abonnement */}
-        {!subscriptionStatus && (
-          <div className="bg-white border-2 border-amber-300 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-1">
-              <span>⭐</span>
-              <h2 className="font-bold text-gray-900 text-lg">Maandelijks abonnement</h2>
-            </div>
-            <p className="text-gray-500 text-sm mb-1">Onbeperkt scannen · opzegbaar wanneer je wil</p>
-            <p className="text-amber-600 text-sm font-semibold mb-4">Eerste maand gratis — geen creditcard nodig</p>
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-3xl font-extrabold text-gray-900">€3,99</span>
-                <span className="text-gray-400 text-sm ml-1">/maand na proefperiode</span>
-              </div>
-              <SubscribeButton priceId={proPriceId} />
-            </div>
-          </div>
-        )}
+        {/* Maandelijks abonnement — NativeSubscribeSection verbergt de koopknop in de iOS-app */}
+        {!subscriptionStatus && <NativeSubscribeSection priceId={proPriceId} />}
 
         {subscriptionStatus === "trialing" && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
