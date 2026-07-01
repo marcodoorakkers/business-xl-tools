@@ -37,6 +37,89 @@ const DOC_ICONS: Record<string, string> = {
 
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
+async function autoCropImage(file: File): Promise<File> {
+  // Only crop camera JPEGs — PNGs are screenshots/downloads where corner sampling
+  // detects UI chrome instead of table background, making the algorithm unreliable.
+  if (file.type !== "image/jpeg") return file;
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      try {
+        const { width, height } = img;
+        const DETECT = 400;
+        const scale = Math.min(1, DETECT / Math.max(width, height));
+        const dw = Math.round(width * scale);
+        const dh = Math.round(height * scale);
+        const dc = document.createElement("canvas");
+        dc.width = dw; dc.height = dh;
+        const dctx = dc.getContext("2d");
+        if (!dctx) { URL.revokeObjectURL(url); resolve(file); return; }
+        dctx.drawImage(img, 0, 0, dw, dh);
+        const { data } = dctx.getImageData(0, 0, dw, dh);
+
+        const cs = Math.max(4, Math.floor(Math.min(dw, dh) * 0.08));
+        const bgBrights: number[] = [];
+        for (let y = 0; y < cs; y++) {
+          for (let x = 0; x < cs; x++) {
+            for (const [cy, cx] of [[y,x],[y,dw-1-x],[dh-1-y,x],[dh-1-y,dw-1-x]] as [number,number][]) {
+              const i = (cy * dw + cx) * 4;
+              bgBrights.push((data[i] + data[i+1] + data[i+2]) / 3);
+            }
+          }
+        }
+        bgBrights.sort((a, b) => a - b);
+        const bgMedian = bgBrights[Math.floor(bgBrights.length / 2)];
+        const thr = Math.max(bgMedian + 50, 150);
+
+        let top = dh, bottom = 0, left = dw, right = 0;
+        for (let y = 0; y < dh; y++) {
+          for (let x = 0; x < dw; x++) {
+            const i = (y * dw + x) * 4;
+            if ((data[i] + data[i + 1] + data[i + 2]) / 3 >= thr) {
+              if (y < top) top = y;
+              if (y > bottom) bottom = y;
+              if (x < left) left = x;
+              if (x > right) right = x;
+            }
+          }
+        }
+
+        if (top >= bottom || left >= right) { URL.revokeObjectURL(url); resolve(file); return; }
+        if ((right - left) > dw * 0.95 && (bottom - top) > dh * 0.95) {
+          URL.revokeObjectURL(url); resolve(file); return;
+        }
+        if ((right - left) < dw * 0.30 || (bottom - top) < dh * 0.30) {
+          URL.revokeObjectURL(url); resolve(file); return;
+        }
+
+        const pad = Math.max(2, Math.round(Math.min(dw, dh) * 0.03));
+        const cl = Math.max(0, Math.round((left - pad) / scale));
+        const ct = Math.max(0, Math.round((top - pad) / scale));
+        const cr = Math.min(width, Math.round((right + pad) / scale));
+        const cb = Math.min(height, Math.round((bottom + pad) / scale));
+        const cw = cr - cl, ch = cb - ct;
+        if (cw < 10 || ch < 10) { URL.revokeObjectURL(url); resolve(file); return; }
+
+        const cc = document.createElement("canvas");
+        cc.width = cw; cc.height = ch;
+        const cctx = cc.getContext("2d");
+        if (!cctx) { URL.revokeObjectURL(url); resolve(file); return; }
+        cctx.drawImage(img, cl, ct, cw, ch, 0, 0, cw, ch);
+        cc.toBlob((blob) => {
+          URL.revokeObjectURL(url);
+          resolve(blob ? new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }) : file);
+        }, "image/jpeg", 0.92);
+      } catch {
+        URL.revokeObjectURL(url);
+        resolve(file);
+      }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+
 async function compressImage(file: File): Promise<File> {
   if (!file.type.startsWith("image/")) return file;
   return new Promise((resolve) => {
@@ -109,6 +192,7 @@ export default function GezinDossierPage() {
   const [archiveRoot, setArchiveRoot] = useState("Archief");
   const [storagePreference, setStoragePreference] = useState<"local" | "onedrive" | "dropbox" | "googledrive">("local");
   const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
+  const [autoCrop, setAutoCrop] = useState(true);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pageInputRef = useRef<HTMLInputElement>(null);
@@ -135,6 +219,7 @@ export default function GezinDossierPage() {
         googleDriveArchiveRoot: string;
         storagePreference: string;
         folderStructure?: string;
+        autoCrop?: boolean;
       }) => {
         setOneDriveConnected(data.connected);
         setDropboxConnected(data.dropboxConnected);
@@ -145,6 +230,7 @@ export default function GezinDossierPage() {
         setMembersLoaded(true);
         setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox" | "googledrive");
         setFolderStructure((data.folderStructure ?? "by_subject") as "by_subject" | "by_person");
+        setAutoCrop(data.autoCrop ?? true);
       })
       .catch(() => {});
 
@@ -193,6 +279,11 @@ export default function GezinDossierPage() {
 
   const addFiles = useCallback(async (newFiles: File[]) => {
     if (newFiles.length === 0) return;
+    // Auto-crop images before showing preview (if enabled in settings)
+    const processed = autoCrop
+      ? await Promise.all(newFiles.map(f => autoCropImage(f)))
+      : newFiles;
+    newFiles = processed;
     const newPreviews = await Promise.all(newFiles.map(f =>
       new Promise<string>(resolve => {
         if (!f.type.startsWith("image/")) { resolve(""); return; }
@@ -212,7 +303,7 @@ export default function GezinDossierPage() {
       return next;
     });
     setPreviews(prev => [...prev, ...newPreviews]);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autoCrop]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function removeFile(index: number) {
     const next = files.filter((_, i) => i !== index);
