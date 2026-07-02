@@ -4,7 +4,7 @@ workflows:
     max_build_duration: 60
     environment:
       xcode: latest
-      node: 20.17.0
+      node: 22.14.0
       ios_signing:
         distribution_type: app_store
         bundle_identifier: nl.nooitmeerpostkwijt.app
