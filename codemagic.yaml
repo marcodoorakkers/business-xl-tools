@@ -1,0 +1,31 @@
+workflows:
+  ios-release:
+    name: iOS Release
+    max_build_duration: 60
+    environment:
+      xcode: 15.4
+      node: 20.17.0
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: nl.nooitmeerpostkwijt.app
+    scripts:
+      - name: Install npm dependencies
+        script: npm ci
+      - name: Create placeholder web dir
+        script: mkdir -p capacitor-web && echo '<!DOCTYPE html><html><body></body></html>' > capacitor-web/index.html
+      - name: Capacitor sync
+        script: npx cap sync ios
+      - name: Set up code signing
+        script: xcode-project use-profiles
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --project ios/App/App.xcodeproj \
+            --scheme App
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
