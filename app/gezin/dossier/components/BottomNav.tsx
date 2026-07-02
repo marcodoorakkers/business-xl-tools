@@ -41,7 +41,7 @@ export default function BottomNav() {
   async function signOut() {
     setMeerOpen(false);
     await createClient().auth.signOut();
-    router.push("/");
+    router.push("/inloggen");
   }
 
   const isExact = (href: string) => pathname === href;
