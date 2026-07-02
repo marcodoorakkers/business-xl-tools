@@ -3,7 +3,7 @@
   "appName": "NooitMeerPostKwijt",
   "webDir": "capacitor-web",
   "server": {
-    "url": "https://nooitmeerpostkwijt.nl",
+    "url": "https://nooitmeerpostkwijt.nl/dossier",
     "cleartext": false,
     "allowNavigation": ["nooitmeerpostkwijt.nl", "*.nooitmeerpostkwijt.nl"]
   },

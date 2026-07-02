@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     // Live URL — app laadt de productiewebsite in de native WebView.
     // Verwijder deze server-sectie en run `npx cap sync` als je ooit
     // een volledig bundled (offline) build wilt maken.
-    url: "https://nooitmeerpostkwijt.nl",
+    url: "https://nooitmeerpostkwijt.nl/dossier",
     cleartext: false,
     allowNavigation: ["nooitmeerpostkwijt.nl", "*.nooitmeerpostkwijt.nl"],
   },

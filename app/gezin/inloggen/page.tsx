@@ -146,9 +146,8 @@ export default function GezinLoginPage() {
                 >
                   {loading ? "Bezig..." : "Inloggen"}
                 </button>
-                <div className="flex justify-between text-sm text-gray-500 mt-1">
-                  <Link href="/auth/forgot-password" className="hover:text-amber-600">Wachtwoord vergeten?</Link>
-                  <Link href="/aanmelden" className="hover:text-amber-600">Account aanmaken</Link>
+                <div className="text-center text-sm mt-1">
+                  <Link href="/auth/forgot-password" className="text-gray-400 hover:text-amber-600">Wachtwoord vergeten?</Link>
                 </div>
               </form>
             </>
@@ -184,6 +183,17 @@ export default function GezinLoginPage() {
             </>
           )}
 
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">Nog geen account?</p>
+          <Link
+            href="/aanmelden"
+            className="inline-block mt-2 text-sm font-semibold text-amber-600 hover:text-amber-700"
+          >
+            Gratis beginnen →
+          </Link>
+          <p className="text-xs text-gray-400 mt-1">Eerste maand gratis · geen creditcard nodig</p>
         </div>
       </div>
     </main>
