@@ -10,6 +10,7 @@ const config: CapacitorConfig = {
     // een volledig bundled (offline) build wilt maken.
     url: "https://nooitmeerpostkwijt.nl",
     cleartext: false,
+    allowNavigation: ["nooitmeerpostkwijt.nl", "*.nooitmeerpostkwijt.nl"],
   },
   ios: {
     contentInset: "always",

@@ -4,7 +4,8 @@
   "webDir": "capacitor-web",
   "server": {
     "url": "https://nooitmeerpostkwijt.nl",
-    "cleartext": false
+    "cleartext": false,
+    "allowNavigation": ["nooitmeerpostkwijt.nl", "*.nooitmeerpostkwijt.nl"]
   },
   "ios": {
     "contentInset": "always",
