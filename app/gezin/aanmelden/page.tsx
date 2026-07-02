@@ -78,7 +78,7 @@ export default function GezinRegisterPage() {
       <main className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <NMMPKLogo href="/" size="lg" />
+            <NMMPKLogo size="lg" />
           </div>
           <div className="bg-white rounded-3xl shadow-sm p-8 text-center">
             <div className="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -88,7 +88,7 @@ export default function GezinRegisterPage() {
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Aanmelding gesloten</h1>
             <p className="text-sm text-gray-500 mb-6">NooitMeerPostKwijt is momenteel niet open voor nieuwe aanmeldingen. Heb je een uitnodigingslink? Open die link om je aan te melden.</p>
-            <Link href="/" className="text-sm text-amber-600 hover:underline font-medium">Terug naar de homepage</Link>
+            <Link href="/inloggen" className="text-sm text-amber-600 hover:underline font-medium">Terug naar inloggen</Link>
           </div>
         </div>
       </main>

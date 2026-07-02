@@ -186,14 +186,7 @@ export default function GezinLoginPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">Nog geen account?</p>
-          <Link
-            href="/aanmelden"
-            className="inline-block mt-2 text-sm font-semibold text-amber-600 hover:text-amber-700"
-          >
-            Gratis beginnen →
-          </Link>
-          <p className="text-xs text-gray-400 mt-1">Eerste maand gratis · geen creditcard nodig</p>
+          <p className="text-xs text-gray-400">Nog geen account? Je hebt een uitnodigingslink nodig.</p>
         </div>
       </div>
     </main>
