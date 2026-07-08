@@ -1,15 +1,21 @@
 {
-  "appId": "nl.nooitmeerpostkwijt.app",
-  "appName": "NooitMeerPostKwijt",
-  "webDir": "capacitor-web",
-  "server": {
-    "url": "https://nooitmeerpostkwijt.nl/dossier",
-    "cleartext": false,
-    "allowNavigation": ["nooitmeerpostkwijt.nl", "*.nooitmeerpostkwijt.nl"]
-  },
-  "ios": {
-    "contentInset": "always",
-    "backgroundColor": "#ffffff",
-    "preferredContentMode": "mobile"
-  }
+	"appId": "nl.nooitmeerpostkwijt.app",
+	"appName": "NooitMeerPostKwijt",
+	"webDir": "capacitor-web",
+	"server": {
+		"url": "https://nooitmeerpostkwijt.nl/dossier",
+		"cleartext": false,
+		"allowNavigation": [
+			"nooitmeerpostkwijt.nl",
+			"*.nooitmeerpostkwijt.nl"
+		]
+	},
+	"ios": {
+		"contentInset": "always",
+		"backgroundColor": "#ffffff",
+		"preferredContentMode": "mobile"
+	},
+	"packageClassList": [
+		"CAPCameraPlugin"
+	]
 }
