@@ -230,7 +230,7 @@ export default function GezinDossierPage() {
         setMembersLoaded(true);
         setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox" | "googledrive");
         setFolderStructure((data.folderStructure ?? "by_subject") as "by_subject" | "by_person");
-        setAutoCrop(data.autoCrop ?? true);
+        setAutoCrop(data.autoCrop ?? false);
       })
       .catch(() => {});
 
