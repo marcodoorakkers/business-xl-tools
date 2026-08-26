@@ -6,8 +6,8 @@ import NMMPKLogo from "@/components/NMMPKLogo";
 import DemoSection from "./components/DemoSection";
 
 export const metadata = {
-  title: "NooitMeerPostKwijt — Digitaal archief voor ZZP'ers en kleine ondernemers",
-  description: "Scan je zakelijke post en vind elk document terug in seconden. NooitMeerPostKwijt herkent wat het is, wat er moet gebeuren en bewaart het automatisch in jouw OneDrive of Dropbox.",
+  title: "NooitMeerPostKwijt — Nooit meer een document kwijt",
+  description: "Scan een brief, factuur of aanslag en vind elk document terug in seconden. NooitMeerPostKwijt herkent wat het is, wat er gedaan moet worden en bewaart het automatisch in jouw OneDrive, Dropbox of Google Drive.",
 };
 
 export const revalidate = 60;
@@ -60,12 +60,11 @@ export default async function GezinLandingPage() {
         {/* Hero */}
         <div className="flex flex-col lg:flex-row items-center gap-12 pt-12 pb-16">
           <div className="flex-1 max-w-xl">
-            <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-4">Voor ZZP&apos;ers en kleine ondernemers</p>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-5 leading-tight">
               Nooit meer<br />een document<br />kwijt.
             </h1>
             <p className="text-lg text-gray-500 mb-6 leading-relaxed">
-              Scan een brief, factuur of aanslag. NooitMeerPostKwijt herkent automatisch wat je moet doen en wanneer — van belastingaanslagen tot contractverlengingen. De deadline staat direct in je actielijst.
+              Scan een brief, factuur of aanslag. NooitMeerPostKwijt herkent automatisch wat het is en wat je moet doen — inclusief deadline. Alles altijd terugvindbaar in je eigen cloud.
             </p>
             <p className="text-base text-gray-700 font-medium mb-8 leading-relaxed">
               En die stapel papier in je kast? Scan hem één keer en je vindt elk document terug in seconden.
@@ -84,7 +83,7 @@ export default async function GezinLandingPage() {
                 Inloggen
               </Link>
             </div>
-            <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · zakelijk aftrekbaar</p>
+            <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · opzegbaar wanneer je wil</p>
           </div>
 
           <div className="flex-1 w-full max-w-lg">
@@ -104,13 +103,13 @@ export default async function GezinLandingPage() {
             {[
               {
                 icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-                title: "Uren kwijt aan zoeken",
-                desc: "Minimaal twee keer per jaar een uur door papier spitten. Bij een uurtarief van €75 is dat €150 per jaar — alleen maar om iets terug te vinden.",
+                title: "Tijd kwijt aan zoeken",
+                desc: "Een halve avond door een stapel papier spitten om één document te vinden. Garantiebewijs, polis, brief — je weet dat je het ergens hebt.",
               },
               {
                 icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-                title: "Stress bij de aangifte",
-                desc: "Je boekhouder vraagt om documenten die je nu niet kunt vinden. Je belt terug met \"ik stuur het nog even op\" — en dan begint het zoeken.",
+                title: "Stress als je iets nodig hebt",
+                desc: "Je hebt een document nodig en weet niet meer waar het is. Verzekeringspolissen, contracten, correspondentie — het kost altijd meer tijd dan het zou moeten.",
               },
               {
                 icon: <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
@@ -125,7 +124,7 @@ export default async function GezinLandingPage() {
               </div>
             ))}
           </div>
-          <p className="text-center text-sm text-gray-400 mt-8">NooitMeerPostKwijt kost je <strong className="text-gray-600">€3,99 per maand</strong> — zakelijk aftrekbaar. En je bent nooit meer iets kwijt.</p>
+          <p className="text-center text-sm text-gray-400 mt-8">NooitMeerPostKwijt kost je <strong className="text-gray-600">€3,99 per maand</strong> — en je bent nooit meer iets kwijt.</p>
         </div>
 
         {/* Hoe het werkt */}
@@ -175,7 +174,7 @@ export default async function GezinLandingPage() {
             {[
               { title: "Automatisch archiveren", desc: "Documenten gaan direct naar de juiste map in je OneDrive of Dropbox — ingedeeld per entiteit en onderwerp." },
               { title: "Acties en deadlines bijhouden", desc: "Deadlines en openstaande acties worden automatisch herkend en bijgehouden in je actielijst." },
-              { title: "Personen én entiteiten", desc: "Koppel documenten aan jezelf, je BV, je eenmanszaak of je partner — elk in een eigen map." },
+              { title: "Meerdere personen", desc: "Koppel documenten aan jezelf, je partner of andere huisgenoten — elk in een eigen map." },
               { title: "Doorsturen via e-mail", desc: "Forward een factuur of brief rechtstreeks naar je persoonlijke scanadres — werkt ook vanuit Gmail of Outlook.", },
               { title: "Jouw cloud, jouw data", desc: "Documenten staan in je eigen OneDrive of Dropbox — niet op onze servers. Privé en veilig." },
               { title: "Zoeken en terugvinden", desc: "Vind elk document terug via het archief. Zoek op afzender, onderwerp of datum — in seconden.", link: undefined },
@@ -219,8 +218,8 @@ export default async function GezinLandingPage() {
         {/* Pricing */}
         <div className="max-w-3xl mx-auto py-16 border-t border-gray-100 text-center">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2">Prijzen</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Minder dan één uur zoeken per jaar</h2>
-          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €3,99/maand incl. BTW. Geen creditcard nodig om te starten. Zakelijk aftrekbaar.</p>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Altijd je documenten bij de hand</h2>
+          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €3,99/maand incl. BTW. Geen creditcard nodig om te starten. Opzegbaar wanneer je wil.</p>
 
           <div className="bg-amber-500 rounded-2xl p-7 text-left text-white mb-5 relative shadow-md">
             <span className="absolute -top-3 left-6 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full">Eerste maand gratis</span>
@@ -232,7 +231,7 @@ export default async function GezinLandingPage() {
                   <p>Onbeperkt scannen</p>
                   <p>OneDrive &amp; Dropbox</p>
                   <p>Personen en entiteiten koppelen</p>
-                  <p>Zakelijk aftrekbaar</p>
+                  <p>Opzegbaar wanneer je wil</p>
                 </div>
               </div>
               <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
@@ -247,7 +246,7 @@ export default async function GezinLandingPage() {
             </div>
           </div>
 
-          <p className="text-xs text-gray-400 mt-2">Betaal via iDEAL, creditcard of Bancontact · Opzegbaar wanneer je wil · Prijzen incl. BTW</p>
+          <p className="text-xs text-gray-400 mt-2">Betaal via iDEAL, creditcard of Bancontact · Prijzen incl. BTW</p>
         </div>
 
         {/* Privacy */}
@@ -264,19 +263,6 @@ export default async function GezinLandingPage() {
           </div>
         </div>
 
-        {/* Knipoog */}
-        <div className="max-w-2xl mx-auto mb-10 py-8 px-6 bg-amber-50 rounded-2xl border border-amber-100 text-center">
-          <p className="text-sm text-gray-600 leading-relaxed">
-            <span className="inline-flex items-center justify-center w-8 h-8 bg-amber-100 rounded-lg mr-2 flex-shrink-0">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                <polyline points="9 22 9 12 15 12 15 22"/>
-              </svg>
-            </span>
-            Overigens ook gewoon handig thuis — voor iedereen die de stapel op de keukentafel wil opruimen.
-          </p>
-        </div>
-
         {/* CTA */}
         <div className="text-center pb-20 border-t border-gray-100 pt-14">
           <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Stop met zoeken. Begin vandaag.</h2>
@@ -287,7 +273,7 @@ export default async function GezinLandingPage() {
           >
             Gratis account aanmaken →
           </Link>
-          <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · zakelijk aftrekbaar</p>
+          <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · opzegbaar wanneer je wil</p>
         </div>
       </main>
 
