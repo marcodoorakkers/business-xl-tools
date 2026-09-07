@@ -260,23 +260,23 @@ function trialEndingHtml(endDate: string, isFoundingMember = false) {
       Als een van de eerste 25 gebruikers heb je 6 maanden gratis NooitMeerPostKwijt gebruikt. We hopen dat je er net zoveel aan hebt gehad als we hoopten.
     </p>
     <p style="margin:0 0 24px;color:#57534e;font-size:14px;line-height:1.6;">
-      Wil je doorgaan? Voeg dan een betaalmethode toe — daarna loopt het automatisch door voor <strong>€3,99/maand</strong>. Doe je niets, dan stopt het automatisch. Je documenten in OneDrive of Dropbox blijven altijd van jou.
+      Wil je doorgaan? Voeg dan een betaalmethode toe — daarna loopt het automatisch door voor <strong>€1,49/maand (€17,88/jaar)</strong>. Doe je niets, dan stopt het automatisch. Je documenten in OneDrive of Dropbox blijven altijd van jou.
     </p>
     <div style="background:#fef3c7;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
-      <p style="margin:0;color:#92400e;font-size:14px;">✓ &nbsp;Zakelijk aftrekbaar &nbsp;·&nbsp; ✓ &nbsp;Opzegbaar wanneer je wil &nbsp;·&nbsp; ✓ &nbsp;€3,99/maand</p>
+      <p style="margin:0;color:#92400e;font-size:14px;">✓ &nbsp;Zakelijk aftrekbaar &nbsp;·&nbsp; ✓ &nbsp;Opzegbaar wanneer je wil &nbsp;·&nbsp; ✓ &nbsp;€1,49/maand</p>
     </div>
     ${cta("https://nooitmeerpostkwijt.nl/account", "Betaalmethode toevoegen →")}
   ` : `
     <p style="margin:0 0 8px;color:#78716c;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Proefperiode</p>
     <h1 style="margin:0 0 16px;color:#1c1917;font-size:22px;font-weight:800;line-height:1.3;">Je proefperiode loopt af op ${endDate}</h1>
     <p style="margin:0 0 16px;color:#57534e;font-size:15px;line-height:1.6;">
-      Wil je NooitMeerPostKwijt blijven gebruiken? Voeg dan een betaalmethode toe — daarna gaat het automatisch door voor <strong>€3,99/maand</strong>.
+      Wil je NooitMeerPostKwijt blijven gebruiken? Voeg dan een betaalmethode toe — daarna gaat het automatisch door voor <strong>€1,49/maand (€17,88/jaar)</strong>.
     </p>
     <p style="margin:0 0 24px;color:#57534e;font-size:14px;line-height:1.6;">
       Doe je niets, dan stopt het abonnement automatisch. Je documenten en archief blijven gewoon in jouw OneDrive of Dropbox staan — die zijn van jou.
     </p>
     <div style="background:#f0fdf4;border-radius:12px;padding:16px 20px;margin-bottom:24px;">
-      <p style="margin:0;color:#166534;font-size:14px;">✓ &nbsp;Zakelijk aftrekbaar &nbsp;·&nbsp; ✓ &nbsp;Opzegbaar wanneer je wil &nbsp;·&nbsp; ✓ &nbsp;€3,99/maand</p>
+      <p style="margin:0;color:#166534;font-size:14px;">✓ &nbsp;Zakelijk aftrekbaar &nbsp;·&nbsp; ✓ &nbsp;Opzegbaar wanneer je wil &nbsp;·&nbsp; ✓ &nbsp;€1,49/maand</p>
     </div>
     ${cta("https://nooitmeerpostkwijt.nl/account", "Abonnement activeren →")}
   `);
