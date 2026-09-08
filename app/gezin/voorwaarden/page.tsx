@@ -37,7 +37,7 @@ export default function GezinVoorwaardenPage() {
             <ul className="space-y-2">
               <li><span className="font-medium text-gray-800">Dienst:</span> de webapplicatie NooitMeerPostKwijt, bereikbaar via nooitmeerpostkwijt.nl, inclusief alle bijbehorende functies.</li>
               <li><span className="font-medium text-gray-800">Gebruiker:</span> iedere natuurlijke persoon of rechtspersoon die een account aanmaakt en de dienst gebruikt.</li>
-              <li><span className="font-medium text-gray-800">Abonnement:</span> de betaalde toegang tot de dienst op basis van een maandelijks terugkerende betaling.</li>
+              <li><span className="font-medium text-gray-800">Abonnement:</span> de betaalde toegang tot de dienst op basis van een jaarlijks terugkerende betaling.</li>
               <li><span className="font-medium text-gray-800">Proefperiode:</span> de gratis testperiode van 30 dagen (of langer bij acties) na aanmelding, zonder betalingsverplichting.</li>
             </ul>
           </section>
@@ -66,7 +66,7 @@ export default function GezinVoorwaardenPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">5.2 Tarief</h3>
-                <p>Het abonnement kost €3,99 per maand inclusief btw. Het tarief wordt maandelijks vooraf in rekening gebracht via de door jou opgegeven betaalmethode.</p>
+                <p>Het abonnement kost €17,88 per jaar inclusief btw (€1,49 per maand). Het tarief wordt jaarlijks vooraf in rekening gebracht via de door jou opgegeven betaalmethode.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">5.3 Facturatie</h3>
@@ -86,7 +86,7 @@ export default function GezinVoorwaardenPage() {
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-3">6. Opzegging</h2>
             <div className="space-y-3">
-              <p>Je kunt je abonnement op elk moment opzeggen via de accountpagina. Na opzegging heb je nog toegang tot de dienst tot het einde van de lopende betaalperiode. Er vindt geen restitutie plaats van reeds betaalde bedragen.</p>
+              <p>Je kunt je abonnement op elk moment opzeggen via de accountpagina. Na opzegging heb je nog toegang tot de dienst tot het einde van het lopende abonnementsjaar. Er vindt geen restitutie plaats van reeds betaalde bedragen.</p>
               <p>Na het einde van de betaalperiode wordt je account inactief. Je gegevens worden bewaard conform de bewaartermijnen in de privacyverklaring, tenzij je uitdrukkelijk verzoekt om verwijdering.</p>
               <p>NooitMeerPostKwijt kan een abonnement beëindigen bij structureel misbruik of schending van deze voorwaarden, met inachtneming van een opzegtermijn van 30 dagen tenzij sprake is van ernstig misbruik.</p>
             </div>

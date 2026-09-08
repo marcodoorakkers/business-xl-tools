@@ -92,8 +92,8 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
               <h2 className="font-bold text-amber-800 text-lg">Proefperiode actief</h2>
             </div>
             <p className="text-amber-700 text-sm">{(isFoundingMember || isVriend)
-              ? "Je zit in je gratis proefperiode van 6 maanden. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt."
-              : "Je zit in je gratis proefmaand. Na de proefperiode gaat het abonnement automatisch over naar €3,99/maand — alleen als je een betaalmethode toevoegt."
+              ? "Je zit in je gratis proefperiode van 6 maanden. Na de proefperiode gaat het abonnement automatisch over naar €1,49/maand (€17,88/jaar) — alleen als je een betaalmethode toevoegt."
+              : "Je zit in je gratis proefmaand. Na de proefperiode gaat het abonnement automatisch over naar €1,49/maand (€17,88/jaar) — alleen als je een betaalmethode toevoegt."
             }</p>
             <ManageSubscriptionButton />
           </div>

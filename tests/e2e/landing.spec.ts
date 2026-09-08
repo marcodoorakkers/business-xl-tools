@@ -8,7 +8,7 @@ test.describe("Landingspagina", () => {
 
   test("toont de abonnementsprijs", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("€3,99").first()).toBeVisible();
+    await expect(page.getByText("€1,49").first()).toBeVisible();
     await expect(page.getByText("Maandelijks abonnement").first()).toBeVisible();
   });
 
