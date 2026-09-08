@@ -236,8 +236,8 @@ export default async function GezinLandingPage() {
               </div>
               <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
                 <div>
-                  <p className="text-4xl font-extrabold">€17,88</p>
-                  <p className="text-amber-200 text-sm">/jaar · €1,49 per maand</p>
+                  <p className="text-4xl font-extrabold">€1,49 <span className="text-xl font-semibold">/maand</span></p>
+                  <p className="text-amber-200 text-sm">€17,88 per jaar · jaarlijks gefactureerd</p>
                 </div>
                 <Link href="/aanmelden" className="bg-white text-amber-600 hover:bg-amber-50 font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
                   Gratis starten →
