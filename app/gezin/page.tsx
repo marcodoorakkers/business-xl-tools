@@ -124,7 +124,7 @@ export default async function GezinLandingPage() {
               </div>
             ))}
           </div>
-          <p className="text-center text-sm text-gray-400 mt-8">NooitMeerPostKwijt kost je <strong className="text-gray-600">€1,49 per maand</strong> — en je bent nooit meer iets kwijt.</p>
+          <p className="text-center text-sm text-gray-400 mt-8">NooitMeerPostKwijt kost je <strong className="text-gray-600">€17,88 per jaar</strong> — en je bent nooit meer iets kwijt.</p>
         </div>
 
         {/* Hoe het werkt */}
@@ -219,14 +219,14 @@ export default async function GezinLandingPage() {
         <div className="max-w-3xl mx-auto py-16 border-t border-gray-100 text-center">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2">Prijzen</p>
           <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Altijd je documenten bij de hand</h2>
-          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis, daarna €1,49/maand (€17,88/jaar) incl. BTW. Geen creditcard nodig om te starten. Opzegbaar wanneer je wil.</p>
+          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis — geen creditcard nodig. Daarna €17,88/jaar (€1,49/maand) incl. BTW. Opzegbaar wanneer je wil.</p>
 
           <div className="bg-amber-500 rounded-2xl p-7 text-left text-white mb-5 relative shadow-md">
             <span className="absolute -top-3 left-6 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full">Eerste maand gratis</span>
             <div className="flex items-start justify-between gap-6 flex-wrap">
               <div className="flex-1">
                 <h3 className="font-bold text-xl mb-1">Jaarabonnement</h3>
-                <p className="text-amber-100 text-sm mb-4">€1,49/maand · €17,88/jaar incl. BTW · geen creditcard nodig · opzegbaar wanneer je wil</p>
+                <p className="text-amber-100 text-sm mb-4">Geen creditcard nodig · opzegbaar wanneer je wil</p>
                 <div className="text-sm text-amber-50 space-y-1">
                   <p>Onbeperkt scannen</p>
                   <p>OneDrive &amp; Dropbox</p>
@@ -236,8 +236,8 @@ export default async function GezinLandingPage() {
               </div>
               <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
                 <div>
-                  <p className="text-4xl font-extrabold">€1,49</p>
-                  <p className="text-amber-200 text-sm">/maand · €17,88/jaar na proefperiode</p>
+                  <p className="text-4xl font-extrabold">€17,88</p>
+                  <p className="text-amber-200 text-sm">/jaar · €1,49 per maand</p>
                 </div>
                 <Link href="/aanmelden" className="bg-white text-amber-600 hover:bg-amber-50 font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
                   Gratis starten →
