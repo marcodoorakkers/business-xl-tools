@@ -37,15 +37,16 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
   const { data: profile } = await admin
     .from("profiles")
-    .select("id, subscription_status")
+    .select("id, subscription_status, credits")
     .eq("scan_email_token", scanToken)
     .single();
 
   if (!profile) return NextResponse.json({ error: "Onbekend scan-adres" }, { status: 404 });
 
-  const hasAccess =
+  const hasSubscription =
     profile.subscription_status === "active" || profile.subscription_status === "trialing";
-  if (!hasAccess) return NextResponse.json({ skipped: true });
+  const hasCredits = (profile.credits ?? 0) > 0;
+  if (!hasSubscription && !hasCredits) return NextResponse.json({ skipped: true });
 
   // Allowlist check: alleen afzenders in de lijst worden verwerkt
   const { data: allowlist } = await admin
@@ -274,6 +275,14 @@ Formaat:
       file_url: fileUrl,
       status: "open",
     });
+  }
+
+  // Credit aftrekken als gebruiker geen actief abonnement heeft
+  if (!hasSubscription) {
+    await admin
+      .from("profiles")
+      .update({ credits: Math.max(0, (profile.credits ?? 1) - 1) })
+      .eq("id", profile.id);
   }
 
   return NextResponse.json({ ok: true, afzender: analysis.afzender, actie: analysis.actie ?? null });

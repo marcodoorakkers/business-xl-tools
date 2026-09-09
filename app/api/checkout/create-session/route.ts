@@ -9,11 +9,15 @@ function buildCreditPackages(): Record<string, number> {
   if (process.env.STRIPE_PRICE_STARTER)  map[process.env.STRIPE_PRICE_STARTER]  = 50;
   if (process.env.STRIPE_PRICE_POPULAIR) map[process.env.STRIPE_PRICE_POPULAIR] = 200;
   if (process.env.STRIPE_PRICE_BESTEKOOP) map[process.env.STRIPE_PRICE_BESTEKOOP] = 500;
-  // New credit packs
+  // New credit packs (TimeSaverTools)
   if (process.env.STRIPE_PRICE_10)  map[process.env.STRIPE_PRICE_10]  = 10;
   if (process.env.STRIPE_PRICE_50)  map[process.env.STRIPE_PRICE_50]  = 50;
   if (process.env.STRIPE_PRICE_100) map[process.env.STRIPE_PRICE_100] = 100;
   if (process.env.STRIPE_PRICE_200) map[process.env.STRIPE_PRICE_200] = 200;
+  // NooitMeerPostKwijt scan-credits
+  if (process.env.NMMPK_CREDIT_PRICE_25)  map[process.env.NMMPK_CREDIT_PRICE_25]  = 25;
+  if (process.env.NMMPK_CREDIT_PRICE_100) map[process.env.NMMPK_CREDIT_PRICE_100] = 100;
+  if (process.env.NMMPK_CREDIT_PRICE_300) map[process.env.NMMPK_CREDIT_PRICE_300] = 300;
   return map;
 }
 

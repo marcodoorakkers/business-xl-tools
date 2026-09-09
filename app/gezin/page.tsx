@@ -124,7 +124,7 @@ export default async function GezinLandingPage() {
               </div>
             ))}
           </div>
-          <p className="text-center text-sm text-gray-400 mt-8">NooitMeerPostKwijt kost je <strong className="text-gray-600">€17,88 per jaar</strong> — en je bent nooit meer iets kwijt.</p>
+          <p className="text-center text-sm text-gray-400 mt-8">Start gratis met <strong className="text-gray-600">10 scans</strong> — credits koop je bij als je ze nodig hebt.</p>
         </div>
 
         {/* Hoe het werkt */}
@@ -218,35 +218,29 @@ export default async function GezinLandingPage() {
         {/* Pricing */}
         <div className="max-w-3xl mx-auto py-16 border-t border-gray-100 text-center">
           <p className="text-sm font-semibold text-amber-600 uppercase tracking-widest mb-2">Prijzen</p>
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Altijd je documenten bij de hand</h2>
-          <p className="text-gray-500 text-sm mb-10">Eerste maand gratis — geen creditcard nodig. Daarna €17,88/jaar (€1,49/maand) incl. BTW. Opzegbaar wanneer je wil.</p>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-3">Betaal alleen wat je gebruikt</h2>
+          <p className="text-gray-500 text-sm mb-10">10 gratis scans bij aanmelding — geen creditcard nodig. Daarna credits kopen als je meer nodig hebt. Credits vervallen nooit.</p>
 
-          <div className="bg-amber-500 rounded-2xl p-7 text-left text-white mb-5 relative shadow-md">
-            <span className="absolute -top-3 left-6 bg-gray-900 text-white text-xs font-bold px-4 py-1 rounded-full">Eerste maand gratis</span>
-            <div className="flex items-start justify-between gap-6 flex-wrap">
-              <div className="flex-1">
-                <h3 className="font-bold text-xl mb-1">Jaarabonnement</h3>
-                <p className="text-amber-100 text-sm mb-4">Geen creditcard nodig · opzegbaar wanneer je wil</p>
-                <div className="text-sm text-amber-50 space-y-1">
-                  <p>Onbeperkt scannen</p>
-                  <p>OneDrive &amp; Dropbox</p>
-                  <p>Personen en entiteiten koppelen</p>
-                  <p>Opzegbaar wanneer je wil</p>
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-left">
+            {[
+              { label: "25 scans", price: "€2,49", per: "€0,10 per scan", desc: "Af en toe een document" },
+              { label: "100 scans", price: "€7,99", per: "€0,08 per scan", desc: "Regelmatig gebruik", popular: true },
+              { label: "300 scans", price: "€19,99", per: "€0,07 per scan", desc: "Intensief gebruik" },
+            ].map((b) => (
+              <div key={b.label} className={`rounded-2xl p-5 relative ${b.popular ? "bg-amber-500 text-white shadow-md" : "bg-gray-50 text-gray-900"}`}>
+                {b.popular && <span className="absolute -top-3 left-5 bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full">Meest gekozen</span>}
+                <p className={`font-bold text-xl mb-0.5 ${b.popular ? "text-white" : "text-gray-900"}`}>{b.price}</p>
+                <p className={`text-sm font-semibold mb-1 ${b.popular ? "text-amber-100" : "text-amber-600"}`}>{b.label}</p>
+                <p className={`text-xs mb-2 ${b.popular ? "text-amber-200" : "text-gray-400"}`}>{b.per}</p>
+                <p className={`text-sm ${b.popular ? "text-amber-50" : "text-gray-500"}`}>{b.desc}</p>
               </div>
-              <div className="text-right flex-shrink-0 flex flex-col items-end justify-between gap-4">
-                <div>
-                  <p className="text-4xl font-extrabold">€1,49 <span className="text-xl font-semibold">/maand</span></p>
-                  <p className="text-amber-200 text-sm">€17,88 per jaar · jaarlijks gefactureerd</p>
-                </div>
-                <Link href="/aanmelden" className="bg-white text-amber-600 hover:bg-amber-50 font-bold py-2.5 px-6 rounded-xl text-sm transition-colors whitespace-nowrap">
-                  Gratis starten →
-                </Link>
-              </div>
-            </div>
+            ))}
           </div>
 
-          <p className="text-xs text-gray-400 mt-2">Betaal via iDEAL, creditcard of Bancontact · Prijzen incl. BTW</p>
+          <Link href="/aanmelden" className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-xl text-sm transition-colors">
+            Gratis starten met 10 scans →
+          </Link>
+          <p className="text-xs text-gray-400 mt-4">Betaal via iDEAL, creditcard of Bancontact · Prijzen incl. BTW</p>
         </div>
 
         {/* Privacy */}
