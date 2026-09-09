@@ -56,12 +56,14 @@ Elke tool trekt credits af in de API route (`app/api/tools/[tool]/route.ts`). Zo
 - Bestaande abonnees worden nog wel ondersteund (status `active`/`cancelling`)
 
 ### NooitMeerPostKwijt
-- **Abonnement-only** — geen losse scan-pakketten
-- Eerste maand gratis, geen creditcard nodig (`payment_method_collection: "if_required"`, `trial_period_days: 30`)
-- Daarna €3,99/maand incl. BTW · onbeperkt scannen
-- Abonnement-statussen: `trialing` → `active` → `cancelling` → `null`
-- NMPK-abonnees krijgen automatisch **10 TST credits per maand** (bijgeschreven via Stripe webhook bij start + verlenging)
-- Toegangscheck altijd op `subscription_status` (active/trialing), nooit op `subscription_credits`
+- **Credits-only** — geen abonnement meer voor nieuwe gebruikers
+- 10 gratis scan-credits bij aanmelding (via DB trigger `handle_new_user`)
+- Credits kopen in bundels: 25 scans €2,49 / 100 scans €7,99 / 300 scans €19,99
+- Credits vervallen nooit; worden opgeslagen in `profiles.credits` (gedeeld met TST)
+- Toegangscheck: `subscription_status IN ('active','trialing') OR credits > 0`
+  - Legacy: founding members en vriendenvan nog in trial → toegang via subscription_status
+  - Nieuwe gebruikers → toegang via credits
+- Env vars voor credit price IDs: `NMMPK_CREDIT_PRICE_25`, `NMMPK_CREDIT_PRICE_100`, `NMMPK_CREDIT_PRICE_300`
 
 ## Projectstructuur
 

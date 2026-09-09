@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import BottomNav from "@/app/gezin/dossier/components/BottomNav";
-import NativeSubscribeSection from "./NativeSubscribeSection";
+import NativeBuyCreditsSection from "./NativeBuyCreditsSection";
 import ManageSubscriptionButton from "@/app/account/ManageSubscriptionButton";
 import ChangePasswordForm from "@/app/account/ChangePasswordForm";
 import DeleteAccountButton from "@/app/account/DeleteAccountButton";
@@ -9,14 +9,14 @@ import TwoFactorSection from "./TwoFactorSection";
 import ClearDataSection from "./ClearDataSection";
 
 
-export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string }> }) {
+export default async function GezinAccountPage({ searchParams }: { searchParams: Promise<{ payment?: string; credits?: string }> }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/gezin/inloggen");
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_status, subscription_period_end, promo_code")
+    .select("subscription_status, subscription_period_end, promo_code, credits")
     .eq("id", user.id)
     .single();
 
@@ -24,13 +24,18 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
   const subscriptionPeriodEnd = profile?.subscription_period_end ?? null;
   const isFoundingMember = profile?.promo_code === "founding25" || /^fm\d+$/.test(profile?.promo_code ?? "");
   const isVriend = profile?.promo_code === "vriendenvan";
+  const credits = profile?.credits ?? 0;
   const params = await searchParams;
   const paymentStatus = params.payment;
-  const proPriceId = process.env.STRIPE_PRO_PRICE_ID!;
+  const newCredits = params.credits ? parseInt(params.credits) : null;
 
   const formattedPeriodEnd = subscriptionPeriodEnd
     ? new Date(subscriptionPeriodEnd).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })
     : null;
+
+  const priceId25  = process.env.NMMPK_CREDIT_PRICE_25  ?? "";
+  const priceId100 = process.env.NMMPK_CREDIT_PRICE_100 ?? "";
+  const priceId300 = process.env.NMMPK_CREDIT_PRICE_300 ?? "";
 
   return (
     <div className="min-h-screen bg-white md:pt-14">
@@ -63,17 +68,15 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
             </div>
             <div>
               <p className="text-sm font-bold text-blue-900">Vriend van NooitMeerPostKwijt</p>
-              <p className="text-xs text-blue-700 mt-0.5">Je geniet 6 maanden gratis toegang. Welkom!</p>
+              <p className="text-xs text-blue-700 mt-0.5">Je geniet 6 maanden gratis toegang. Daarna gebruik je scan-credits.</p>
             </div>
           </div>
         )}
 
         {/* Betaalfeedback */}
-        {paymentStatus === "subscribed" && (
+        {paymentStatus === "success" && newCredits && (
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-green-700 text-sm font-medium">
-            {(isFoundingMember || isVriend)
-              ? "Abonnement gestart! Je proefperiode van 6 maanden is actief."
-              : "Abonnement gestart! Je eerste maand is gratis."}
+            {newCredits} scan-credits bijgeschreven. Scan maar raak!
           </div>
         )}
         {paymentStatus === "cancelled" && (
@@ -82,45 +85,43 @@ export default async function GezinAccountPage({ searchParams }: { searchParams:
           </div>
         )}
 
-        {/* Maandelijks abonnement — NativeSubscribeSection verbergt de koopknop in de iOS-app */}
-        {!subscriptionStatus && <NativeSubscribeSection priceId={proPriceId} />}
-
-        {subscriptionStatus === "trialing" && (
+        {/* Legacy: founding members nog in trial */}
+        {(subscriptionStatus === "trialing" || subscriptionStatus === "active") && (isFoundingMember || isVriend) && (
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-amber-600 font-bold text-lg">✓</span>
-              <h2 className="font-bold text-amber-800 text-lg">Proefperiode actief</h2>
+              <h2 className="font-bold text-amber-800 text-lg">Gratis proefperiode actief</h2>
             </div>
-            <p className="text-amber-700 text-sm">{(isFoundingMember || isVriend)
-              ? "Je zit in je gratis proefperiode van 6 maanden. Na de proefperiode gaat het abonnement automatisch over naar €1,49/maand (€17,88/jaar) — alleen als je een betaalmethode toevoegt."
-              : "Je zit in je gratis proefmaand. Na de proefperiode gaat het abonnement automatisch over naar €1,49/maand (€17,88/jaar) — alleen als je een betaalmethode toevoegt."
-            }</p>
+            <p className="text-amber-700 text-sm">
+              Je gratis periode loopt tot {formattedPeriodEnd ?? "het einde van je proefperiode"}. Daarna scan je met je credits.
+            </p>
             <ManageSubscriptionButton />
           </div>
         )}
 
-        {subscriptionStatus === "active" && (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-green-600 font-bold text-lg">✓</span>
-              <h2 className="font-bold text-green-800 text-lg">Maandelijks abonnement actief</h2>
-            </div>
-            <p className="text-green-700 text-sm">Je abonnement is actief. Onbeperkt scannen en archiveren.</p>
-            {formattedPeriodEnd && (
-              <p className="text-green-600 text-sm mt-1">Volgende verlenging: {formattedPeriodEnd}</p>
-            )}
-            <ManageSubscriptionButton />
+        {/* Credits weergave */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="font-bold text-gray-900 text-lg">Scan-credits</h2>
+            <span className={`text-3xl font-extrabold ${credits === 0 ? "text-red-500" : "text-amber-500"}`}>
+              {credits}
+            </span>
           </div>
-        )}
+          <p className="text-sm text-gray-500">
+            {credits === 0
+              ? "Je credits zijn op. Koop een bundel om door te scannen."
+              : credits === 1
+              ? "1 scan over."
+              : `${credits} scans over.`}
+          </p>
+        </div>
 
-        {subscriptionStatus === "cancelling" && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-            <h2 className="font-bold text-amber-800 text-lg mb-1">
-              Abonnement loopt af{formattedPeriodEnd ? ` op ${formattedPeriodEnd}` : ""}
-            </h2>
-            <p className="text-amber-700 text-sm">Je kunt de app nog gebruiken tot het einde van de betaalperiode.</p>
-          </div>
-        )}
+        {/* Credits kopen */}
+        <NativeBuyCreditsSection
+          priceId25={priceId25}
+          priceId100={priceId100}
+          priceId300={priceId300}
+        />
 
         {/* Account info */}
         <div className="bg-white rounded-2xl border border-gray-100 p-6">

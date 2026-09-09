@@ -11,12 +11,14 @@ export async function POST(req: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_status")
+    .select("subscription_status, credits")
     .eq("id", user.id)
     .single();
 
-  if (!profile || !["active", "trialing"].includes(profile.subscription_status ?? "")) {
-    return NextResponse.json({ error: "Geen actief abonnement" }, { status: 403 });
+  const hasSubscription = ["active", "trialing"].includes(profile?.subscription_status ?? "");
+  const hasCredits = (profile?.credits ?? 0) > 0;
+  if (!profile || (!hasSubscription && !hasCredits)) {
+    return NextResponse.json({ error: "Geen toegang" }, { status: 403 });
   }
 
   const body = await req.json().catch(() => ({}));

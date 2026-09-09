@@ -86,10 +86,14 @@ export default function GezinLoginPage() {
     if (user) {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("subscription_status")
+        .select("subscription_status, credits")
         .eq("id", user.id)
         .single();
-      router.push(profile?.subscription_status ? "/dossier" : "/account");
+      const hasAccess =
+        profile?.subscription_status === "active" ||
+        profile?.subscription_status === "trialing" ||
+        (profile?.credits ?? 0) > 0;
+      router.push(hasAccess ? "/dossier" : "/account");
     } else {
       router.push("/dossier");
     }

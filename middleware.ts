@@ -63,7 +63,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(redirectTo, request.url));
   }
 
-  // Subscription check: dossier en acties vereisen een actief abonnement
+  // Toegangscheck: dossier en acties vereisen een actief abonnement OF credits
   const isGezinSubscriptionProtected =
     effectivePath.startsWith("/gezin/dossier") ||
     effectivePath.startsWith("/gezin/acties");
@@ -71,11 +71,14 @@ export async function middleware(request: NextRequest) {
   if (isGezinSubscriptionProtected && user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("subscription_status")
+      .select("subscription_status, credits")
       .eq("id", user.id)
       .single();
 
-    if (!profile?.subscription_status) {
+    const hasSubscription =
+      profile?.subscription_status === "active" || profile?.subscription_status === "trialing";
+    const hasCredits = (profile?.credits ?? 0) > 0;
+    if (!hasSubscription && !hasCredits) {
       const redirectTo = isFamilySite ? "/account" : "/gezin/account";
       return NextResponse.redirect(new URL(redirectTo, request.url));
     }
