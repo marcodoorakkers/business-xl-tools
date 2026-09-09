@@ -14,7 +14,7 @@ export default function GezinVoorwaardenPage() {
       <main className="max-w-3xl mx-auto px-6 py-14">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Algemene Voorwaarden</h1>
-          <p className="text-sm text-gray-500">Versie 1.0 · Ingangsdatum: 27 mei 2026</p>
+          <p className="text-sm text-gray-500">Versie 2.0 · Ingangsdatum: 9 september 2026</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col gap-10 text-sm text-gray-600 leading-relaxed">
@@ -37,8 +37,8 @@ export default function GezinVoorwaardenPage() {
             <ul className="space-y-2">
               <li><span className="font-medium text-gray-800">Dienst:</span> de webapplicatie NooitMeerPostKwijt, bereikbaar via nooitmeerpostkwijt.nl, inclusief alle bijbehorende functies.</li>
               <li><span className="font-medium text-gray-800">Gebruiker:</span> iedere natuurlijke persoon of rechtspersoon die een account aanmaakt en de dienst gebruikt.</li>
-              <li><span className="font-medium text-gray-800">Abonnement:</span> de betaalde toegang tot de dienst op basis van een jaarlijks terugkerende betaling.</li>
-              <li><span className="font-medium text-gray-800">Proefperiode:</span> de gratis testperiode van 30 dagen (of langer bij acties) na aanmelding, zonder betalingsverplichting.</li>
+              <li><span className="font-medium text-gray-800">Scan-credits:</span> eenheden die recht geven op het uitvoeren van scans via de dienst. Credits vervallen nooit en zijn gekoppeld aan het account.</li>
+              <li><span className="font-medium text-gray-800">Gratis credits:</span> 10 scan-credits die automatisch worden bijgeschreven bij aanmelding, zonder betalingsverplichting.</li>
             </ul>
           </section>
 
@@ -53,48 +53,54 @@ export default function GezinVoorwaardenPage() {
               <li>Je bent verantwoordelijk voor het geheimhouden van je inloggegevens en voor alle activiteiten via jouw account.</li>
               <li>Vermoed je misbruik van je account? Meld dit direct via <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a>.</li>
               <li>Je mag jouw account niet overdragen aan derden of toegang verlenen aan meerdere gebruikers tegelijk.</li>
-              <li>Eén abonnement geldt voor één gebruiker. Gezinsgebruik binnen hetzelfde huishouden is toegestaan mits via hetzelfde account.</li>
+              <li>Scan-credits zijn gekoppeld aan één account en mogen niet worden gedeeld of overgedragen. Gezinsgebruik binnen hetzelfde huishouden is toegestaan mits via hetzelfde account.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">5. Abonnement en betaling</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">5. Credits en betaling</h2>
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-800 mb-1">5.1 Proefperiode</h3>
-                <p>Na aanmelding ontvang je een gratis proefperiode van 30 dagen. Tijdens de proefperiode is geen betaling vereist en hoef je geen betaalgegevens in te voeren. Betaling gaat pas in nadat je zelf een betaalmethode hebt toegevoegd. Doe je dat niet, dan eindigt de toegang na de proefperiode automatisch zonder kosten.</p>
+                <h3 className="font-semibold text-gray-800 mb-1">5.1 Gratis credits bij aanmelding</h3>
+                <p>Na aanmelding ontvang je automatisch 10 gratis scan-credits. Er is geen betaling vereist en je hoeft geen betaalgegevens in te voeren om te starten.</p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-1">5.2 Tarief</h3>
-                <p>Het abonnement kost €17,88 per jaar inclusief btw (€1,49 per maand). Het tarief wordt jaarlijks vooraf in rekening gebracht via de door jou opgegeven betaalmethode.</p>
+                <h3 className="font-semibold text-gray-800 mb-1">5.2 Tarieven</h3>
+                <p>Aanvullende credits kun je kopen in de volgende bundels (prijzen inclusief btw):</p>
+                <ul className="list-disc list-inside mt-2 space-y-1">
+                  <li>25 scans — €2,49</li>
+                  <li>100 scans — €7,99</li>
+                  <li>300 scans — €19,99</li>
+                </ul>
+                <p className="mt-2">Credits vervallen nooit en zijn niet gebonden aan een abonnementsperiode.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">5.3 Facturatie</h3>
-                <p>Facturen worden automatisch gegenereerd via Stripe en zijn inclusief btw. Je ontvangt een factuur per e-mail na elke betaling. Betaling geschiedt via iDEAL, creditcard of andere door Stripe aangeboden betaalmethoden.</p>
+                <p>Aankopen zijn eenmalige betalingen. Facturen worden automatisch gegenereerd via Stripe en zijn inclusief btw. Je ontvangt een factuur per e-mail na elke betaling. Betaling geschiedt via iDEAL, creditcard of andere door Stripe aangeboden betaalmethoden.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">5.4 Mislukte betaling</h3>
-                <p>Bij een mislukte betaling word je hierover geïnformeerd via e-mail. NooitMeerPostKwijt behoudt zich het recht voor de toegang tijdelijk te beperken totdat de betaling is voldaan.</p>
+                <p>Bij een mislukte betaling ontvang je hierover een melding. Credits worden pas bijgeschreven na succesvolle betaling.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">5.5 Tariefwijzigingen</h3>
-                <p>Wij kunnen het abonnementstariefwijzigen. Je wordt minimaal 30 dagen van tevoren per e-mail geïnformeerd. Als je niet akkoord gaat, kun je je abonnement opzeggen vóór de ingangsdatum van de nieuwe prijs.</p>
+                <p>Wij kunnen de prijzen van creditbundels wijzigen. Reeds gekochte credits worden niet in waarde aangepast. Bij wezenlijke prijswijzigingen communiceren wij dit vooraf via de website of per e-mail.</p>
               </div>
             </div>
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">6. Opzegging</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">6. Restitutie en beëindiging</h2>
             <div className="space-y-3">
-              <p>Je kunt je abonnement op elk moment opzeggen via de accountpagina. Na opzegging heb je nog toegang tot de dienst tot het einde van het lopende abonnementsjaar. Er vindt geen restitutie plaats van reeds betaalde bedragen.</p>
-              <p>Na het einde van de betaalperiode wordt je account inactief. Je gegevens worden bewaard conform de bewaartermijnen in de privacyverklaring, tenzij je uitdrukkelijk verzoekt om verwijdering.</p>
-              <p>NooitMeerPostKwijt kan een abonnement beëindigen bij structureel misbruik of schending van deze voorwaarden, met inachtneming van een opzegtermijn van 30 dagen tenzij sprake is van ernstig misbruik.</p>
+              <p>Gekochte credits worden niet terugbetaald, tenzij sprake is van een aantoonbare technische fout aan onze zijde waardoor credits onterecht zijn afgeschreven.</p>
+              <p>Bij het verwijderen van je account vervallen eventuele resterende credits. Je gegevens worden bewaard conform de bewaartermijnen in de privacyverklaring, tenzij je uitdrukkelijk verzoekt om verwijdering.</p>
+              <p>NooitMeerPostKwijt kan een account beëindigen bij structureel misbruik of schending van deze voorwaarden, met inachtneming van een opzegtermijn van 30 dagen tenzij sprake is van ernstig misbruik.</p>
             </div>
           </section>
 
           <section>
             <h2 className="text-base font-bold text-gray-900 mb-3">7. Herroepingsrecht</h2>
-            <p>Als consument heb je wettelijk het recht om binnen 14 dagen na aanmelding de overeenkomst zonder opgave van redenen te herroepen. Omdat wij een gratis proefperiode van 30 dagen hanteren zonder betalingsverplichting — en betaling pas ingaat nadat je zelf betaalgegevens hebt toegevoegd — kun je gedurende de volledige proefperiode kosteloos opzeggen via je accountpagina. Dat is ruimer dan het wettelijke minimum. Een formeel herroepingsverzoek is daarvoor niet nodig.</p>
+            <p>Als consument heb je wettelijk het recht om binnen 14 dagen na een aankoop de overeenkomst zonder opgave van redenen te herroepen, mits de dienst nog niet volledig is uitgevoerd. Omdat scan-credits direct inzetbaar zijn na aankoop, geldt het herroepingsrecht niet voor credits die al zijn gebruikt. Voor ongebruikte credits kun je binnen 14 dagen na aankoop contact opnemen via <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a>.</p>
           </section>
 
           <section>
