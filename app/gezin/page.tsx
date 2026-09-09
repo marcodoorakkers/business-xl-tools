@@ -146,7 +146,7 @@ export default async function GezinLandingPage() {
               {
                 num: "03",
                 title: "Altijd terugvindbaar",
-                desc: "Het document gaat naar de juiste map in jouw OneDrive of Dropbox. Zoek later op afzender, datum of onderwerp — in seconden.",
+                desc: "Het document gaat naar de juiste map in jouw OneDrive, Dropbox of Google Drive. Zoek later op afzender, datum of onderwerp — in seconden.",
               },
             ].map((item) => (
               <div key={item.num} className="flex gap-5">
@@ -172,11 +172,11 @@ export default async function GezinLandingPage() {
           <h2 className="text-2xl font-extrabold text-gray-900 mb-10 text-center">Alles wat je nodig hebt</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 gap-y-6 max-w-3xl mx-auto">
             {[
-              { title: "Automatisch archiveren", desc: "Documenten gaan direct naar de juiste map in je OneDrive of Dropbox — ingedeeld per entiteit en onderwerp." },
+              { title: "Automatisch archiveren", desc: "Documenten gaan direct naar de juiste map in je OneDrive, Dropbox of Google Drive — ingedeeld per entiteit en onderwerp." },
               { title: "Acties en deadlines bijhouden", desc: "Deadlines en openstaande acties worden automatisch herkend en bijgehouden in je actielijst." },
               { title: "Meerdere personen", desc: "Koppel documenten aan jezelf, je partner of andere huisgenoten — elk in een eigen map." },
               { title: "Doorsturen via e-mail", desc: "Forward een factuur of brief rechtstreeks naar je persoonlijke scanadres — werkt ook vanuit Gmail of Outlook.", },
-              { title: "Jouw cloud, jouw data", desc: "Documenten staan in je eigen OneDrive of Dropbox — niet op onze servers. Privé en veilig." },
+              { title: "Jouw cloud, jouw data", desc: "Documenten staan in je eigen OneDrive, Dropbox of Google Drive — niet op onze servers. Privé en veilig." },
               { title: "Zoeken en terugvinden", desc: "Vind elk document terug via het archief. Zoek op afzender, onderwerp of datum — in seconden.", link: undefined },
             ].map((f) => (
               <div key={f.title} className="flex gap-3">
@@ -250,7 +250,7 @@ export default async function GezinLandingPage() {
             Belastingaanslagen, contracten en facturen zijn vertrouwelijk. Je foto wordt naar de analyse-API gestuurd, verwerkt, en daarna door zowel ons als Anthropic automatisch verwijderd. Anthropic gebruikt API-verzoeken nooit voor training. Wat wij bewaren is alleen het resultaat — nooit de afbeelding zelf, en nooit specifieke bedragen of rekeningnummers.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-600">
-            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Documenten opgeslagen in jouw eigen OneDrive of Dropbox</p>
+            <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Documenten opgeslagen in jouw eigen OneDrive, Dropbox of Google Drive</p>
             <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>De foto verdwijnt na de analyse — bij ons én bij Anthropic</p>
             <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Geen bedragen of rekeningnummers in de database — alleen afzender, type en datum</p>
             <p className="flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">—</span>Download of wis al je data zelf — geen e-mail aan ons nodig</p>
