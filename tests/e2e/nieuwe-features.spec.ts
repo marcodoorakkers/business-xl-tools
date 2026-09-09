@@ -29,23 +29,6 @@ test.describe("API auth-checks (geen sessie)", () => {
   });
 });
 
-// Launch pagina — founding members
-test.describe("Launch pagina", () => {
-  test("laadt en toont founding member inhoud", async ({ page }) => {
-    await page.goto("/launch");
-    await expect(page.getByText(/founding member/i).first()).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/6 maanden/i).first()).toBeVisible();
-  });
-
-  test("CTA stuurt door naar aanmelden met promo code", async ({ page }) => {
-    await page.goto("/launch");
-    const ctaLink = page.getByRole("link", { name: /claim jouw plek|gratis proberen/i }).first();
-    await expect(ctaLink).toBeVisible();
-    const href = await ctaLink.getAttribute("href");
-    expect(href).toMatch(/aanmelden/);
-  });
-});
-
 // Trial-informatie op landingspagina
 test.describe("Trial-informatie op landingspagina", () => {
   test("CTA stuurt door naar aanmelden", async ({ page }) => {

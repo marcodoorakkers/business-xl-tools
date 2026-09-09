@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 import DemoSection from "./components/DemoSection";
@@ -17,27 +16,8 @@ export default async function GezinLandingPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect("/dossier");
 
-  const admin = createAdminClient();
-  const { count: foundingCount } = await admin
-    .from("profiles")
-    .select("id", { count: "exact", head: true })
-    .eq("promo_code", "founding25");
-
-  const max = 25;
-  const used = foundingCount ?? 0;
-  const remaining = Math.max(0, max - used);
-
   return (
     <div className="min-h-screen bg-white">
-      {/* Launch banner */}
-      {remaining > 0 && (
-        <div className="bg-amber-500 text-white text-sm text-center px-4 py-2.5 font-medium">
-          🎉 Founding members krijgen 6 maanden gratis —{" "}
-          <Link href="/launch" className="underline font-semibold hover:text-amber-100 transition-colors">
-            nog {remaining} van de 25 plekken vrij →
-          </Link>
-        </div>
-      )}
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-5 py-4 max-w-5xl mx-auto">
