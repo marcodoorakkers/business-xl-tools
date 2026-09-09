@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient, logUsage } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getValidAccessToken, uploadFileToOneDrive } from "@/lib/onedrive";
 import { convertToPdf } from "@/lib/convert-to-pdf";
 import { NextRequest, NextResponse } from "next/server";
@@ -47,9 +47,6 @@ export async function POST(req: NextRequest) {
 
   try {
     const { webUrl } = await uploadFileToOneDrive(accessToken, fullPath, pdfBuffer, "application/pdf");
-
-    await supabase.from("profiles").update({ credits: profile.credits - 1 }).eq("id", user.id);
-    await logUsage(user.id, "mijn-dossier", 1);
 
     return NextResponse.json({ webUrl, path: fullPath });
   } catch (err) {
