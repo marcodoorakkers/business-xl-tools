@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "NooitMeerPostKwijt — Nooit meer een brief kwijt",
-  description: "Scan je post, laat het slim analyseren en sla alles veilig op in je eigen OneDrive of Dropbox.",
+  title: "NooitMeerPostKwijt — Nooit meer een document kwijt",
+  description: "Scan je post, laat het slim analyseren en sla alles veilig op in je eigen OneDrive, Dropbox of Google Drive.",
   applicationName: "NooitMeerPostKwijt",
   manifest: "/gezin/manifest.webmanifest",
   appleWebApp: {
@@ -18,6 +18,20 @@ export const metadata: Metadata = {
     apple: [
       { url: "/gezin-apple-touch-icon.png", sizes: "180x180" },
     ],
+  },
+  openGraph: {
+    type: "website",
+    locale: "nl_NL",
+    url: "https://www.nooitmeerpostkwijt.nl",
+    siteName: "NooitMeerPostKwijt",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@nooitmeerpostkwijt",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
