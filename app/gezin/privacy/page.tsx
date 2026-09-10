@@ -14,7 +14,7 @@ export default function GezinPrivacyPage() {
       <main className="max-w-3xl mx-auto px-6 py-14">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Privacyverklaring</h1>
-          <p className="text-gray-500 text-sm">Versie 1.1 · Ingangsdatum: 14 juni 2026</p>
+          <p className="text-gray-500 text-sm">Versie 1.2 · Ingangsdatum: 10 september 2026</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col gap-10 text-sm text-gray-600 leading-relaxed">
@@ -43,13 +43,14 @@ export default function GezinPrivacyPage() {
                   <li>E-mailadres</li>
                   <li>Wachtwoord (versleuteld opgeslagen)</li>
                   <li>Datum van registratie</li>
-                  <li>Factuurgegevens (naam en adres) — alleen bij het afsluiten van een betaald abonnement, opgeslagen bij Stripe</li>
+                  <li>Factuurgegevens (naam en adres) — alleen bij aankoop van scan-credits, opgeslagen bij Stripe</li>
                 </ul>
+                <p className="mt-2 text-xs text-gray-400">De dienst is uitsluitend bedoeld voor personen van 16 jaar en ouder. Door een account aan te maken verklaar je 16 jaar of ouder te zijn. Als wij vernemen dat een gebruiker jonger is dan 16, verwijderen wij het account.</p>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800 mb-1">2.2 Gebruik van de app</h3>
                 <ul className="list-disc list-inside space-y-0.5">
-                  <li>Abonnementsstatus</li>
+                  <li>Credit-saldo en aankoophistorie</li>
                   <li>Tijdstip van gebruik</li>
                 </ul>
               </div>
@@ -189,7 +190,40 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">8. Jouw rechten</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">8. Internationale gegevensoverdrachten</h2>
+            <p className="mb-3">Een aantal van onze dienstverleners is gevestigd buiten de Europese Economische Ruimte (EER), met name in de Verenigde Staten. Voor deze overdrachten gelden de volgende waarborgen:</p>
+            <div className="overflow-hidden rounded-xl border border-gray-100">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-100 text-gray-700">
+                    <th className="px-4 py-2 text-left font-semibold">Partij</th>
+                    <th className="px-4 py-2 text-left font-semibold">Land</th>
+                    <th className="px-4 py-2 text-left font-semibold">Waarborg</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ["Anthropic", "VS", "Standard Contractual Clauses (SCCs)"],
+                    ["Stripe", "VS", "Standard Contractual Clauses (SCCs) + EU-locatie"],
+                    ["Vercel", "VS", "Standard Contractual Clauses (SCCs) + EU-regio mogelijk"],
+                    ["Supabase", "VS", "Standard Contractual Clauses (SCCs) + EU-regio"],
+                    ["Resend", "VS", "Standard Contractual Clauses (SCCs)"],
+                    ["Cloudflare", "VS", "Standard Contractual Clauses (SCCs) + EU-netwerk"],
+                  ].map(([party, country, safeguard], i) => (
+                    <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                      <td className="px-4 py-3 font-medium text-gray-800">{party}</td>
+                      <td className="px-4 py-3">{country}</td>
+                      <td className="px-4 py-3">{safeguard}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-xs text-gray-500">SCCs zijn door de Europese Commissie goedgekeurde modelcontractbepalingen die een passend beschermingsniveau garanderen bij doorgifte van persoonsgegevens naar derde landen (AVG artikel 46 lid 2 sub c).</p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-gray-900 mb-3">9. Jouw rechten</h2>
             <p className="mb-3">Op basis van de AVG heb jij de volgende rechten:</p>
             <ul className="space-y-2">
               {[
@@ -217,7 +251,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">9. Beveiliging</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">10. Beveiliging</h2>
             <p className="mb-2">Wij nemen passende technische en organisatorische maatregelen om jouw gegevens te beschermen:</p>
             <ul className="list-disc list-inside space-y-0.5">
               <li>Versleutelde verbindingen (HTTPS/TLS)</li>
@@ -230,7 +264,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">10. Klacht indienen</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">11. Klacht indienen</h2>
             <p className="mb-2">Ben je niet tevreden? Neem dan eerst contact met ons op via <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a>.</p>
             <p>Je hebt ook het recht om een klacht in te dienen bij de Autoriteit Persoonsgegevens:<br />
               Website: <a href="https://www.autoriteitpersoonsgegevens.nl" className="text-amber-600 hover:underline" target="_blank" rel="noopener noreferrer">www.autoriteitpersoonsgegevens.nl</a><br />
@@ -239,7 +273,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">11. Wijzigingen</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">12. Wijzigingen</h2>
             <p>Wij kunnen deze privacyverklaring aanpassen. Bij wezenlijke wijzigingen ontvang je een melding via e-mail of via de website. De meest actuele versie is altijd te vinden op <a href="https://www.nooitmeerpostkwijt.nl/privacy" className="text-amber-600 hover:underline">www.nooitmeerpostkwijt.nl/privacy</a>.</p>
           </section>
 
