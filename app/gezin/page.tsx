@@ -6,7 +6,22 @@ import DemoSection from "./components/DemoSection";
 
 export const metadata = {
   title: "NooitMeerPostKwijt — Nooit meer een document kwijt",
-  description: "Scan een brief, factuur of aanslag en vind elk document terug in seconden. NooitMeerPostKwijt herkent wat het is, wat er gedaan moet worden en bewaart het automatisch in jouw OneDrive, Dropbox of Google Drive.",
+  description: "Scan een brief, factuur of aanslag en vind elk document terug in seconden. AI herkent afzender, type en deadline — opgeslagen in jouw OneDrive, Dropbox of Google Drive.",
+  openGraph: {
+    title: "NooitMeerPostKwijt — Nooit meer een document kwijt",
+    description: "Scan een brief, factuur of aanslag en vind elk document terug in seconden. AI herkent afzender, type en deadline — opgeslagen in jouw cloud.",
+    url: "https://www.nooitmeerpostkwijt.nl",
+    type: "website" as const,
+    locale: "nl_NL",
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "NooitMeerPostKwijt — Nooit meer een document kwijt",
+    description: "Scan een brief, factuur of aanslag en vind elk document terug in seconden.",
+  },
+  alternates: {
+    canonical: "https://www.nooitmeerpostkwijt.nl",
+  },
 };
 
 export const revalidate = 60;
@@ -16,8 +31,47 @@ export default async function GezinLandingPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (user) redirect("/dossier");
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "NooitMeerPostKwijt",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "Web, iOS, Android",
+        "url": "https://www.nooitmeerpostkwijt.nl",
+        "description": "Scan je post, facturen en aanslagen. AI herkent afzender, type en deadline en slaat alles op in je eigen OneDrive, Dropbox of Google Drive.",
+        "offers": [
+          { "@type": "Offer", "price": "0", "priceCurrency": "EUR", "description": "10 gratis scans bij aanmelding" },
+          { "@type": "Offer", "price": "2.49", "priceCurrency": "EUR", "description": "25 scan-credits" },
+          { "@type": "Offer", "price": "7.99", "priceCurrency": "EUR", "description": "100 scan-credits" },
+          { "@type": "Offer", "price": "19.99", "priceCurrency": "EUR", "description": "300 scan-credits" },
+        ],
+        "publisher": {
+          "@type": "Organization",
+          "name": "Business XL",
+          "legalName": "Business XL",
+          "url": "https://www.nooitmeerpostkwijt.nl",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Bosscheweg 44",
+            "addressLocality": "Berkel-Enschot",
+            "postalCode": "5056 KC",
+            "addressCountry": "NL",
+          },
+          "vatID": "NL822754435B01",
+          "email": "nooitmeerpostkwijt@business-xl.nl",
+        },
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-5 py-4 max-w-5xl mx-auto">
@@ -63,7 +117,7 @@ export default async function GezinLandingPage() {
                 Inloggen
               </Link>
             </div>
-            <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · opzegbaar wanneer je wil</p>
+            <p className="text-xs text-gray-400 mt-3">10 gratis scans bij aanmelding · geen creditcard nodig</p>
           </div>
 
           <div className="flex-1 w-full max-w-lg">
@@ -189,7 +243,7 @@ export default async function GezinLandingPage() {
                 Ik ging mijn auto verkopen en kon de brief van het RDW met de tenaamstellingscode niet snel genoeg vinden. Uiteindelijk heb ik maar een nieuwe code aangeschaft bij het RDW. Achteraf zo zonde.
               </p>
               <footer className="mt-4 text-xs text-gray-400 font-medium not-italic">
-                — Marco, eigenaar van een BV
+                — Anna, particulier
               </footer>
             </blockquote>
           </div>
@@ -247,7 +301,7 @@ export default async function GezinLandingPage() {
           >
             Gratis account aanmaken →
           </Link>
-          <p className="text-xs text-gray-400 mt-3">Eerste maand gratis · geen creditcard nodig · opzegbaar wanneer je wil</p>
+          <p className="text-xs text-gray-400 mt-3">10 gratis scans bij aanmelding · geen creditcard nodig</p>
         </div>
       </main>
 
