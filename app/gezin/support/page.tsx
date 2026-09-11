@@ -44,6 +44,14 @@ const faq = [
     a: "Ga naar je accountpagina en scroll naar onderen. Daar vind je de optie om je account te verwijderen. Al je gegevens worden daarna gewist.",
   },
   {
+    q: "Welke gegevens slaan jullie van mij op?",
+    a: "Via je accountpagina kun je een volledig overzicht opvragen van alles wat wij van je bewaren: je accountgegevens, scan-historie, geadresseerden en instellingen. Je kunt dit overzicht opslaan als PDF. Ga naar Account → Gegevens bekijken & downloaden.",
+  },
+  {
+    q: "Kan ik mijn gegevens laten verwijderen?",
+    a: "Ja, op meerdere manieren. Via Account → Gegevens wissen kun je samenvattingen en acties wissen (zonder je documenten te verliezen), of alles in één keer verwijderen. Je account zelf verwijder je via Account → Account verwijderen. Alles wordt dan gewist. Voor vragen over je AVG-rechten stuur je een e-mail naar nooitmeerpostkwijt@business-xl.nl.",
+  },
+  {
     q: "Ik heb een vraag die hier niet bij staat — wat nu?",
     a: "Stuur een e-mail naar nooitmeerpostkwijt@business-xl.nl. We reageren binnen 2 werkdagen.",
   },
