@@ -309,6 +309,8 @@ export default async function GezinLandingPage() {
       <footer className="border-t border-gray-100 py-6 text-center text-xs text-gray-400 space-x-3">
         <span>© {new Date().getFullYear()} NooitMeerPostKwijt · Business XL · KvK 50418041</span>
         <span>·</span>
+        <Link href="/support" className="hover:text-gray-600 underline">Support &amp; FAQ</Link>
+        <span>·</span>
         <Link href="/privacy" className="hover:text-gray-600 underline">Privacyverklaring</Link>
         <span>·</span>
         <Link href="/veiligheid" className="hover:text-gray-600 underline">Veiligheid &amp; Privacy FAQ</Link>
