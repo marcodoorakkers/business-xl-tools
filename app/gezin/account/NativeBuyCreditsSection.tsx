@@ -22,6 +22,7 @@ export default function NativeBuyCreditsSection({ priceId25, priceId100, priceId
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selected, setSelected] = useState("nl.nooitmeerpostkwijt.credits.100");
 
   const webPriceIds = { priceId25, priceId100, priceId300 };
 
@@ -122,17 +123,19 @@ export default function NativeBuyCreditsSection({ priceId25, priceId100, priceId
           {PRODUCT_IDS.map((p) => {
             const storeProduct = products.find(sp => sp.identifier === p.id);
             const priceLabel = storeProduct?.priceString ?? "…";
+            const isSelected = selected === p.id;
             return (
               <div
                 key={p.id}
-                className={`flex items-center justify-between p-4 rounded-xl border ${p.popular ? "border-amber-300 bg-amber-50" : "border-gray-100 bg-gray-50"}`}
+                onClick={() => setSelected(p.id)}
+                className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer ${isSelected ? "border-amber-300 bg-amber-50" : "border-gray-100 bg-gray-50"}`}
               >
                 <div>
                   <p className="font-semibold text-gray-900 text-sm">{p.label}</p>
                   <p className="text-xs text-gray-500">{p.description}</p>
                 </div>
                 <button
-                  onClick={() => handleIAPBuy(p.id)}
+                  onClick={(e) => { e.stopPropagation(); handleIAPBuy(p.id); }}
                   disabled={!storeProduct || loading === p.id}
                   className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
                 >
@@ -149,34 +152,46 @@ export default function NativeBuyCreditsSection({ priceId25, priceId100, priceId
 
   // Web / browser: Stripe checkout
   const webBundles = [
-    { label: "25 scans",  description: "Af en toe een document", priceId: webPriceIds.priceId25,  price: "€2,99", popular: false },
-    { label: "100 scans", description: "Regelmatig gebruik",     priceId: webPriceIds.priceId100, price: "€7,99", popular: true  },
-    { label: "300 scans", description: "Intensief gebruik",      priceId: webPriceIds.priceId300, price: "€19,99", popular: false },
+    { label: "25 scans",  description: "Af en toe een document", priceId: webPriceIds.priceId25,  price: "€2,99" },
+    { label: "100 scans", description: "Regelmatig gebruik",     priceId: webPriceIds.priceId100, price: "€7,99" },
+    { label: "300 scans", description: "Intensief gebruik",      priceId: webPriceIds.priceId300, price: "€19,99" },
   ];
+  const webSelected = selected === "nl.nooitmeerpostkwijt.credits.25" ? webPriceIds.priceId25
+    : selected === "nl.nooitmeerpostkwijt.credits.300" ? webPriceIds.priceId300
+    : webPriceIds.priceId100;
 
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-6">
       <h2 className="font-bold text-gray-900 mb-1">Credits kopen</h2>
       <p className="text-sm text-gray-500 mb-4">Credits vervallen nooit.</p>
       <div className="flex flex-col gap-3">
-        {webBundles.map((b) => (
-          <div
-            key={b.priceId}
-            className={`flex items-center justify-between p-4 rounded-xl border ${b.popular ? "border-amber-300 bg-amber-50" : "border-gray-100 bg-gray-50"}`}
-          >
-            <div>
-              <p className="font-semibold text-gray-900 text-sm">{b.label}</p>
-              <p className="text-xs text-gray-500">{b.description}</p>
-            </div>
-            <button
-              onClick={() => handleWebBuy(b.priceId)}
-              disabled={!b.priceId || loading === b.priceId}
-              className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
+        {webBundles.map((b) => {
+          const isSelected = webSelected === b.priceId;
+          return (
+            <div
+              key={b.priceId}
+              onClick={() => {
+                const id = b.priceId === webPriceIds.priceId25 ? "nl.nooitmeerpostkwijt.credits.25"
+                  : b.priceId === webPriceIds.priceId300 ? "nl.nooitmeerpostkwijt.credits.300"
+                  : "nl.nooitmeerpostkwijt.credits.100";
+                setSelected(id);
+              }}
+              className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer ${isSelected ? "border-amber-300 bg-amber-50" : "border-gray-100 bg-gray-50"}`}
             >
-              {loading === b.priceId ? "…" : b.price}
-            </button>
-          </div>
-        ))}
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">{b.label}</p>
+                <p className="text-xs text-gray-500">{b.description}</p>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleWebBuy(b.priceId); }}
+                disabled={!b.priceId || loading === b.priceId}
+                className="bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors whitespace-nowrap"
+              >
+                {loading === b.priceId ? "…" : b.price}
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
