@@ -19,6 +19,7 @@
     "@capacitor/core": "^8.4.1",
     "@capacitor/ios": "^8.4.1",
     "@hcaptcha/react-hcaptcha": "^2.0.2",
+    "@revenuecat/purchases-capacitor": "^13.5.1",
     "@sparticuz/chromium": "^149.0.0",
     "@stripe/stripe-js": "^9.6.0",
     "@supabase/ssr": "^0.10.3",
