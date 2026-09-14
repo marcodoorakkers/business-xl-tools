@@ -70,10 +70,10 @@ export default function NativeBuyCreditsSection({ priceId25, priceId100, priceId
         }),
       });
       if (res.ok) {
-        const credits = productId.endsWith(".25") ? 25 : productId.endsWith(".100") ? 100 : 300;
-        setSuccess(`${credits} credits bijgeschreven!`);
-        // Refresh the page to show new credit balance
-        setTimeout(() => window.location.reload(), 1500);
+        const data = await res.json();
+        const added = productId.endsWith(".25") ? 25 : productId.endsWith(".100") ? 100 : 300;
+        setSuccess(`${added} credits bijgeschreven! Je hebt nu ${data.credits} credits.`);
+        setTimeout(() => window.location.reload(), 2000);
       } else {
         setError("Aankoop geslaagd, maar credits konden niet worden bijgeschreven. Neem contact op.");
       }
