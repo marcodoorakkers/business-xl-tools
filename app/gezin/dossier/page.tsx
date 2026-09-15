@@ -324,7 +324,10 @@ export default function GezinDossierPage() {
     }
     try {
       const res = await fetch("/api/tools/mijn-dossier", { method: "POST", body: formData });
-      const data = await res.json();
+      const text = await res.text();
+      if (!text) throw new Error("Geen reactie van server. Probeer het opnieuw.");
+      let data: Record<string, string>;
+      try { data = JSON.parse(text); } catch { throw new Error("Ongeldig antwoord van server. Probeer het opnieuw."); }
       if (data.error) throw new Error(data.error);
       setAnalysis(data);
       setMappad(data.mappad ?? "");
