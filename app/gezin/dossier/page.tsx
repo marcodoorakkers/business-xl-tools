@@ -326,7 +326,8 @@ export default function GezinDossierPage() {
       const res = await fetch("/api/tools/mijn-dossier", { method: "POST", body: formData });
       const text = await res.text();
       if (!text) throw new Error("Geen reactie van server. Probeer het opnieuw.");
-      let data: Record<string, string>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let data: any;
       try { data = JSON.parse(text); } catch { throw new Error("Ongeldig antwoord van server. Probeer het opnieuw."); }
       if (data.error) throw new Error(data.error);
       setAnalysis(data);
