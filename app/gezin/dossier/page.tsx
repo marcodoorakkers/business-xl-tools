@@ -816,14 +816,29 @@ export default function GezinDossierPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Er ging iets mis</h2>
-            <p className="text-sm text-red-500 mb-6">{errorMsg}</p>
-            <button
-              onClick={reset}
-              className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-8 rounded-2xl transition-colors"
-            >
-              Opnieuw proberen
-            </button>
+            {errorMsg === "Niet genoeg credits" ? (
+              <>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Credits zijn op</h2>
+                <p className="text-sm text-gray-500 mb-6">Koop een bundel om door te scannen. Credits vervallen nooit.</p>
+                <Link
+                  href="/gezin/account"
+                  className="inline-block bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-8 rounded-2xl transition-colors"
+                >
+                  Credits kopen →
+                </Link>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Er ging iets mis</h2>
+                <p className="text-sm text-red-500 mb-6">{errorMsg}</p>
+                <button
+                  onClick={reset}
+                  className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 px-8 rounded-2xl transition-colors"
+                >
+                  Opnieuw proberen
+                </button>
+              </>
+            )}
           </div>
         )}
       </main>
