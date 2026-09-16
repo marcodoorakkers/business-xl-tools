@@ -11,8 +11,10 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("profiles").select("credits").eq("id", user.id).single();
-  if (!profile || profile.credits < 1) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
+  const { data: profile } = await supabase.from("profiles").select("credits, subscription_status").eq("id", user.id).single();
+  if (!profile) return NextResponse.json({ error: "Profiel niet gevonden" }, { status: 402 });
+  const hasAccess = profile.credits > 0 || profile.subscription_status === "active" || profile.subscription_status === "trialing";
+  if (!hasAccess) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
 
   const accessToken = await getValidGoogleDriveToken(user.id);
   if (!accessToken) return NextResponse.json({ error: "Google Drive niet gekoppeld" }, { status: 400 });
@@ -35,12 +37,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ontbrekende velden" }, { status: 400 });
   }
 
-  const rawBuffer = Buffer.from(await file.arrayBuffer());
-  const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
-  const filename = `${bestandsnaam}.pdf`;
-  const folderPath = mappad.trim();
-
   try {
+    const rawBuffer = Buffer.from(await file.arrayBuffer());
+    const pdfBuffer = await convertToPdf(rawBuffer, file.type || "application/octet-stream");
+    const filename = `${bestandsnaam}.pdf`;
+    const folderPath = mappad.trim();
     let token = accessToken;
     let result: { webUrl: string };
     try {
