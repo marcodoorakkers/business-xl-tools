@@ -11,13 +11,10 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
 
-  const hostname = req.nextUrl.hostname;
-  const isFamilySite = hostname === "nooitmeerpostkwijt.nl" || hostname === "www.nooitmeerpostkwijt.nl";
   const { data: profile } = await supabase.from("profiles").select("credits, subscription_status").eq("id", user.id).single();
   if (!profile) return NextResponse.json({ error: "Profiel niet gevonden" }, { status: 402 });
-  const hasActiveSubscription = profile.subscription_status === "active" || profile.subscription_status === "trialing";
-  const isUnlimited = isFamilySite && hasActiveSubscription;
-  if (!isUnlimited && profile.credits < 1) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
+  const hasAccess = profile.credits > 0 || profile.subscription_status === "active" || profile.subscription_status === "trialing";
+  if (!hasAccess) return NextResponse.json({ error: "Niet genoeg credits" }, { status: 402 });
 
   const accessToken = await getValidAccessToken(user.id);
   if (!accessToken) return NextResponse.json({ error: "OneDrive niet gekoppeld" }, { status: 400 });
