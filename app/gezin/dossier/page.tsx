@@ -424,7 +424,11 @@ export default function GezinDossierPage() {
 
     try {
       const res = await fetch(endpoint, { method: "POST", body: fd });
-      const data = await res.json();
+      const text = await res.text();
+      if (!text) { setErrorMsg("Geen reactie van server bij uploaden. Probeer opnieuw."); setStep("error"); return; }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let data: any;
+      try { data = JSON.parse(text); } catch { setErrorMsg("Ongeldig antwoord bij uploaden. Probeer opnieuw."); setStep("error"); return; }
       if (data.error) { setErrorMsg(data.error); setStep("error"); return; }
 
       if (includeActie && analysis.actie) await saveActie(analysis, data.webUrl);
