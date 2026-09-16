@@ -50,8 +50,19 @@ export async function convertToPdf(buffer: Buffer, mimeType: string): Promise<Bu
     mimeType === "application/msword"
   ) {
     const mammoth = (await import("mammoth")).default;
-    const { value: html } = await mammoth.convertToHtml({ buffer });
-    return htmlToPdf(`<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;font-size:11pt;line-height:1.5;margin:40px 50px;">${html}</body></html>`);
+    const { value: text } = await mammoth.extractRawText({ buffer });
+    const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const doc = await (await import("pdf-lib")).PDFDocument.create();
+    const font = await doc.embedFont((await import("pdf-lib")).StandardFonts.Helvetica);
+    const page = doc.addPage([595, 842]);
+    const lines = escaped.split("\n");
+    let y = 802;
+    for (const line of lines) {
+      if (y < 40) break;
+      page.drawText(line.slice(0, 100), { x: 40, y, size: 10, font });
+      y -= 14;
+    }
+    return Buffer.from(await doc.save());
   }
 
   if (mimeType === "text/html") {
