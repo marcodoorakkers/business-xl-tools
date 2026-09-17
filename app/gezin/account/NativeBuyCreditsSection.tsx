@@ -35,11 +35,14 @@ export default function NativeBuyCreditsSection({ priceId25, priceId100, priceId
         setChecked(true);
         if (!native) return;
         try {
+          const { Capacitor } = await import("@capacitor/core");
           const { Purchases, LOG_LEVEL } = await import("@revenuecat/purchases-capacitor");
           await Purchases.setLogLevel({ level: LOG_LEVEL.ERROR });
-          await Purchases.configure({
-            apiKey: process.env.NEXT_PUBLIC_REVENUECAT_API_KEY!,
-          });
+          const isAndroid = Capacitor.getPlatform() === "android";
+          const apiKey = isAndroid
+            ? process.env.NEXT_PUBLIC_REVENUECAT_ANDROID_KEY!
+            : process.env.NEXT_PUBLIC_REVENUECAT_API_KEY!;
+          await Purchases.configure({ apiKey });
           const { products: storeProducts } = await Purchases.getProducts({
             productIdentifiers: PRODUCT_IDS.map(p => p.id),
           });
@@ -145,7 +148,12 @@ export default function NativeBuyCreditsSection({ priceId25, priceId100, priceId
             );
           })}
         </div>
-        <p className="text-xs text-gray-400 mt-3 text-center">Betaling via Apple. Credits worden direct bijgeschreven.</p>
+        <p className="text-xs text-gray-400 mt-3 text-center">
+          {typeof window !== "undefined" && /android/i.test(navigator.userAgent)
+            ? "Betaling via Google Play."
+            : "Betaling via Apple."}{" "}
+          Credits worden direct bijgeschreven.
+        </p>
       </div>
     );
   }
