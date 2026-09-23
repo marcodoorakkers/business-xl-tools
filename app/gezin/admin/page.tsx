@@ -164,6 +164,7 @@ export default function NMMPKAdminPage() {
                     <th className="px-5 py-3 text-xs font-semibold text-gray-500">E-mail</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Aangemeld</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Status</th>
+                    <th className="px-4 py-3 text-xs font-semibold text-gray-500">Credits</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Einde periode</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Opslag</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Docs</th>
