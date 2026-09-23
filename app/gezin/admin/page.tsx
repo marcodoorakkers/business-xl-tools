@@ -163,9 +163,7 @@ export default function NMMPKAdminPage() {
                   <tr className="bg-gray-50 text-left">
                     <th className="px-5 py-3 text-xs font-semibold text-gray-500">E-mail</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Aangemeld</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-gray-500">Status</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Credits</th>
-                    <th className="px-4 py-3 text-xs font-semibold text-gray-500">Einde periode</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Opslag</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Docs</th>
                     <th className="px-4 py-3 text-xs font-semibold text-gray-500">Founding</th>
@@ -184,9 +182,7 @@ export default function NMMPKAdminPage() {
                     <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-5 py-3 text-gray-800 font-medium max-w-[200px] truncate">{u.email}</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{formatDate(u.created_at)}</td>
-                      <td className="px-4 py-3"><StatusBadge status={u.subscription_status} /></td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{u.credits ?? 0} credits</td>
-                      <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{formatDate(u.subscription_period_end)}</td>
                       <td className="px-4 py-3 text-gray-500">{u.storage_preference ?? "—"}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
