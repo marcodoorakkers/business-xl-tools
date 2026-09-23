@@ -13,6 +13,7 @@ interface NMUser {
   subscription_period_end: string | null;
   promo_code: string | null;
   storage_preference: string | null;
+  credits: number;
   doc_count: number;
 }
 
@@ -183,6 +184,7 @@ export default function NMMPKAdminPage() {
                       <td className="px-5 py-3 text-gray-800 font-medium max-w-[200px] truncate">{u.email}</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{formatDate(u.created_at)}</td>
                       <td className="px-4 py-3"><StatusBadge status={u.subscription_status} /></td>
+                      <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{u.credits ?? 0} credits</td>
                       <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{formatDate(u.subscription_period_end)}</td>
                       <td className="px-4 py-3 text-gray-500">{u.storage_preference ?? "—"}</td>
                       <td className="px-4 py-3">

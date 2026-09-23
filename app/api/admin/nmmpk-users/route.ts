@@ -15,7 +15,7 @@ export async function GET() {
   const { data: authUsers } = await admin.auth.admin.listUsers();
   const { data: profiles } = await admin
     .from("profiles")
-    .select("id, subscription_status, subscription_period_end, promo_code, created_at");
+    .select("id, subscription_status, subscription_period_end, promo_code, credits, created_at");
   const { data: settings } = await admin
     .from("archive_settings")
     .select("user_id, storage_preference");
@@ -36,7 +36,7 @@ export async function GET() {
     .filter((u) => {
       // Alleen NMMPK gebruikers — die hebben een subscription_status of komen van nooitmeerpostkwijt.nl
       const profile = profileMap[u.id];
-      return profile?.subscription_status || profile?.promo_code;
+      return profile?.subscription_status || profile?.promo_code || (profile?.credits ?? 0) > 0;
     })
     .map((u) => {
       const profile = profileMap[u.id];
@@ -49,6 +49,7 @@ export async function GET() {
         subscription_period_end: profile?.subscription_period_end ?? null,
         promo_code: profile?.promo_code ?? null,
         storage_preference: setting?.storage_preference ?? null,
+        credits: profile?.credits ?? 0,
         doc_count: docMap[u.id] ?? 0,
       };
     })
