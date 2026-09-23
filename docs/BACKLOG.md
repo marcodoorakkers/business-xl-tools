@@ -41,6 +41,20 @@ Functies die bewust zijn uitgesteld. Elke entry bevat de motivatie en wat er nod
 
 ## Lage prioriteit
 
+### Apple Sign-In
+**Wat:** Gebruikers kunnen inloggen/aanmelden met hun Apple ID, zonder e-mailbevestiging. Vermindert aanmeldingsfrictie en lost problemen op met niet-ontvangen bevestigingsmails.
+
+**Wat er nodig is:**
+1. Apple Developer → Service ID aanmaken (`nl.nooitmeerpostkwijt.signin`) + redirect URL instellen
+2. Key aanmaken met "Sign in with Apple" → `.p8` downloaden
+3. Supabase → Apple provider inschakelen (Team ID, Client ID, Key ID, `.p8`)
+4. iOS-app: "Sign in with Apple" capability in Xcode + knop in aanmeldscherm
+5. Web: knop toevoegen aan `gezin/aanmelden/page.tsx` en `gezin/inloggen/page.tsx`
+
+**Waarom uitgesteld:** Setup vereist meerdere stappen in Apple Developer Console en Xcode; geen urgent probleem zolang e-maillevering via Resend betrouwbaar is.
+
+---
+
 ### Google Drive integratie
 **Wat:** Naast OneDrive en Dropbox ook Google Drive als opslaglocatie ondersteunen.
 
