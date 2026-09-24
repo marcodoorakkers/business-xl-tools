@@ -2,16 +2,17 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 
-type LoginStep = "credentials" | "mfa";
+type LoginStep = "credentials" | "mfa" | "biometric";
 
 const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ?? "";
+const BIOMETRIC_KEY = "biometric_login_enabled";
 
 export default function GezinLoginPage() {
   const [step, setStep] = useState<LoginStep>("credentials");
@@ -24,6 +25,48 @@ export default function GezinLoginPage() {
   const [loading, setLoading] = useState(false);
   const captchaRef = useRef<HCaptcha>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    checkBiometricLogin();
+  }, []);
+
+  async function checkBiometricLogin() {
+    try {
+      const { Capacitor } = await import("@capacitor/core");
+      if (!Capacitor.isNativePlatform()) return;
+      if (localStorage.getItem(BIOMETRIC_KEY) !== "true") return;
+
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { BiometricAuth } = await import("@aparajita/capacitor-biometric-auth");
+      const { isAvailable } = await BiometricAuth.checkBiometry();
+      if (!isAvailable) return;
+
+      setStep("biometric");
+      try {
+        await BiometricAuth.authenticate({ reason: "Inloggen bij NooitMeerPostKwijt" });
+        await redirectAfterLogin(supabase);
+      } catch {
+        setStep("credentials");
+      }
+    } catch {
+      // Plugin niet beschikbaar of fout — gewone login tonen
+    }
+  }
+
+  async function enableBiometricIfAvailable() {
+    try {
+      const { Capacitor } = await import("@capacitor/core");
+      if (!Capacitor.isNativePlatform()) return;
+      const { BiometricAuth } = await import("@aparajita/capacitor-biometric-auth");
+      const { isAvailable } = await BiometricAuth.checkBiometry();
+      if (isAvailable) localStorage.setItem(BIOMETRIC_KEY, "true");
+    } catch {
+      // Niet beschikbaar
+    }
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -60,7 +103,7 @@ export default function GezinLoginPage() {
       }
     }
 
-    await redirectAfterLogin(supabase);
+    await redirectAfterLogin(supabase, true);
   }
 
   async function handleMfa(e: React.FormEvent) {
@@ -78,10 +121,11 @@ export default function GezinLoginPage() {
       return;
     }
 
-    await redirectAfterLogin(supabase);
+    await redirectAfterLogin(supabase, true);
   }
 
-  async function redirectAfterLogin(supabase: ReturnType<typeof createClient>) {
+  async function redirectAfterLogin(supabase: ReturnType<typeof createClient>, enableBiometric = false) {
+    if (enableBiometric) await enableBiometricIfAvailable();
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const { data: profile } = await supabase
@@ -155,6 +199,27 @@ export default function GezinLoginPage() {
                 </div>
               </form>
             </>
+          )}
+
+          {step === "biometric" && (
+            <div className="flex flex-col items-center gap-5 py-4">
+              <div className="text-5xl">
+                <svg viewBox="0 0 24 24" className="w-16 h-16 text-amber-500" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2C9.38 2 7 3.56 7 6v1.09A5 5 0 0 0 7 17v.91C7 20.44 9.38 22 12 22s5-1.56 5-4.09V17a5 5 0 0 0 0-9.91V6c0-2.44-2.38-4-5-4z"/>
+                  <path d="M12 8v8M9 11l3-3 3 3"/>
+                </svg>
+              </div>
+              <div className="text-center">
+                <h1 className="text-xl font-bold text-gray-900 mb-1">Face ID</h1>
+                <p className="text-gray-500 text-sm">Bezig met inloggen…</p>
+              </div>
+              <button
+                onClick={() => setStep("credentials")}
+                className="text-sm text-gray-400 hover:text-gray-600 mt-2"
+              >
+                Wachtwoord gebruiken
+              </button>
+            </div>
           )}
 
           {step === "mfa" && (

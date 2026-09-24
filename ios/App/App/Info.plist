@@ -24,6 +24,8 @@
 	<string>11</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSFaceIDUsageDescription</key>
+	<string>NooitMeerPostKwijt gebruikt Face ID zodat je snel en veilig kunt inloggen.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Maak een foto van een brief, factuur of document om het te scannen en op te slaan in je dossier.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
