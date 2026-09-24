@@ -75,7 +75,13 @@ export async function POST(req: NextRequest) {
 
   // Base64 → Buffer → altijd omzetten naar PDF — nooit opslaan, alleen in memory
   const rawBuffer = Buffer.from(data, "base64");
-  const pdfBuffer = await convertToPdf(rawBuffer, contentType);
+  let pdfBuffer: Buffer;
+  try {
+    pdfBuffer = await convertToPdf(rawBuffer, contentType);
+  } catch (err) {
+    console.error("[email-scan] convertToPdf mislukt", { contentType, filename, from, err });
+    return NextResponse.json({ error: "Bestandstype niet ondersteund", contentType }, { status: 422 });
+  }
   const pdfBase64 = pdfBuffer.toString("base64");
 
   // Eerder gescande afzenders ophalen voor consistente categorisering

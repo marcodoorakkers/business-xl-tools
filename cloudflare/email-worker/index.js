@@ -18,14 +18,17 @@ export default {
     const rawEmail = await new Response(message.raw).arrayBuffer();
     const email = await PostalMime.parse(rawEmail);
 
-    // Eerste PDF, afbeelding of Word-bijlage zoeken
-    const attachment = email.attachments?.find(
-      (a) =>
-        a.mimeType === "application/pdf" ||
-        a.mimeType?.startsWith("image/") ||
-        a.mimeType === DOCX ||
-        a.mimeType === "application/msword"
-    );
+    // PDF heeft prioriteit boven afbeeldingen (logo's in e-mailhandtekening zijn ook bijlagen)
+    const attachment =
+      email.attachments?.find((a) => a.mimeType === "application/pdf") ||
+      email.attachments?.find(
+        (a) =>
+          a.mimeType === DOCX ||
+          a.mimeType === "application/msword" ||
+          a.mimeType === "image/jpeg" ||
+          a.mimeType === "image/jpg" ||
+          a.mimeType === "image/png"
+      );
 
     let payload;
 
