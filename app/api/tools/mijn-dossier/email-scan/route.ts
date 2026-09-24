@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import Anthropic from "@anthropic-ai/sdk";
 import { getValidAccessToken, uploadFileToOneDrive } from "@/lib/onedrive";
 import { getValidDropboxToken, forceRefreshDropboxToken, uploadFileToDropbox } from "@/lib/dropbox";
+import { getValidGoogleDriveToken, uploadFileToGoogleDrive } from "@/lib/googledrive";
 import { convertToPdf } from "@/lib/convert-to-pdf";
 
 export const runtime = "nodejs";
@@ -245,6 +246,19 @@ Formaat:
           }
         }
       }
+    }
+  }
+
+  if (!fileUrl) {
+    const googleDriveToken = await getValidGoogleDriveToken(profile.id);
+    if (googleDriveToken) {
+      const { data: tokenRow } = await admin.from("google_drive_tokens").select("archive_root").eq("user_id", profile.id).single();
+      const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
+      try {
+        const result = await uploadFileToGoogleDrive(googleDriveToken, `${archiveRoot}/${mappad}`, fullFilename, pdfBuffer, "application/pdf");
+        fileUrl = result.webUrl;
+        storage = "googledrive";
+      } catch { /* upload mislukt */ }
     }
   }
 
