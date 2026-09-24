@@ -14,7 +14,7 @@ export default function GezinPrivacyPage() {
       <main className="max-w-3xl mx-auto px-6 py-14">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-gray-900 mb-3">Privacyverklaring</h1>
-          <p className="text-gray-500 text-sm">Versie 1.2 · Ingangsdatum: 10 september 2026</p>
+          <p className="text-gray-500 text-sm">Versie 1.3 · Ingangsdatum: 24 september 2026</p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm p-8 flex flex-col gap-10 text-sm text-gray-600 leading-relaxed">
@@ -123,7 +123,35 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">5. Cookies</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">5. Gebruik van Google-diensten (Google Drive)</h2>
+            <p className="mb-3">Als je kiest voor Google Drive als opslaglocatie, vraagt NooitMeerPostKwijt via OAuth toegang tot jouw Google Drive. Daarvoor gelden de volgende regels:</p>
+            <div className="space-y-3">
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Welke toegang wij vragen</h3>
+                <p>Wij vragen alleen schrijf- en leestoegang tot bestanden die onze app zelf aanmaakt in jouw Google Drive (beperkte scope: <code className="bg-gray-100 px-1 rounded text-xs">drive.file</code>). Wij hebben geen toegang tot andere bestanden in jouw Google Drive.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Waarvoor wij die toegang gebruiken</h3>
+                <p>Uitsluitend om gescande documenten die jij opslaat te plaatsen in een map in jouw Google Drive (standaard: &quot;MijnDossier&quot;). Wij lezen nooit andere bestanden dan die wij zelf hebben aangemaakt.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Wat wij opslaan</h3>
+                <p>Jouw Google-toegangstoken en refreshtoken worden versleuteld opgeslagen (AES-256-GCM) in onze beveiligde database, zodat de koppeling actief blijft. Wij slaan geen andere Google-gegevens op.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Delen met derden</h3>
+                <p>Jouw Google-gegevens worden nooit gedeeld met derden, niet gebruikt voor advertenties en niet gebruikt om jou buiten de app te volgen.</p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Intrekken van toegang</h3>
+                <p>Je kunt de koppeling op elk moment verbreken via Instellingen in de app, of via <a href="https://myaccount.google.com/permissions" className="text-amber-600 hover:underline" target="_blank" rel="noopener noreferrer">myaccount.google.com/permissions</a>. Na ontkoppeling verwijderen wij je token direct.</p>
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-gray-500">Het gebruik van Google Drive-data door NooitMeerPostKwijt is in overeenstemming met het <a href="https://developers.google.com/terms/api-services-user-data-policy" className="text-amber-600 hover:underline" target="_blank" rel="noopener noreferrer">Google API Services User Data Policy</a>, inclusief de Limited Use-vereisten.</p>
+          </section>
+
+          <section>
+            <h2 className="text-base font-bold text-gray-900 mb-3">6. Cookies</h2>
             <p className="mb-2">Wij maken uitsluitend gebruik van functionele cookies die noodzakelijk zijn voor het goed functioneren van de app:</p>
             <ul className="list-disc list-inside space-y-0.5 mb-2">
               <li>Inlogcookies (sessiebeheer)</li>
@@ -133,7 +161,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">6. Bewaartermijnen</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">7. Bewaartermijnen</h2>
             <div className="overflow-hidden rounded-xl border border-gray-100">
               <table className="w-full">
                 <tbody>
@@ -157,7 +185,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">7. Delen met derden</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">8. Delen met derden</h2>
             <p className="mb-3">Wij verkopen jouw gegevens nooit aan derden. Wij werken uitsluitend samen met partijen die noodzakelijk zijn voor het leveren van onze diensten:</p>
             <div className="overflow-hidden rounded-xl border border-gray-100">
               <table className="w-full">
@@ -190,7 +218,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">8. Internationale gegevensoverdrachten</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">9. Internationale gegevensoverdrachten</h2>
             <p className="mb-3">Een aantal van onze dienstverleners is gevestigd buiten de Europese Economische Ruimte (EER), met name in de Verenigde Staten. Voor deze overdrachten gelden de volgende waarborgen:</p>
             <div className="overflow-hidden rounded-xl border border-gray-100">
               <table className="w-full">
@@ -223,7 +251,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">9. Jouw rechten</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">10. Jouw rechten</h2>
             <p className="mb-3">Op basis van de AVG heb jij de volgende rechten:</p>
             <ul className="space-y-2">
               {[
@@ -251,7 +279,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">10. Beveiliging</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">11. Beveiliging</h2>
             <p className="mb-2">Wij nemen passende technische en organisatorische maatregelen om jouw gegevens te beschermen:</p>
             <ul className="list-disc list-inside space-y-0.5">
               <li>Versleutelde verbindingen (HTTPS/TLS)</li>
@@ -264,7 +292,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">11. Klacht indienen</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">12. Klacht indienen</h2>
             <p className="mb-2">Ben je niet tevreden? Neem dan eerst contact met ons op via <a href="mailto:nooitmeerpostkwijt@business-xl.nl" className="text-amber-600 hover:underline">nooitmeerpostkwijt@business-xl.nl</a>.</p>
             <p>Je hebt ook het recht om een klacht in te dienen bij de Autoriteit Persoonsgegevens:<br />
               Website: <a href="https://www.autoriteitpersoonsgegevens.nl" className="text-amber-600 hover:underline" target="_blank" rel="noopener noreferrer">www.autoriteitpersoonsgegevens.nl</a><br />
@@ -273,7 +301,7 @@ export default function GezinPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-900 mb-3">12. Wijzigingen</h2>
+            <h2 className="text-base font-bold text-gray-900 mb-3">13. Wijzigingen</h2>
             <p>Wij kunnen deze privacyverklaring aanpassen. Bij wezenlijke wijzigingen ontvang je een melding via e-mail of via de website. De meest actuele versie is altijd te vinden op <a href="https://www.nooitmeerpostkwijt.nl/privacy" className="text-amber-600 hover:underline">www.nooitmeerpostkwijt.nl/privacy</a>.</p>
           </section>
 
