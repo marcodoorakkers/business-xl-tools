@@ -49,7 +49,9 @@ export async function POST(req: NextRequest) {
   const hasCredits = (profile.credits ?? 0) > 0;
   if (!hasSubscription && !hasCredits) return NextResponse.json({ skipped: true });
 
-  // Allowlist check: alleen afzenders in de lijst worden verwerkt
+  // Allowlist check: alleen afzenders in de lijst worden verwerkt.
+  // Uitzondering: als de afzender het eigen e-mailadres van de gebruiker is,
+  // is het een forward vanuit de eigen inbox → altijd vertrouwd.
   const { data: allowlist } = await admin
     .from("scan_email_allowlist")
     .select("email")
@@ -59,7 +61,12 @@ export async function POST(req: NextRequest) {
     const senderEmail = from.toLowerCase().trim();
     const allowed = allowlist?.some((a) => a.email.toLowerCase() === senderEmail) ?? false;
     if (!allowed) {
-      return NextResponse.json({ skipped: true, reason: "sender_not_allowed" });
+      // Controleer of het de gebruiker zelf is die doorstuurt
+      const { data: { user: profileUser } } = await admin.auth.admin.getUserById(profile.id);
+      const ownerEmail = profileUser?.email?.toLowerCase() ?? "";
+      if (ownerEmail && senderEmail !== ownerEmail) {
+        return NextResponse.json({ skipped: true, reason: "sender_not_allowed" });
+      }
     }
   } else {
     // Geen afzender bekend → weigeren
