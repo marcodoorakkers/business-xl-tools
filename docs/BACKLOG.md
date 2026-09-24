@@ -41,6 +41,13 @@ Functies die bewust zijn uitgesteld. Elke entry bevat de motivatie en wat er nod
 
 ## Lage prioriteit
 
+### Vereenvoudigde mapstructuur
+**Wat:** De huidige mappenstructuur (`Afzender/Onderwerp/Jaar`) is voor sommige gebruikers te diep. Optie om te kiezen voor een plattere structuur, bijv. alleen `Afzender/Jaar` of een vrije indeling.
+
+**Waarom uitgesteld:** Zit diep in AI-prompt, mappenview en retroactieve herindeling van bestaande documenten. Pas oppakken als meerdere gebruikers dit noemen.
+
+---
+
 ### Apple Sign-In
 **Wat:** Gebruikers kunnen inloggen/aanmelden met hun Apple ID, zonder e-mailbevestiging. Vermindert aanmeldingsfrictie en lost problemen op met niet-ontvangen bevestigingsmails.
 
