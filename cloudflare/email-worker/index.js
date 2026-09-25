@@ -18,6 +18,16 @@ export default {
     const rawEmail = await new Response(message.raw).arrayBuffer();
     const email = await PostalMime.parse(rawEmail);
 
+    // Log alle bijlagen voor debugging
+    console.log("[email-worker] from:", email.from?.address, "subject:", email.subject);
+    console.log("[email-worker] attachments:", JSON.stringify(
+      (email.attachments ?? []).map((a) => ({
+        filename: a.filename,
+        mimeType: a.mimeType,
+        size: a.content?.byteLength ?? 0,
+      }))
+    ));
+
     // PDF en documenten hebben prioriteit; afbeeldingen zonder naam zijn logo's in handtekeningen.
     // application/octet-stream met .pdf extensie wordt ook herkend.
     const attachment =
@@ -38,6 +48,8 @@ export default {
           a.filename &&
           a.filename.length > 0
       );
+
+    console.log("[email-worker] gekozen bijlage:", attachment ? `${attachment.filename} (${attachment.mimeType})` : "geen");
 
     let payload;
 
