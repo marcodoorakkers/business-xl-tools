@@ -24,17 +24,15 @@ async function htmlToPdf(html: string): Promise<Buffer> {
 export async function convertToPdf(buffer: Buffer, mimeType: string): Promise<Buffer> {
   if (mimeType === "application/pdf") return buffer;
 
-  if (mimeType === "image/jpeg" || mimeType === "image/jpg") {
+  if (mimeType === "image/jpeg" || mimeType === "image/jpg" || mimeType === "image/png") {
     const doc = await PDFDocument.create();
-    const img = await doc.embedJpg(buffer);
-    const page = doc.addPage([img.width, img.height]);
-    page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
-    return Buffer.from(await doc.save());
-  }
-
-  if (mimeType === "image/png") {
-    const doc = await PDFDocument.create();
-    const img = await doc.embedPng(buffer);
+    // Probeer JPEG, val terug op PNG als de bytes geen geldig JPEG zijn
+    let img;
+    try {
+      img = mimeType === "image/png" ? await doc.embedPng(buffer) : await doc.embedJpg(buffer);
+    } catch {
+      img = mimeType === "image/png" ? await doc.embedJpg(buffer) : await doc.embedPng(buffer);
+    }
     const page = doc.addPage([img.width, img.height]);
     page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
     return Buffer.from(await doc.save());

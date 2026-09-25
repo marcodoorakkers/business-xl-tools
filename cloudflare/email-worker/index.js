@@ -18,16 +18,25 @@ export default {
     const rawEmail = await new Response(message.raw).arrayBuffer();
     const email = await PostalMime.parse(rawEmail);
 
-    // PDF heeft prioriteit boven afbeeldingen (logo's in e-mailhandtekening zijn ook bijlagen)
+    // PDF en documenten hebben prioriteit; afbeeldingen zonder naam zijn logo's in handtekeningen.
+    // application/octet-stream met .pdf extensie wordt ook herkend.
     const attachment =
       email.attachments?.find((a) => a.mimeType === "application/pdf") ||
       email.attachments?.find(
         (a) =>
-          a.mimeType === DOCX ||
-          a.mimeType === "application/msword" ||
-          a.mimeType === "image/jpeg" ||
-          a.mimeType === "image/jpg" ||
-          a.mimeType === "image/png"
+          a.mimeType === "application/octet-stream" &&
+          a.filename?.toLowerCase().endsWith(".pdf")
+      ) ||
+      email.attachments?.find(
+        (a) => a.mimeType === DOCX || a.mimeType === "application/msword"
+      ) ||
+      email.attachments?.find(
+        (a) =>
+          (a.mimeType === "image/jpeg" ||
+            a.mimeType === "image/jpg" ||
+            a.mimeType === "image/png") &&
+          a.filename &&
+          a.filename.length > 0
       );
 
     let payload;
