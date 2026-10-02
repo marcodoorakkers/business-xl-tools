@@ -86,7 +86,7 @@ async function autoCropImage(file: File): Promise<File> {
         }
 
         if (top >= bottom || left >= right) { URL.revokeObjectURL(url); resolve(file); return; }
-        if ((right - left) > dw * 0.95 && (bottom - top) > dh * 0.95) {
+        if ((right - left) > dw * 0.99 && (bottom - top) > dh * 0.99) {
           URL.revokeObjectURL(url); resolve(file); return;
         }
         if ((right - left) < dw * 0.30 || (bottom - top) < dh * 0.30) {
@@ -230,7 +230,7 @@ export default function GezinDossierPage() {
         setMembersLoaded(true);
         setStoragePreference((data.storagePreference ?? "local") as "local" | "onedrive" | "dropbox" | "googledrive");
         setFolderStructure((data.folderStructure ?? "by_subject") as "by_subject" | "by_person");
-        setAutoCrop(data.autoCrop ?? false);
+        setAutoCrop(data.autoCrop ?? true);
       })
       .catch(() => {});
 
