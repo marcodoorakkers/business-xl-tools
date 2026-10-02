@@ -18,7 +18,7 @@ workflows:
       - name: Restore app icon
         script: cp resources/icon.png ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png
       - name: Set build number
-        script: agvtool new-version -all $BUILD_NUMBER
+        script: cd ios/App && agvtool new-version -all $BUILD_NUMBER
       - name: Set up code signing
         script: xcode-project use-profiles
       - name: Build IPA
