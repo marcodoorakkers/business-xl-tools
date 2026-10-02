@@ -9,7 +9,7 @@ import Link from "next/link";
 import NMMPKLogo from "@/components/NMMPKLogo";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 
-type LoginStep = "credentials" | "mfa" | "biometric";
+type LoginStep = "credentials" | "mfa" | "biometric" | "biometric_prompt";
 
 const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY ?? "";
 const BIOMETRIC_KEY = "biometric_login_enabled";
@@ -23,6 +23,7 @@ export default function GezinLoginPage() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingRedirectUrl, setPendingRedirectUrl] = useState<string | null>(null);
   const captchaRef = useRef<HCaptcha>(null);
   const router = useRouter();
 
@@ -56,15 +57,15 @@ export default function GezinLoginPage() {
     }
   }
 
-  async function enableBiometricIfAvailable() {
+  async function checkBiometricAvailable(): Promise<boolean> {
     try {
       const { Capacitor } = await import("@capacitor/core");
-      if (!Capacitor.isNativePlatform()) return;
+      if (!Capacitor.isNativePlatform()) return false;
       const { BiometricAuth } = await import("@aparajita/capacitor-biometric-auth");
       const { isAvailable } = await BiometricAuth.checkBiometry();
-      if (isAvailable) localStorage.setItem(BIOMETRIC_KEY, "true");
+      return isAvailable;
     } catch {
-      // Niet beschikbaar
+      return false;
     }
   }
 
@@ -124,23 +125,43 @@ export default function GezinLoginPage() {
     await redirectAfterLogin(supabase, true);
   }
 
-  async function redirectAfterLogin(supabase: ReturnType<typeof createClient>, enableBiometric = false) {
-    if (enableBiometric) await enableBiometricIfAvailable();
+  async function computeRedirectUrl(supabase: ReturnType<typeof createClient>): Promise<string> {
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("subscription_status, credits")
-        .eq("id", user.id)
-        .single();
-      const hasAccess =
-        profile?.subscription_status === "active" ||
-        profile?.subscription_status === "trialing" ||
-        (profile?.credits ?? 0) > 0;
-      router.push(hasAccess ? "/dossier" : "/account");
-    } else {
-      router.push("/dossier");
+    if (!user) return "/dossier";
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("subscription_status, credits")
+      .eq("id", user.id)
+      .single();
+    const hasAccess =
+      profile?.subscription_status === "active" ||
+      profile?.subscription_status === "trialing" ||
+      (profile?.credits ?? 0) > 0;
+    return hasAccess ? "/dossier" : "/account";
+  }
+
+  async function redirectAfterLogin(supabase: ReturnType<typeof createClient>, checkBiometric = false) {
+    const url = await computeRedirectUrl(supabase);
+    if (checkBiometric && localStorage.getItem(BIOMETRIC_KEY) === null) {
+      const available = await checkBiometricAvailable();
+      if (available) {
+        setPendingRedirectUrl(url);
+        setStep("biometric_prompt");
+        setLoading(false);
+        return;
+      }
     }
+    router.push(url);
+  }
+
+  function handleBiometricYes() {
+    localStorage.setItem(BIOMETRIC_KEY, "true");
+    router.push(pendingRedirectUrl ?? "/dossier");
+  }
+
+  function handleBiometricNo() {
+    localStorage.setItem(BIOMETRIC_KEY, "false");
+    router.push(pendingRedirectUrl ?? "/dossier");
   }
 
   return (
@@ -219,6 +240,36 @@ export default function GezinLoginPage() {
               >
                 Wachtwoord gebruiken
               </button>
+            </div>
+          )}
+
+          {step === "biometric_prompt" && (
+            <div className="flex flex-col items-center gap-5 py-4">
+              <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center">
+                <svg viewBox="0 0 24 24" className="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2a5 5 0 0 1 5 5v1a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/>
+                  <path d="M9 14a6 6 0 0 0 6 0"/>
+                  <path d="M12 17v2M9 19h6"/>
+                </svg>
+              </div>
+              <div className="text-center">
+                <h1 className="text-xl font-bold text-gray-900 mb-2">Inloggen met Face ID?</h1>
+                <p className="text-sm text-gray-500">Volgende keer open je de app direct met Face ID — geen wachtwoord nodig.</p>
+              </div>
+              <div className="flex flex-col gap-3 w-full mt-2">
+                <button
+                  onClick={handleBiometricYes}
+                  className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 rounded-2xl transition-colors"
+                >
+                  Ja, gebruik Face ID
+                </button>
+                <button
+                  onClick={handleBiometricNo}
+                  className="text-sm text-gray-400 hover:text-gray-600 transition-colors py-1"
+                >
+                  Nee, liever niet
+                </button>
+              </div>
             </div>
           )}
 
