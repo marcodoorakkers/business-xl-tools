@@ -18,14 +18,38 @@ export default {
     const rawEmail = await new Response(message.raw).arrayBuffer();
     const email = await PostalMime.parse(rawEmail);
 
-    // Eerste PDF, afbeelding of Word-bijlage zoeken
-    const attachment = email.attachments?.find(
-      (a) =>
-        a.mimeType === "application/pdf" ||
-        a.mimeType?.startsWith("image/") ||
-        a.mimeType === DOCX ||
-        a.mimeType === "application/msword"
-    );
+    // Log alle bijlagen voor debugging
+    console.log("[email-worker] from:", email.from?.address, "subject:", email.subject);
+    console.log("[email-worker] attachments:", JSON.stringify(
+      (email.attachments ?? []).map((a) => ({
+        filename: a.filename,
+        mimeType: a.mimeType,
+        size: a.content?.byteLength ?? 0,
+      }))
+    ));
+
+    // PDF en documenten hebben prioriteit; afbeeldingen zonder naam zijn logo's in handtekeningen.
+    // application/octet-stream met .pdf extensie wordt ook herkend.
+    const attachment =
+      email.attachments?.find((a) => a.mimeType === "application/pdf") ||
+      email.attachments?.find(
+        (a) =>
+          a.mimeType === "application/octet-stream" &&
+          a.filename?.toLowerCase().endsWith(".pdf")
+      ) ||
+      email.attachments?.find(
+        (a) => a.mimeType === DOCX || a.mimeType === "application/msword"
+      ) ||
+      email.attachments?.find(
+        (a) =>
+          (a.mimeType === "image/jpeg" ||
+            a.mimeType === "image/jpg" ||
+            a.mimeType === "image/png") &&
+          a.filename &&
+          a.filename.length > 0
+      );
+
+    console.log("[email-worker] gekozen bijlage:", attachment ? `${attachment.filename} (${attachment.mimeType})` : "geen");
 
     let payload;
 

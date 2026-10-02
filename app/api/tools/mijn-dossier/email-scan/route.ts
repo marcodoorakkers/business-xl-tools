@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import Anthropic from "@anthropic-ai/sdk";
 import { getValidAccessToken, uploadFileToOneDrive } from "@/lib/onedrive";
 import { getValidDropboxToken, forceRefreshDropboxToken, uploadFileToDropbox } from "@/lib/dropbox";
+import { getValidGoogleDriveToken, uploadFileToGoogleDrive } from "@/lib/googledrive";
 import { convertToPdf } from "@/lib/convert-to-pdf";
 
 export const runtime = "nodejs";
@@ -48,7 +49,9 @@ export async function POST(req: NextRequest) {
   const hasCredits = (profile.credits ?? 0) > 0;
   if (!hasSubscription && !hasCredits) return NextResponse.json({ skipped: true });
 
-  // Allowlist check: alleen afzenders in de lijst worden verwerkt
+  // Allowlist check: alleen afzenders in de lijst worden verwerkt.
+  // Uitzondering: als de afzender het eigen e-mailadres van de gebruiker is,
+  // is het een forward vanuit de eigen inbox → altijd vertrouwd.
   const { data: allowlist } = await admin
     .from("scan_email_allowlist")
     .select("email")
@@ -58,7 +61,12 @@ export async function POST(req: NextRequest) {
     const senderEmail = from.toLowerCase().trim();
     const allowed = allowlist?.some((a) => a.email.toLowerCase() === senderEmail) ?? false;
     if (!allowed) {
-      return NextResponse.json({ skipped: true, reason: "sender_not_allowed" });
+      // Controleer of het de gebruiker zelf is die doorstuurt
+      const { data: { user: profileUser } } = await admin.auth.admin.getUserById(profile.id);
+      const ownerEmail = profileUser?.email?.toLowerCase() ?? "";
+      if (ownerEmail && senderEmail !== ownerEmail) {
+        return NextResponse.json({ skipped: true, reason: "sender_not_allowed" });
+      }
     }
   } else {
     // Geen afzender bekend → weigeren
@@ -67,7 +75,13 @@ export async function POST(req: NextRequest) {
 
   // Base64 → Buffer → altijd omzetten naar PDF — nooit opslaan, alleen in memory
   const rawBuffer = Buffer.from(data, "base64");
-  const pdfBuffer = await convertToPdf(rawBuffer, contentType);
+  let pdfBuffer: Buffer;
+  try {
+    pdfBuffer = await convertToPdf(rawBuffer, contentType);
+  } catch (err) {
+    console.error("[email-scan] convertToPdf mislukt", { contentType, filename, from, err });
+    return NextResponse.json({ error: "Bestandstype niet ondersteund", contentType }, { status: 422 });
+  }
   const pdfBase64 = pdfBuffer.toString("base64");
 
   // Eerder gescande afzenders ophalen voor consistente categorisering
@@ -245,6 +259,19 @@ Formaat:
           }
         }
       }
+    }
+  }
+
+  if (!fileUrl) {
+    const googleDriveToken = await getValidGoogleDriveToken(profile.id);
+    if (googleDriveToken) {
+      const { data: tokenRow } = await admin.from("google_drive_tokens").select("archive_root").eq("user_id", profile.id).single();
+      const archiveRoot = tokenRow?.archive_root ?? "MijnDossier";
+      try {
+        const result = await uploadFileToGoogleDrive(googleDriveToken, `${archiveRoot}/${mappad}`, fullFilename, pdfBuffer, "application/pdf");
+        fileUrl = result.webUrl;
+        storage = "googledrive";
+      } catch { /* upload mislukt */ }
     }
   }
 
