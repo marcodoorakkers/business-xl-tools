@@ -130,6 +130,7 @@ function ArchiefContent() {
   const [folderStructure, setFolderStructure] = useState<"by_subject" | "by_person">("by_subject");
   const [archiveRoot, setArchiveRoot] = useState("MijnDossier");
   const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [storageConnected, setStorageConnected] = useState<boolean | null>(null);
   const [drillPath, setDrillPath] = useState<string[]>([]);
   const [autoMappingLoading, setAutoMappingLoading] = useState(false);
   const [autoMappingDone, setAutoMappingDone] = useState<number | null>(null);
@@ -246,11 +247,12 @@ function ArchiefContent() {
       .catch(() => {});
     fetch("/api/tools/mijn-dossier/onedrive/status")
       .then((r) => r.json())
-      .then((data: { folderStructure?: string; archiveRoot?: string }) => {
+      .then((data: { folderStructure?: string; archiveRoot?: string; connected?: boolean; dropboxConnected?: boolean; googleDriveConnected?: boolean; storagePreference?: string }) => {
         if (data.folderStructure === "by_person" || data.folderStructure === "by_subject") {
           setFolderStructure(data.folderStructure);
         }
         if (data.archiveRoot) setArchiveRoot(data.archiveRoot);
+        setStorageConnected(!!(data.connected || data.dropboxConnected || data.googleDriveConnected));
       })
       .catch(() => {})
       .finally(() => setSettingsLoaded(true));
@@ -335,6 +337,22 @@ function ArchiefContent() {
             </button>
           </div>
         </div>
+
+        {/* Cloudopslag-banner — toon als geen opslag gekoppeld */}
+        {settingsLoaded && storageConnected === false && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5 flex items-start gap-3">
+            <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+            </svg>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-amber-800 mb-0.5">Geen cloudopslag gekoppeld</p>
+              <p className="text-sm text-amber-700">Koppel OneDrive, Dropbox of Google Drive zodat je documenten altijd vindbaar zijn.</p>
+            </div>
+            <a href="/dossier/instellingen" className="text-sm font-semibold text-amber-700 hover:text-amber-900 whitespace-nowrap flex-shrink-0 mt-0.5">
+              Koppelen →
+            </a>
+          </div>
+        )}
 
         {viewMode === "list" ? (
           <>
